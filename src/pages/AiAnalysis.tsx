@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { DisclaimerBanner } from "@/components/ui/disclaimer-banner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -10,6 +9,11 @@ import {
   AlertCircle,
   Image as ImageIcon,
   X,
+  Sparkles,
+  Eye,
+  CheckCircle2,
+  AlertTriangle,
+  Zap,
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -17,9 +21,11 @@ interface AnalysisResult {
     name: string;
     description: string;
     likelihood: "low" | "medium" | "high";
+    confidence?: number;
   }[];
   observations: string[];
   recommendation: string;
+  detailedAnalysis?: string;
 }
 
 export default function AiAnalysis() {
@@ -90,60 +96,81 @@ export default function AiAnalysis() {
     }
   };
 
-  const getLikelihoodColor = (likelihood: string) => {
+  const getLikelihoodStyles = (likelihood: string) => {
     switch (likelihood) {
       case "low":
-        return "bg-medical-green/10 text-medical-green border-medical-green/20";
+        return {
+          bg: "bg-medical-green/10",
+          border: "border-medical-green/20",
+          text: "text-medical-green",
+          icon: CheckCircle2,
+        };
       case "medium":
-        return "bg-medical-warning/10 text-medical-warning border-medical-warning/20";
+        return {
+          bg: "bg-medical-warning/10",
+          border: "border-medical-warning/20",
+          text: "text-medical-warning",
+          icon: AlertTriangle,
+        };
       case "high":
-        return "bg-destructive/10 text-destructive border-destructive/20";
+        return {
+          bg: "bg-destructive/10",
+          border: "border-destructive/20",
+          text: "text-destructive",
+          icon: AlertCircle,
+        };
       default:
-        return "bg-muted text-muted-foreground";
+        return {
+          bg: "bg-muted",
+          border: "border-border",
+          text: "text-muted-foreground",
+          icon: Eye,
+        };
     }
   };
 
   return (
-    <Layout>
-      <div className="container py-8 md:py-12">
+    <Layout showFooterDisclaimer>
+      <div className="container py-12 md:py-16">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-medical-purple/10 text-medical-purple text-sm font-medium mb-4">
-            <Camera className="h-4 w-4" />
-            AI Image Analysis
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
+            <Camera className="h-4 w-4 text-medical-purple" />
+            <span className="text-gradient">Precision AI Analysis</span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Analyze Skin Conditions
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            AI <span className="text-gradient">Image</span> Analysis
           </h1>
-          <p className="text-muted-foreground">
-            Upload a photo of skin rashes, inflammation, or other visible conditions
-            for AI-powered visual analysis.
+          <p className="text-lg text-muted-foreground">
+            Upload a photo of skin conditions for detailed AI-powered visual analysis with high accuracy.
           </p>
         </div>
 
-        <DisclaimerBanner className="max-w-3xl mx-auto mb-8" />
-
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Upload Area */}
-          <div className="medical-card mb-6">
-            <h2 className="font-display text-lg font-semibold text-foreground mb-4">
+          <div className="glass-card p-8 rounded-3xl mb-6">
+            <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Upload className="h-5 w-5 text-primary" />
               Upload Image
             </h2>
 
             {!image ? (
               <label
                 htmlFor="image-upload"
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition-colors bg-muted/30"
+                className="flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-border rounded-3xl cursor-pointer hover:border-primary/50 transition-all bg-muted/30 hover:bg-muted/50"
               >
                 <div className="flex flex-col items-center justify-center py-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
-                    <Upload className="h-7 w-7" />
+                  <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-medical-purple mb-6">
+                    <Upload className="h-10 w-10 text-white" />
                   </div>
-                  <p className="mb-2 text-sm text-foreground font-medium">
+                  <p className="mb-2 text-lg text-foreground font-semibold">
                     Click to upload or drag and drop
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     PNG, JPG, WEBP up to 10MB
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    For best results, use clear, well-lit images
                   </p>
                 </div>
                 <input
@@ -160,16 +187,16 @@ export default function AiAnalysis() {
                 <img
                   src={image}
                   alt="Uploaded image"
-                  className="w-full max-h-96 object-contain rounded-2xl"
+                  className="w-full max-h-[400px] object-contain rounded-2xl bg-muted"
                 />
                 <button
                   onClick={clearImage}
-                  className="absolute top-2 right-2 p-2 rounded-xl bg-background/90 text-foreground hover:bg-background transition-colors shadow-md"
+                  className="absolute top-3 right-3 p-2.5 rounded-xl bg-background/90 text-foreground hover:bg-destructive hover:text-white transition-colors shadow-lg"
                   aria-label="Remove image"
                 >
                   <X className="h-5 w-5" />
                 </button>
-                <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                   <ImageIcon className="h-4 w-4" />
                   {fileName}
                 </div>
@@ -178,9 +205,9 @@ export default function AiAnalysis() {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive mb-6">
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-destructive/10 text-destructive mb-6">
               <AlertCircle className="h-5 w-5 shrink-0" />
-              <p className="text-sm">{error}</p>
+              <p className="font-medium">{error}</p>
             </div>
           )}
 
@@ -188,7 +215,7 @@ export default function AiAnalysis() {
             onClick={analyzeImage}
             disabled={!image || isAnalyzing}
             size="lg"
-            className="w-full gradient-primary text-primary-foreground border-0 rounded-xl"
+            className="w-full gradient-primary text-primary-foreground border-0 rounded-2xl h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             {isAnalyzing ? (
               <>
@@ -197,7 +224,7 @@ export default function AiAnalysis() {
               </>
             ) : (
               <>
-                <Camera className="mr-2 h-5 w-5" />
+                <Zap className="mr-2 h-5 w-5" />
                 Analyze Image
               </>
             )}
@@ -205,69 +232,88 @@ export default function AiAnalysis() {
 
           {/* Results */}
           {results && (
-            <div className="mt-8 space-y-6 animate-fade-up">
+            <div className="mt-12 space-y-8 animate-fade-up">
               {/* Observations */}
               {results.observations && results.observations.length > 0 && (
-                <div className="medical-card">
-                  <h2 className="font-display text-lg font-semibold text-foreground mb-4">
-                    Observations
+                <div className="glass-card p-6 rounded-2xl">
+                  <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Eye className="h-5 w-5 text-primary" />
+                    AI Observations
                   </h2>
-                  <ul className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {results.observations.map((observation, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="h-1.5 w-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                        {observation}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Possible Conditions */}
-              {results.conditions && results.conditions.length > 0 && (
-                <div>
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
-                    Possible Conditions
-                  </h2>
-                  <div className="space-y-4">
-                    {results.conditions.map((condition, index) => (
-                      <div key={index} className="medical-card">
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <h3 className="font-display text-lg font-semibold text-foreground">
-                            {condition.name}
-                          </h3>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium border shrink-0 ${getLikelihoodColor(
-                              condition.likelihood
-                            )}`}
-                          >
-                            {condition.likelihood.charAt(0).toUpperCase() +
-                              condition.likelihood.slice(1)}{" "}
-                            Likelihood
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground text-sm">
-                          {condition.description}
-                        </p>
+                      <div 
+                        key={index} 
+                        className="flex items-start gap-3 p-3 rounded-xl bg-muted/50"
+                      >
+                        <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">{observation}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Recommendation */}
-              {results.recommendation && (
-                <div className="medical-card bg-primary/5 border border-primary/20">
-                  <h2 className="font-display text-lg font-semibold text-foreground mb-2">
-                    Recommendation
+              {/* Possible Conditions */}
+              {results.conditions && results.conditions.length > 0 && (
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">
+                    Possible <span className="text-gradient">Conditions</span>
                   </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {results.recommendation}
-                  </p>
+                  <div className="space-y-4">
+                    {results.conditions.map((condition, index) => {
+                      const styles = getLikelihoodStyles(condition.likelihood);
+                      const LikelihoodIcon = styles.icon;
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className={`glass-card p-6 rounded-2xl border-2 ${styles.border}`}
+                        >
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <div className="flex items-start gap-4">
+                              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${styles.bg}`}>
+                                <LikelihoodIcon className={`h-6 w-6 ${styles.text}`} />
+                              </div>
+                              <div>
+                                <h3 className="font-display text-xl font-bold text-foreground mb-1">
+                                  {condition.name}
+                                </h3>
+                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${styles.bg} ${styles.text}`}>
+                                  <LikelihoodIcon className="h-3 w-3" />
+                                  {condition.likelihood.charAt(0).toUpperCase() + condition.likelihood.slice(1)} Likelihood
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {condition.description}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
-              <DisclaimerBanner dismissible={false} />
+              {/* Recommendation */}
+              {results.recommendation && (
+                <div className="glass-card p-6 rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                      <Sparkles className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground mb-2">
+                        AI Recommendation
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {results.recommendation}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

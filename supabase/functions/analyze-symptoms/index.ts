@@ -19,13 +19,30 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: `You are a medical information assistant. Analyze symptoms and suggest 3 possible conditions. Return JSON only: {"conditions":[{"name":"","description":"","possibleCause":"","severity":"low|medium|high"}]}. Never diagnose - provide educational information only.` },
-          { role: "user", content: `Analyze these symptoms: ${symptoms}` }
+          { 
+            role: "system", 
+            content: `You are an expert medical information assistant with deep knowledge of symptom analysis. 
+Your task is to analyze symptoms and provide accurate, detailed condition assessments.
+
+IMPORTANT GUIDELINES:
+1. Analyze ALL provided symptoms together to find conditions that match the symptom pattern
+2. Consider symptom combinations - some conditions have specific symptom clusters
+3. Prioritize conditions by how well they match ALL symptoms, not just some
+4. Include both common and less common but relevant conditions
+5. Provide detailed, medically accurate descriptions
+6. Always include severity based on symptom combination risk
+7. Be thorough in explaining possible causes
+8. NEVER diagnose - this is educational information only
+
+Return exactly 3 conditions ranked by likelihood of matching the symptom pattern.` 
+          },
+          { role: "user", content: `Analyze these symptoms thoroughly and identify the 3 most likely conditions: ${symptoms}. Consider how these symptoms interact and what conditions commonly present with this combination.` }
         ],
         tools: [{
           type: "function",
           function: {
             name: "return_conditions",
+            description: "Return the analyzed conditions based on symptom pattern matching",
             parameters: {
               type: "object",
               properties: {
@@ -34,10 +51,10 @@ serve(async (req) => {
                   items: {
                     type: "object",
                     properties: {
-                      name: { type: "string" },
-                      description: { type: "string" },
-                      possibleCause: { type: "string" },
-                      severity: { type: "string", enum: ["low", "medium", "high"] }
+                      name: { type: "string", description: "Medical condition name" },
+                      description: { type: "string", description: "Detailed description of the condition and why it matches the symptoms (2-3 sentences)" },
+                      possibleCause: { type: "string", description: "Detailed explanation of what causes this condition (2-3 sentences)" },
+                      severity: { type: "string", enum: ["low", "medium", "high"], description: "Severity level based on symptom combination" }
                     },
                     required: ["name", "description", "possibleCause", "severity"]
                   }

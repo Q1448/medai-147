@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart, Stethoscope } from "lucide-react";
+import { Menu, X, Heart, Stethoscope, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/ai-analysis", label: "AI Analysis" },
   { href: "/medicines", label: "Medicines" },
   { href: "/hospitals", label: "Hospitals" },
+  { href: "/about", label: "About" },
 ];
 
 export function Header() {
@@ -18,28 +19,34 @@ export function Header() {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-transform group-hover:scale-105">
-            <Stethoscope className="h-5 w-5" />
-            <Heart className="absolute -right-1 -top-1 h-3.5 w-3.5 text-accent animate-pulse-soft" />
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-18 items-center justify-between py-3">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-transform group-hover:scale-105 shadow-lg">
+            <Stethoscope className="h-6 w-6" />
+            <Heart className="absolute -right-1 -top-1 h-4 w-4 text-accent animate-pulse-soft" />
           </div>
-          <span className="font-display text-xl font-bold text-foreground">
-            MedAI<span className="text-primary">+</span>
-          </span>
+          <div className="flex flex-col">
+            <span className="font-display text-xl font-bold text-foreground leading-tight">
+              MedAI<span className="text-gradient">+</span>
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+              <Sparkles className="h-2.5 w-2.5" />
+              AI Health Assistant
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               className={cn(
-                "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                "px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
                 location.pathname === link.href
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary text-primary-foreground shadow-md"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
@@ -52,7 +59,7 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="lg:hidden rounded-xl"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -62,7 +69,7 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background animate-fade-in">
+        <div className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl animate-fade-in">
           <nav className="container py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -70,9 +77,9 @@ export function Header() {
                 to={link.href}
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  "px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                  "px-4 py-3.5 text-sm font-medium rounded-xl transition-colors",
                   location.pathname === link.href
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
