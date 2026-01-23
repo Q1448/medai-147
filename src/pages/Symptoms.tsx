@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { DisclaimerBanner } from "@/components/ui/disclaimer-banner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Activity,
@@ -17,6 +14,10 @@ import {
   Eye,
   Ear,
   Wind,
+  Sparkles,
+  Stethoscope,
+  AlertTriangle,
+  CheckCircle2,
 } from "lucide-react";
 
 const commonSymptoms = [
@@ -40,6 +41,7 @@ interface AnalysisResult {
     description: string;
     possibleCause: string;
     severity: "low" | "medium" | "high";
+    matchScore?: number;
   }[];
 }
 
@@ -92,44 +94,62 @@ export default function Symptoms() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityStyles = (severity: string) => {
     switch (severity) {
       case "low":
-        return "bg-medical-green/10 text-medical-green border-medical-green/20";
+        return {
+          bg: "bg-medical-green/10",
+          border: "border-medical-green/20",
+          text: "text-medical-green",
+          icon: CheckCircle2,
+        };
       case "medium":
-        return "bg-medical-warning/10 text-medical-warning border-medical-warning/20";
+        return {
+          bg: "bg-medical-warning/10",
+          border: "border-medical-warning/20",
+          text: "text-medical-warning",
+          icon: AlertTriangle,
+        };
       case "high":
-        return "bg-destructive/10 text-destructive border-destructive/20";
+        return {
+          bg: "bg-destructive/10",
+          border: "border-destructive/20",
+          text: "text-destructive",
+          icon: AlertCircle,
+        };
       default:
-        return "bg-muted text-muted-foreground";
+        return {
+          bg: "bg-muted",
+          border: "border-border",
+          text: "text-muted-foreground",
+          icon: Activity,
+        };
     }
   };
 
   return (
-    <Layout>
-      <div className="container py-8 md:py-12">
+    <Layout showFooterDisclaimer>
+      <div className="container py-12 md:py-16">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Activity className="h-4 w-4" />
-            Symptoms Checker
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
+            <Activity className="h-4 w-4 text-primary" />
+            <span className="text-gradient">Advanced Symptom Analysis</span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Analyze Your Symptoms
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Analyze Your <span className="text-gradient">Symptoms</span>
           </h1>
-          <p className="text-muted-foreground">
-            Select your symptoms or describe them in detail. Our AI will analyze
-            them and suggest possible conditions.
+          <p className="text-lg text-muted-foreground">
+            Select your symptoms and describe them in detail for more accurate condition identification.
           </p>
         </div>
 
-        <DisclaimerBanner className="max-w-3xl mx-auto mb-8" />
-
-        {/* Symptoms Selection */}
-        <div className="max-w-3xl mx-auto">
-          <div className="medical-card mb-6">
-            <h2 className="font-display text-lg font-semibold text-foreground mb-4">
-              Common Symptoms
+        <div className="max-w-4xl mx-auto">
+          {/* Symptoms Selection */}
+          <div className="glass-card p-8 rounded-3xl mb-6">
+            <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Stethoscope className="h-5 w-5 text-primary" />
+              Select Your Symptoms
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {commonSymptoms.map((symptom) => {
@@ -139,13 +159,17 @@ export default function Symptoms() {
                   <button
                     key={symptom.id}
                     onClick={() => toggleSymptom(symptom.id)}
-                    className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 ${
                       isSelected
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border bg-background hover:border-primary/50 text-foreground"
+                        ? "border-primary bg-primary/10 text-primary shadow-md"
+                        : "border-border bg-background hover:border-primary/50 text-foreground hover:bg-muted/50"
                     }`}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                      isSelected ? "bg-primary text-white" : "bg-muted"
+                    }`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
                     <span className="text-sm font-medium">{symptom.label}</span>
                   </button>
                 );
@@ -153,22 +177,26 @@ export default function Symptoms() {
             </div>
           </div>
 
-          <div className="medical-card mb-6">
-            <h2 className="font-display text-lg font-semibold text-foreground mb-4">
-              Additional Symptoms
+          <div className="glass-card p-8 rounded-3xl mb-6">
+            <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              Describe in Detail
             </h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              The more details you provide, the more accurate the analysis will be.
+            </p>
             <Textarea
-              placeholder="Describe any other symptoms you're experiencing in detail..."
+              placeholder="Describe your symptoms in detail: When did they start? How severe are they? Are there any triggers? Include any other relevant information..."
               value={additionalSymptoms}
               onChange={(e) => setAdditionalSymptoms(e.target.value)}
-              className="min-h-[120px] resize-none"
+              className="min-h-[140px] resize-none rounded-2xl text-base"
             />
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive mb-6">
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-destructive/10 text-destructive mb-6">
               <AlertCircle className="h-5 w-5 shrink-0" />
-              <p className="text-sm">{error}</p>
+              <p className="font-medium">{error}</p>
             </div>
           )}
 
@@ -176,7 +204,7 @@ export default function Symptoms() {
             onClick={analyzeSymptoms}
             disabled={isAnalyzing}
             size="lg"
-            className="w-full gradient-primary text-primary-foreground border-0 rounded-xl"
+            className="w-full gradient-primary text-primary-foreground border-0 rounded-2xl h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             {isAnalyzing ? (
               <>
@@ -185,7 +213,7 @@ export default function Symptoms() {
               </>
             ) : (
               <>
-                <Activity className="mr-2 h-5 w-5" />
+                <Sparkles className="mr-2 h-5 w-5" />
                 Analyze Symptoms
               </>
             )}
@@ -193,40 +221,57 @@ export default function Symptoms() {
 
           {/* Results */}
           {results && results.conditions && (
-            <div className="mt-8 space-y-4 animate-fade-up">
-              <h2 className="font-display text-xl font-semibold text-foreground">
-                Possible Conditions
-              </h2>
-              {results.conditions.map((condition, index) => (
-                <div key={index} className="medical-card">
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <h3 className="font-display text-lg font-semibold text-foreground">
-                      {condition.name}
-                    </h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${getSeverityColor(
-                        condition.severity
-                      )}`}
+            <div className="mt-12 space-y-6 animate-fade-up">
+              <div className="text-center">
+                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+                  Possible <span className="text-gradient">Conditions</span>
+                </h2>
+                <p className="text-muted-foreground">
+                  Based on your symptoms, here are the most likely conditions
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {results.conditions.map((condition, index) => {
+                  const styles = getSeverityStyles(condition.severity);
+                  const SeverityIcon = styles.icon;
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className={`glass-card p-6 rounded-2xl border-2 ${styles.border}`}
                     >
-                      {condition.severity.charAt(0).toUpperCase() +
-                        condition.severity.slice(1)}{" "}
-                      Severity
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground mb-3">
-                    {condition.description}
-                  </p>
-                  <div className="text-sm">
-                    <span className="font-medium text-foreground">
-                      Possible Cause:{" "}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {condition.possibleCause}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <DisclaimerBanner className="mt-6" dismissible={false} />
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex items-start gap-4">
+                          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${styles.bg}`}>
+                            <SeverityIcon className={`h-6 w-6 ${styles.text}`} />
+                          </div>
+                          <div>
+                            <h3 className="font-display text-xl font-bold text-foreground mb-1">
+                              {condition.name}
+                            </h3>
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${styles.bg} ${styles.text}`}>
+                              <SeverityIcon className="h-3 w-3" />
+                              {condition.severity.charAt(0).toUpperCase() + condition.severity.slice(1)} Severity
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground mb-4 leading-relaxed">
+                        {condition.description}
+                      </p>
+                      <div className="p-4 rounded-xl bg-muted/50">
+                        <span className="font-semibold text-foreground text-sm">
+                          Possible Cause:
+                        </span>
+                        <p className="text-muted-foreground text-sm mt-1">
+                          {condition.possibleCause}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

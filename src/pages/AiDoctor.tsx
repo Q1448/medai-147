@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { DisclaimerBanner } from "@/components/ui/disclaimer-banner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, User, Send, Loader2, Stethoscope, AlertCircle } from "lucide-react";
+import { Bot, User, Send, Loader2, Stethoscope, AlertCircle, Sparkles, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -14,11 +13,18 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-doctor`;
 
+const suggestedQuestions = [
+  "What are the symptoms of the flu?",
+  "How can I improve my sleep quality?",
+  "What should I do for a headache?",
+  "When should I see a doctor for a cough?",
+];
+
 export default function AiDoctor() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your AI medical assistant. I can help you understand symptoms, explain medical conditions, and provide general health information. How can I help you today?\n\n**Important:** I cannot diagnose conditions or prescribe treatments. Always consult a healthcare professional for medical advice.",
+      content: "Hello! I'm your advanced AI medical assistant powered by the latest AI technology. I can provide comprehensive information about:\n\n• **Symptoms & Conditions** - Detailed explanations of medical symptoms\n• **Treatment Options** - General treatment information and home remedies\n• **Medication Info** - How medicines work and their effects\n• **Specialist Guidance** - Which doctor to consult for specific issues\n• **Preventive Care** - Tips for maintaining good health\n\n**Important:** I provide educational information only. For medical emergencies, call 103 immediately. Always consult a healthcare professional for diagnosis and treatment.\n\nHow can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -32,10 +38,11 @@ export default function AiDoctor() {
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input.trim() };
+    const userMessage: Message = { role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -124,41 +131,45 @@ export default function AiDoctor() {
   };
 
   return (
-    <Layout>
+    <Layout showFooterDisclaimer>
       <div className="container py-8 md:py-12">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-medical-blue/10 text-medical-blue text-sm font-medium mb-4">
-            <Bot className="h-4 w-4" />
-            AI Medical Assistant
+        <div className="max-w-3xl mx-auto text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
+            <Brain className="h-4 w-4 text-medical-blue" />
+            <span className="text-gradient">Powered by Advanced AI</span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Talk to AI Doctor
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            AI <span className="text-gradient">Doctor</span> Assistant
           </h1>
-          <p className="text-muted-foreground">
-            Ask questions about symptoms, conditions, and general health information.
+          <p className="text-lg text-muted-foreground">
+            Get comprehensive health information from our powerful AI medical assistant.
           </p>
         </div>
 
-        <DisclaimerBanner className="max-w-3xl mx-auto mb-6" />
-
         {/* Chat Container */}
-        <div className="max-w-3xl mx-auto">
-          <div className="medical-card p-0 overflow-hidden">
+        <div className="max-w-4xl mx-auto">
+          <div className="glass-card rounded-3xl overflow-hidden shadow-xl">
             {/* Chat Header */}
-            <div className="flex items-center gap-3 p-4 border-b border-border bg-muted/30">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <Stethoscope className="h-5 w-5" />
+            <div className="flex items-center gap-4 p-5 border-b border-border bg-gradient-to-r from-primary/5 to-medical-blue/5">
+              <div className="relative">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary text-primary-foreground shadow-lg">
+                  <Stethoscope className="h-7 w-7" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-medical-green border-2 border-background pulse-dot" />
               </div>
               <div>
-                <h3 className="font-display font-semibold text-foreground">AI Doctor</h3>
-                <p className="text-xs text-muted-foreground">Online • Ready to help</p>
+                <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                  AI Doctor
+                  <Sparkles className="h-4 w-4 text-primary" />
+                </h3>
+                <p className="text-sm text-muted-foreground">Online • Ready to help 24/7</p>
               </div>
             </div>
 
             {/* Messages */}
-            <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
-              <div className="space-y-4">
+            <ScrollArea className="h-[450px] p-5" ref={scrollRef}>
+              <div className="space-y-5">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -168,69 +179,91 @@ export default function AiDoctor() {
                     )}
                   >
                     {message.role === "assistant" && (
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <Bot className="h-4 w-4" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
+                        <Bot className="h-5 w-5" />
                       </div>
                     )}
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-4 py-3 text-sm",
+                        "max-w-[80%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
                         message.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
+                          ? "bg-gradient-to-br from-primary to-medical-sky text-white rounded-br-md shadow-lg"
                           : "bg-muted text-foreground rounded-bl-md"
                       )}
                     >
                       <div className="whitespace-pre-wrap">{message.content}</div>
                     </div>
                     {message.role === "user" && (
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
-                        <User className="h-4 w-4" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-muted text-foreground">
+                        <User className="h-5 w-5" />
                       </div>
                     )}
                   </div>
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3 justify-start">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Bot className="h-4 w-4" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
+                      <Bot className="h-5 w-5" />
                     </div>
-                    <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    <div className="bg-muted rounded-2xl rounded-bl-md px-5 py-4">
+                      <div className="flex gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
             </ScrollArea>
 
+            {/* Suggested Questions */}
+            {messages.length === 1 && (
+              <div className="px-5 pb-4">
+                <p className="text-xs text-muted-foreground mb-2 font-medium">Quick questions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestedQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => sendMessage(question)}
+                      className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Error */}
             {error && (
-              <div className="mx-4 mb-4 flex items-center gap-2 p-3 rounded-xl bg-destructive/10 text-destructive text-sm">
+              <div className="mx-5 mb-4 flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive text-sm font-medium">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </div>
             )}
 
             {/* Input */}
-            <div className="p-4 border-t border-border bg-muted/30">
+            <div className="p-5 border-t border-border bg-muted/30">
               <div className="flex gap-3">
                 <Textarea
-                  placeholder="Describe your symptoms or ask a health question..."
+                  placeholder="Ask about symptoms, conditions, treatments, or any health-related questions..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   disabled={isLoading}
-                  className="min-h-[60px] max-h-[120px] resize-none rounded-xl"
+                  className="min-h-[60px] max-h-[120px] resize-none rounded-2xl text-base"
                 />
                 <Button
-                  onClick={sendMessage}
+                  onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
                   size="icon"
-                  className="h-[60px] w-[60px] shrink-0 gradient-primary text-primary-foreground border-0 rounded-xl"
+                  className="h-[60px] w-[60px] shrink-0 gradient-primary text-primary-foreground border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all"
                 >
                   {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-6 w-6 animate-spin" />
                   ) : (
-                    <Send className="h-5 w-5" />
+                    <Send className="h-6 w-6" />
                   )}
                 </Button>
               </div>

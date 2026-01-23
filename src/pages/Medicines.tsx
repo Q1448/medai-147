@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { DisclaimerBanner } from "@/components/ui/disclaimer-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Pill, Loader2, AlertCircle, Search } from "lucide-react";
+import { 
+  ShoppingBag, 
+  Loader2, 
+  AlertCircle, 
+  Search, 
+  Pill, 
+  DollarSign, 
+  Clock, 
+  AlertTriangle,
+  Package,
+  Info,
+  Sparkles
+} from "lucide-react";
 
 interface Medicine {
   name: string;
@@ -14,6 +24,8 @@ interface Medicine {
   dosage: string;
   instructions: string;
   warnings: string[];
+  estimatedPrice: string;
+  duration: string;
 }
 
 interface MedicineResult {
@@ -22,7 +34,7 @@ interface MedicineResult {
   generalAdvice: string;
 }
 
-const commonConditions = [
+const popularConditions = [
   "Headache",
   "Cold & Flu",
   "Fever",
@@ -30,9 +42,9 @@ const commonConditions = [
   "Stomach Pain",
   "Sore Throat",
   "Back Pain",
-  "Skin Rash",
+  "Cough",
   "Insomnia",
-  "Anxiety",
+  "Muscle Pain",
 ];
 
 export default function Medicines() {
@@ -45,7 +57,7 @@ export default function Medicines() {
 
   const searchMedicines = async () => {
     if (!condition.trim()) {
-      setError("Please enter or select a condition.");
+      setError("Please enter a condition or disease.");
       return;
     }
 
@@ -73,52 +85,49 @@ export default function Medicines() {
   };
 
   return (
-    <Layout>
-      <div className="container py-8 md:py-12">
+    <Layout showFooterDisclaimer>
+      <div className="container py-12 md:py-16">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-medical-green/10 text-medical-green text-sm font-medium mb-4">
-            <Pill className="h-4 w-4" />
-            Medicine Guide
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
+            <ShoppingBag className="h-4 w-4 text-medical-green" />
+            <span className="text-gradient">Medicine Shop</span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Find Medication Information
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Find <span className="text-gradient">Medicines</span> for Your Condition
           </h1>
-          <p className="text-muted-foreground">
-            Search for medicine recommendations based on your condition, age, and weight.
+          <p className="text-lg text-muted-foreground">
+            Enter your disease or condition to get medicine recommendations with prices and usage instructions.
           </p>
         </div>
 
-        <DisclaimerBanner className="max-w-3xl mx-auto mb-8" />
-
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Search Form */}
-          <div className="medical-card mb-6">
-            <h2 className="font-display text-lg font-semibold text-foreground mb-4">
-              Search Medicines
-            </h2>
-
-            <div className="space-y-4">
-              {/* Condition */}
+          <div className="glass-card p-8 rounded-3xl mb-8">
+            <div className="space-y-6">
+              {/* Condition Input */}
               <div>
-                <Label htmlFor="condition" className="text-foreground mb-2 block">
-                  Condition or Symptom
+                <Label htmlFor="condition" className="text-foreground text-base font-semibold mb-3 block">
+                  What's your condition or disease?
                 </Label>
-                <Input
-                  id="condition"
-                  placeholder="e.g., Headache, Cold, Fever..."
-                  value={condition}
-                  onChange={(e) => setCondition(e.target.value)}
-                  className="rounded-xl"
-                />
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {commonConditions.map((c) => (
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="condition"
+                    placeholder="e.g., Headache, Flu, Allergies, Back Pain..."
+                    value={condition}
+                    onChange={(e) => setCondition(e.target.value)}
+                    className="pl-12 h-14 rounded-2xl text-base border-2 focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {popularConditions.map((c) => (
                     <button
                       key={c}
                       onClick={() => setCondition(c)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                      className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
                         condition === c
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-md"
                           : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
@@ -131,22 +140,22 @@ export default function Medicines() {
               {/* Age & Weight */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="age" className="text-foreground mb-2 block">
+                  <Label htmlFor="age" className="text-foreground font-medium mb-2 block">
                     Age (optional)
                   </Label>
                   <Input
                     id="age"
                     type="number"
-                    placeholder="e.g., 30"
+                    placeholder="e.g., 25"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="rounded-xl"
+                    className="h-12 rounded-xl"
                     min="0"
                     max="120"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight" className="text-foreground mb-2 block">
+                  <Label htmlFor="weight" className="text-foreground font-medium mb-2 block">
                     Weight in kg (optional)
                   </Label>
                   <Input
@@ -155,7 +164,7 @@ export default function Medicines() {
                     placeholder="e.g., 70"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    className="rounded-xl"
+                    className="h-12 rounded-xl"
                     min="0"
                     max="300"
                   />
@@ -165,9 +174,9 @@ export default function Medicines() {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive mb-6">
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-destructive/10 text-destructive mb-6">
               <AlertCircle className="h-5 w-5 shrink-0" />
-              <p className="text-sm">{error}</p>
+              <p className="font-medium">{error}</p>
             </div>
           )}
 
@@ -175,16 +184,16 @@ export default function Medicines() {
             onClick={searchMedicines}
             disabled={isSearching}
             size="lg"
-            className="w-full gradient-primary text-primary-foreground border-0 rounded-xl"
+            className="w-full gradient-primary text-primary-foreground border-0 rounded-2xl h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             {isSearching ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Searching Medicines...
+                Finding Medicines...
               </>
             ) : (
               <>
-                <Search className="mr-2 h-5 w-5" />
+                <Sparkles className="mr-2 h-5 w-5" />
                 Find Medicines
               </>
             )}
@@ -192,62 +201,106 @@ export default function Medicines() {
 
           {/* Results */}
           {results && (
-            <div className="mt-8 space-y-6 animate-fade-up">
+            <div className="mt-12 space-y-8 animate-fade-up">
               <div className="text-center">
-                <h2 className="font-display text-xl font-semibold text-foreground">
-                  Medicines for {results.condition}
+                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+                  Medicines for <span className="text-gradient">{results.condition}</span>
                 </h2>
+                <p className="text-muted-foreground">
+                  Found {results.medicines?.length || 0} recommended medicines
+                </p>
               </div>
 
-              {/* Medicine Cards */}
+              {/* Medicine Cards - Shop Style */}
               {results.medicines && results.medicines.length > 0 && (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {results.medicines.map((medicine, index) => (
-                    <div key={index} className="medical-card">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-medical-green/10 text-medical-green">
-                          <Pill className="h-6 w-6" />
+                    <div key={index} className="medicine-shop-card">
+                      {/* Header */}
+                      <div className="p-6 pb-4">
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-medical-green to-medical-mint">
+                            <Pill className="h-7 w-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-display text-xl font-bold text-foreground mb-1">
+                              {medicine.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {medicine.purpose}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-display text-lg font-semibold text-foreground mb-1">
-                            {medicine.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            {medicine.purpose}
-                          </p>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="p-3 rounded-xl bg-muted/50">
-                              <span className="font-medium text-foreground block mb-1">
-                                Dosage
+                      </div>
+
+                      {/* Price Badge */}
+                      <div className="px-6 pb-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-medical-green/10 border border-medical-green/20">
+                          <DollarSign className="h-4 w-4 text-medical-green" />
+                          <span className="font-display font-bold text-medical-green">
+                            {medicine.estimatedPrice || "Price varies"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Details */}
+                      <div className="px-6 pb-6 space-y-3">
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50">
+                          <Package className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-medium text-foreground text-sm block mb-0.5">
+                              Dosage
+                            </span>
+                            <span className="text-muted-foreground text-sm">
+                              {medicine.dosage}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50">
+                          <Info className="h-5 w-5 text-medical-blue shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-medium text-foreground text-sm block mb-0.5">
+                              Instructions
+                            </span>
+                            <span className="text-muted-foreground text-sm">
+                              {medicine.instructions}
+                            </span>
+                          </div>
+                        </div>
+
+                        {medicine.duration && (
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/50">
+                            <Clock className="h-5 w-5 text-medical-purple shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-medium text-foreground text-sm block mb-0.5">
+                                Duration
                               </span>
-                              <span className="text-muted-foreground">
-                                {medicine.dosage}
-                              </span>
-                            </div>
-                            <div className="p-3 rounded-xl bg-muted/50">
-                              <span className="font-medium text-foreground block mb-1">
-                                Instructions
-                              </span>
-                              <span className="text-muted-foreground">
-                                {medicine.instructions}
+                              <span className="text-muted-foreground text-sm">
+                                {medicine.duration}
                               </span>
                             </div>
                           </div>
+                        )}
 
-                          {medicine.warnings && medicine.warnings.length > 0 && (
-                            <div className="mt-3 p-3 rounded-xl bg-medical-warning/10 border border-medical-warning/20">
-                              <span className="font-medium text-medical-warning block mb-1 text-sm">
-                                ⚠️ Warnings
+                        {medicine.warnings && medicine.warnings.length > 0 && (
+                          <div className="p-3 rounded-xl bg-medical-warning/10 border border-medical-warning/20">
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertTriangle className="h-4 w-4 text-medical-warning" />
+                              <span className="font-medium text-medical-warning text-sm">
+                                Warnings
                               </span>
-                              <ul className="text-xs text-muted-foreground space-y-1">
-                                {medicine.warnings.map((warning, wIndex) => (
-                                  <li key={wIndex}>• {warning}</li>
-                                ))}
-                              </ul>
                             </div>
-                          )}
-                        </div>
+                            <ul className="text-xs text-muted-foreground space-y-1">
+                              {medicine.warnings.map((warning, wIndex) => (
+                                <li key={wIndex} className="flex items-start gap-1.5">
+                                  <span className="text-medical-warning">•</span>
+                                  {warning}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -256,17 +309,22 @@ export default function Medicines() {
 
               {/* General Advice */}
               {results.generalAdvice && (
-                <div className="medical-card bg-primary/5 border border-primary/20">
-                  <h3 className="font-display text-lg font-semibold text-foreground mb-2">
-                    General Advice
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {results.generalAdvice}
-                  </p>
+                <div className="glass-card p-6 rounded-2xl border-2 border-primary/20">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                      <Info className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground mb-2">
+                        General Advice
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {results.generalAdvice}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
-
-              <DisclaimerBanner dismissible={false} />
             </div>
           )}
         </div>

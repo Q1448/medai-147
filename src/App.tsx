@@ -9,6 +9,7 @@ import AiDoctor from "./pages/AiDoctor";
 import AiAnalysis from "./pages/AiAnalysis";
 import Medicines from "./pages/Medicines";
 import Hospitals from "./pages/Hospitals";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/ai-analysis" element={<AiAnalysis />} />
           <Route path="/medicines" element={<Medicines />} />
           <Route path="/hospitals" element={<Hospitals />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
