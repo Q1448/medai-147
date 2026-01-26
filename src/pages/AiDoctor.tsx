@@ -3,7 +3,9 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, User, Send, Loader2, Stethoscope, AlertCircle, Sparkles, Brain } from "lucide-react";
+import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { EvidenceModal } from "@/components/ui/evidence-modal";
+import { Bot, User, Send, Stethoscope, AlertCircle, Sparkles, Brain, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -21,6 +23,7 @@ const suggestedQuestions = [
 ];
 
 export default function AiDoctor() {
+  const { profile, getProfileContext } = useMedicalProfile();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -42,6 +45,7 @@ export default function AiDoctor() {
     const text = messageText || input.trim();
     if (!text || isLoading) return;
 
+    const profileContext = getProfileContext();
     const userMessage: Message = { role: "user", content: text };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -57,7 +61,10 @@ export default function AiDoctor() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          profileContext,
+        }),
       });
 
       if (!response.ok) {
@@ -147,24 +154,48 @@ export default function AiDoctor() {
           </p>
         </div>
 
+        {/* Profile Context Notice */}
+        {(profile.age || profile.chronicConditions.length > 0) && (
+          <div className="max-w-4xl mx-auto mb-4">
+            <div className="p-3 rounded-2xl bg-primary/5 border border-primary/10">
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <Info className="h-4 w-4 text-primary shrink-0" />
+                <span>
+                  Responses personalized for your profile
+                  {profile.age && ` • Age: ${profile.age}`}
+                  {profile.chronicConditions.length > 0 && ` • ${profile.chronicConditions.length} conditions`}
+                </span>
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Chat Container */}
         <div className="max-w-4xl mx-auto">
           <div className="glass-card rounded-3xl overflow-hidden shadow-xl">
             {/* Chat Header */}
-            <div className="flex items-center gap-4 p-5 border-b border-border bg-gradient-to-r from-primary/5 to-medical-blue/5">
-              <div className="relative">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary text-primary-foreground shadow-lg">
-                  <Stethoscope className="h-7 w-7" />
+            <div className="flex items-center justify-between gap-4 p-5 border-b border-border bg-gradient-to-r from-primary/5 to-medical-blue/5">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary text-primary-foreground shadow-lg">
+                    <Stethoscope className="h-7 w-7" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-medical-green border-2 border-background pulse-dot" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-medical-green border-2 border-background pulse-dot" />
+                <div>
+                  <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                    AI Doctor
+                    <Sparkles className="h-4 w-4 text-primary" />
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Online • Ready to help 24/7</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-                  AI Doctor
-                  <Sparkles className="h-4 w-4 text-primary" />
-                </h3>
-                <p className="text-sm text-muted-foreground">Online • Ready to help 24/7</p>
-              </div>
+              <EvidenceModal>
+                <Button variant="ghost" size="sm">
+                  <BookOpen className="h-4 w-4 mr-1" />
+                  Sources
+                </Button>
+              </EvidenceModal>
             </div>
 
             {/* Messages */}
@@ -174,9 +205,10 @@ export default function AiDoctor() {
                   <div
                     key={index}
                     className={cn(
-                      "flex gap-3",
+                      "flex gap-3 animate-fade-up",
                       message.role === "user" ? "justify-end" : "justify-start"
                     )}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {message.role === "assistant" && (
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
@@ -201,7 +233,7 @@ export default function AiDoctor() {
                   </div>
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
-                  <div className="flex gap-3 justify-start">
+                  <div className="flex gap-3 justify-start animate-fade-up">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
                       <Bot className="h-5 w-5" />
                     </div>
@@ -261,7 +293,7 @@ export default function AiDoctor() {
                   className="h-[60px] w-[60px] shrink-0 gradient-primary text-primary-foreground border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all"
                 >
                   {isLoading ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <Send className="h-6 w-6" />
                   )}

@@ -9,18 +9,26 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { condition, age, weight } = await req.json();
+    const { condition, age, weight, allergies, currentMedications, profileContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const allergyWarning = allergies?.length > 0 ? `\nKNOWN ALLERGIES (AVOID THESE): ${allergies.join(", ")}` : "";
+    const medicationWarning = currentMedications?.length > 0 ? `\nCURRENT MEDICATIONS (CHECK INTERACTIONS): ${currentMedications.join(", ")}` : "";
+    const patientContext = profileContext || "";
+
     const prompt = `Find medicine recommendations for: ${condition}. ${age ? `Patient age: ${age} years.` : ""} ${weight ? `Weight: ${weight} kg.` : ""} 
-    
+${allergyWarning}${medicationWarning}
+${patientContext ? `\nAdditional patient context: ${patientContext}` : ""}
+
 Provide 3-4 common over-the-counter medicines available in Kazakhstan pharmacies with:
 - Accurate dosage based on age/weight if provided
 - Estimated price range in Kazakhstani Tenge (KZT)
 - Clear usage instructions
 - Duration of treatment
-- Important warnings`;
+- Important warnings
+- Check for interactions with current medications if any are listed
+- Avoid medicines containing allergens if allergies are listed`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -39,11 +47,14 @@ IMPORTANT GUIDELINES:
 4. Include specific usage instructions (how many times per day, with/without food)
 5. Specify treatment duration
 6. List important warnings and contraindications
-7. Always recommend consulting a pharmacist or doctor
+7. CHECK FOR DRUG INTERACTIONS with any current medications listed
+8. AVOID medicines containing any listed allergies
+9. Always recommend consulting a pharmacist or doctor
 
 For children: Provide age-appropriate dosages
 For elderly: Note any special considerations
-For specific weights: Calculate dosage accordingly` 
+For specific weights: Calculate dosage accordingly
+For allergies: Explicitly avoid and warn about potential allergens` 
           },
           { role: "user", content: prompt }
         ],

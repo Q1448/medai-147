@@ -3,9 +3,11 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { ConditionCardSkeleton, AnalyzingAnimation } from "@/components/ui/loading-skeleton";
+import { EvidenceModal } from "@/components/ui/evidence-modal";
 import {
   Activity,
-  Loader2,
   AlertCircle,
   Thermometer,
   HeartPulse,
@@ -18,6 +20,8 @@ import {
   Stethoscope,
   AlertTriangle,
   CheckCircle2,
+  BookOpen,
+  Info,
 } from "lucide-react";
 
 const commonSymptoms = [
@@ -41,11 +45,11 @@ interface AnalysisResult {
     description: string;
     possibleCause: string;
     severity: "low" | "medium" | "high";
-    matchScore?: number;
   }[];
 }
 
 export default function Symptoms() {
+  const { profile, getProfileContext, addToHistory } = useMedicalProfile();
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [additionalSymptoms, setAdditionalSymptoms] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -80,12 +84,24 @@ export default function Symptoms() {
     ].filter(Boolean).join(", ");
 
     try {
+      const profileContext = getProfileContext();
       const { data, error: funcError } = await supabase.functions.invoke("analyze-symptoms", {
-        body: { symptoms: allSymptoms },
+        body: { 
+          symptoms: allSymptoms,
+          profileContext,
+        },
       });
 
       if (funcError) throw funcError;
       setResults(data);
+      
+      // Save to history
+      if (data?.conditions?.length > 0) {
+        addToHistory({
+          symptoms: allSymptoms,
+          result: data.conditions.map((c: { name: string }) => c.name).join(", "),
+        });
+      }
     } catch (err) {
       console.error("Analysis error:", err);
       setError("Failed to analyze symptoms. Please try again.");
@@ -145,6 +161,21 @@ export default function Symptoms() {
         </div>
 
         <div className="max-w-4xl mx-auto">
+          {/* Profile Context Notice */}
+          {(profile.age || profile.chronicConditions.length > 0) && (
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 mb-6">
+              <p className="text-sm text-muted-foreground flex items-start gap-2">
+                <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <span>
+                  Analysis will consider your profile
+                  {profile.age && ` (Age: ${profile.age})`}
+                  {profile.gender && `, ${profile.gender}`}
+                  {profile.chronicConditions.length > 0 && `, ${profile.chronicConditions.length} chronic conditions`}
+                </span>
+              </p>
+            </div>
+          )}
+
           {/* Symptoms Selection */}
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
@@ -161,11 +192,11 @@ export default function Symptoms() {
                     onClick={() => toggleSymptom(symptom.id)}
                     className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 ${
                       isSelected
-                        ? "border-primary bg-primary/10 text-primary shadow-md"
+                        ? "border-primary bg-primary/10 text-primary shadow-md scale-[1.02]"
                         : "border-border bg-background hover:border-primary/50 text-foreground hover:bg-muted/50"
                     }`}
                   >
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
                       isSelected ? "bg-primary text-white" : "bg-muted"
                     }`}>
                       <Icon className="h-5 w-5" />
@@ -208,7 +239,7 @@ export default function Symptoms() {
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <div className="h-5 w-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Analyzing Symptoms...
               </>
             ) : (
@@ -219,8 +250,15 @@ export default function Symptoms() {
             )}
           </Button>
 
+          {/* Loading State */}
+          {isAnalyzing && (
+            <div className="mt-12">
+              <AnalyzingAnimation />
+            </div>
+          )}
+
           {/* Results */}
-          {results && results.conditions && (
+          {results && results.conditions && !isAnalyzing && (
             <div className="mt-12 space-y-6 animate-fade-up">
               <div className="text-center">
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
@@ -239,7 +277,8 @@ export default function Symptoms() {
                   return (
                     <div 
                       key={index} 
-                      className={`glass-card p-6 rounded-2xl border-2 ${styles.border}`}
+                      className={`glass-card p-6 rounded-2xl border-2 ${styles.border} animate-fade-up`}
+                      style={{ animationDelay: `${index * 100}ms` }}
                     >
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex items-start gap-4">
@@ -256,6 +295,11 @@ export default function Symptoms() {
                             </span>
                           </div>
                         </div>
+                        <EvidenceModal condition={condition.name}>
+                          <Button variant="ghost" size="sm" className="shrink-0">
+                            <BookOpen className="h-4 w-4" />
+                          </Button>
+                        </EvidenceModal>
                       </div>
                       <p className="text-muted-foreground mb-4 leading-relaxed">
                         {condition.description}

@@ -2,10 +2,12 @@ import { useState, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { ConditionCardSkeleton, AnalyzingAnimation } from "@/components/ui/loading-skeleton";
+import { EvidenceModal } from "@/components/ui/evidence-modal";
 import {
   Camera,
   Upload,
-  Loader2,
   AlertCircle,
   Image as ImageIcon,
   X,
@@ -14,6 +16,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Zap,
+  BookOpen,
+  Info,
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -21,14 +25,13 @@ interface AnalysisResult {
     name: string;
     description: string;
     likelihood: "low" | "medium" | "high";
-    confidence?: number;
   }[];
   observations: string[];
   recommendation: string;
-  detailedAnalysis?: string;
 }
 
 export default function AiAnalysis() {
+  const { profile, getProfileContext, addToHistory } = useMedicalProfile();
   const [image, setImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -82,12 +85,24 @@ export default function AiAnalysis() {
     setResults(null);
 
     try {
+      const profileContext = getProfileContext();
       const { data, error: funcError } = await supabase.functions.invoke("analyze-image", {
-        body: { image },
+        body: { 
+          image,
+          profileContext,
+        },
       });
 
       if (funcError) throw funcError;
       setResults(data);
+      
+      // Save to history
+      if (data?.conditions?.length > 0) {
+        addToHistory({
+          symptoms: "Image analysis",
+          result: data.conditions.map((c: { name: string }) => c.name).join(", "),
+        });
+      }
     } catch (err) {
       console.error("Analysis error:", err);
       setError("Failed to analyze image. Please try again.");
@@ -147,6 +162,20 @@ export default function AiAnalysis() {
         </div>
 
         <div className="max-w-4xl mx-auto">
+          {/* Profile Context Notice */}
+          {(profile.age || profile.allergies.length > 0) && (
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 mb-6">
+              <p className="text-sm text-muted-foreground flex items-start gap-2">
+                <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <span>
+                  Analysis will be personalized based on your profile
+                  {profile.age && ` (Age: ${profile.age})`}
+                  {profile.allergies.length > 0 && `, considering ${profile.allergies.length} known allergies`}
+                </span>
+              </p>
+            </div>
+          )}
+
           {/* Upload Area */}
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
@@ -157,10 +186,10 @@ export default function AiAnalysis() {
             {!image ? (
               <label
                 htmlFor="image-upload"
-                className="flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-border rounded-3xl cursor-pointer hover:border-primary/50 transition-all bg-muted/30 hover:bg-muted/50"
+                className="flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-border rounded-3xl cursor-pointer hover:border-primary/50 transition-all bg-muted/30 hover:bg-muted/50 group"
               >
                 <div className="flex flex-col items-center justify-center py-6">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-medical-purple mb-6">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-medical-purple mb-6 group-hover:scale-105 transition-transform">
                     <Upload className="h-10 w-10 text-white" />
                   </div>
                   <p className="mb-2 text-lg text-foreground font-semibold">
@@ -219,7 +248,7 @@ export default function AiAnalysis() {
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <div className="h-5 w-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Analyzing Image...
               </>
             ) : (
@@ -230,8 +259,15 @@ export default function AiAnalysis() {
             )}
           </Button>
 
+          {/* Loading State */}
+          {isAnalyzing && (
+            <div className="mt-12">
+              <AnalyzingAnimation />
+            </div>
+          )}
+
           {/* Results */}
-          {results && (
+          {results && !isAnalyzing && (
             <div className="mt-12 space-y-8 animate-fade-up">
               {/* Observations */}
               {results.observations && results.observations.length > 0 && (
@@ -244,7 +280,8 @@ export default function AiAnalysis() {
                     {results.observations.map((observation, index) => (
                       <div 
                         key={index} 
-                        className="flex items-start gap-3 p-3 rounded-xl bg-muted/50"
+                        className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 animate-fade-up"
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span className="text-sm text-muted-foreground">{observation}</span>
@@ -268,7 +305,8 @@ export default function AiAnalysis() {
                       return (
                         <div 
                           key={index} 
-                          className={`glass-card p-6 rounded-2xl border-2 ${styles.border}`}
+                          className={`glass-card p-6 rounded-2xl border-2 ${styles.border} animate-fade-up`}
+                          style={{ animationDelay: `${index * 100}ms` }}
                         >
                           <div className="flex items-start justify-between gap-4 mb-3">
                             <div className="flex items-start gap-4">
@@ -285,6 +323,11 @@ export default function AiAnalysis() {
                                 </span>
                               </div>
                             </div>
+                            <EvidenceModal condition={condition.name}>
+                              <Button variant="ghost" size="sm" className="shrink-0">
+                                <BookOpen className="h-4 w-4" />
+                              </Button>
+                            </EvidenceModal>
                           </div>
                           <p className="text-muted-foreground leading-relaxed">
                             {condition.description}
@@ -303,10 +346,18 @@ export default function AiAnalysis() {
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
                       <Sparkles className="h-6 w-6 text-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                        AI Recommendation
-                      </h3>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="font-display text-lg font-bold text-foreground mb-2">
+                          AI Recommendation
+                        </h3>
+                        <EvidenceModal>
+                          <Button variant="ghost" size="sm">
+                            <BookOpen className="h-4 w-4 mr-1" />
+                            Sources
+                          </Button>
+                        </EvidenceModal>
+                      </div>
                       <p className="text-muted-foreground leading-relaxed">
                         {results.recommendation}
                       </p>
