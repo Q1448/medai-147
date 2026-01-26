@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Heart, Stethoscope, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { MedicalProfileSheet } from "@/components/ui/medical-profile-sheet";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -55,16 +57,26 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden rounded-xl"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        {/* Desktop Actions */}
+        <div className="hidden lg:flex items-center gap-2">
+          <MedicalProfileSheet />
+          <ThemeToggle />
+        </div>
+
+        {/* Mobile Actions */}
+        <div className="flex lg:hidden items-center gap-2">
+          <MedicalProfileSheet />
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-xl"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}

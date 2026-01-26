@@ -9,9 +9,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { symptoms } = await req.json();
+    const { symptoms, profileContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const patientContext = profileContext || "";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -32,7 +34,10 @@ IMPORTANT GUIDELINES:
 5. Provide detailed, medically accurate descriptions
 6. Always include severity based on symptom combination risk
 7. Be thorough in explaining possible causes
-8. NEVER diagnose - this is educational information only
+8. Consider patient demographics and history when provided
+9. NEVER diagnose - this is educational information only
+
+${patientContext ? `PATIENT CONTEXT - Use this to personalize your analysis:\n${patientContext}` : ""}
 
 Return exactly 3 conditions ranked by likelihood of matching the symptom pattern.` 
           },

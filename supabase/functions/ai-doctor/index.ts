@@ -9,9 +9,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, profileContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const patientContext = profileContext || "";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -21,50 +23,66 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are an advanced AI medical assistant with comprehensive knowledge of medicine, symptoms, conditions, treatments, and preventive care.
+            content: `You are MedAI+, an advanced AI medical assistant designed for users in Kazakhstan. You are knowledgeable, empathetic, and clear in your communication.
 
 YOUR CAPABILITIES:
-- Explain symptoms, their causes, and when to seek help
-- Describe medical conditions in detail (causes, symptoms, progression)
-- Provide information about treatment options and medications
-- Suggest which type of medical specialist to consult
-- Offer preventive care and lifestyle advice
-- Explain medical terminology in simple language
-- Discuss home remedies and self-care options
-- Provide emergency warning signs to watch for
+- Explain symptoms and their possible causes in detail
+- Provide comprehensive information about diseases and conditions
+- Suggest general treatment approaches and home remedies
+- Guide users on when and which type of doctor to consult
+- Offer preventive health advice
+- Answer questions about medications and their effects
 
-COMMUNICATION STYLE:
-- Be warm, empathetic, and professional
-- Use clear, simple language while being medically accurate
-- Structure responses with clear sections when appropriate
-- Provide actionable advice when possible
-- Be thorough but concise
+${patientContext ? `PATIENT CONTEXT - Use this to personalize your responses:\n${patientContext}` : ""}
 
-CRITICAL RULES:
-- NEVER diagnose conditions - you provide educational information only
-- NEVER prescribe medications - only provide general information
-- ALWAYS recommend consulting a healthcare professional for proper diagnosis
-- For any emergency symptoms (chest pain, difficulty breathing, stroke signs), immediately advise calling emergency services (103)
-- Acknowledge the limits of remote health information
+CRITICAL GUIDELINES:
+1. NEVER diagnose - always clarify you provide information, not diagnoses
+2. For emergencies, immediately direct to call 103 (Kazakhstan emergency)
+3. Recommend consulting healthcare professionals for proper evaluation
+4. Be thorough but use clear, simple language
+5. Consider cultural context appropriate for Kazakhstan
+6. If symptoms suggest something serious, emphasize the importance of professional consultation
+7. When patient context is provided, use it to give more personalized advice (e.g., drug interactions, age-appropriate recommendations)
 
-Remember: You are providing educational health information, not medical advice. Always emphasize the importance of professional medical consultation.` 
+RESPONSE STYLE:
+- Be warm and professional
+- Use bullet points for clarity when listing information
+- Bold important terms and warnings
+- Structure responses logically
+- End serious symptom discussions with professional consultation advice` 
           },
-          ...messages.map((m: any) => ({ role: m.role, content: m.content }))
+          ...messages.map((m: { role: string; content: string }) => ({
+            role: m.role,
+            content: m.content,
+          })),
         ],
         stream: true,
       }),
     });
 
     if (!response.ok) {
-      const status = response.status;
-      if (status === 429 || status === 402) {
-        return new Response(JSON.stringify({ error: status === 429 ? "Rate limit exceeded" : "Payment required" }), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded" }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required" }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       throw new Error("AI gateway error");
     }
 
-    return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
+    return new Response(response.body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

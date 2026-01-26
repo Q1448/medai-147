@@ -9,9 +9,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { image } = await req.json();
+    const { image, profileContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const patientContext = profileContext || "";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -29,12 +31,15 @@ YOUR ANALYSIS APPROACH:
 3. Consider size, shape, symmetry, and any visible inflammation
 4. Look for characteristic features of common skin conditions
 5. Assess based on clinical presentation patterns
+6. Consider patient age, known allergies, and medical history when provided
 
 PROVIDE:
 - Detailed visual observations (what you see)
 - 3 possible conditions ranked by likelihood
 - Clear reasoning for each condition
 - Specific recommendations for next steps
+
+${patientContext ? `PATIENT CONTEXT - Use this to personalize your analysis:\n${patientContext}` : ""}
 
 IMPORTANT:
 - Be precise in your observations
