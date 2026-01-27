@@ -4,21 +4,25 @@ import { Menu, X, Heart, Stethoscope, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { MedicalProfileSheet } from "@/components/ui/medical-profile-sheet";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/symptoms", label: "Symptoms" },
-  { href: "/ai-doctor", label: "AI Doctor" },
-  { href: "/ai-analysis", label: "AI Analysis" },
-  { href: "/medicines", label: "Medicines" },
-  { href: "/hospitals", label: "Hospitals" },
-  { href: "/about", label: "About" },
+const navLinkKeys = [
+  { href: "/", labelKey: "home" },
+  { href: "/symptoms", labelKey: "symptoms" },
+  { href: "/ai-doctor", labelKey: "aiDoctor" },
+  { href: "/ai-analysis", labelKey: "aiAnalysis" },
+  { href: "/medicines", labelKey: "medicines" },
+  { href: "/hospitals", labelKey: "hospitals" },
+  { href: "/about", labelKey: "about" },
+  { href: "/feedback", labelKey: "feedback" },
 ];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -41,18 +45,18 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {navLinkKeys.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               className={cn(
-                "px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
+                "px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
                 location.pathname === link.href
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
         </nav>
@@ -60,12 +64,14 @@ export function Header() {
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-2">
           <MedicalProfileSheet />
+          <LanguageSwitcher />
           <ThemeToggle />
         </div>
 
         {/* Mobile Actions */}
         <div className="flex lg:hidden items-center gap-2">
           <MedicalProfileSheet />
+          <LanguageSwitcher />
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -83,7 +89,7 @@ export function Header() {
       {isOpen && (
         <div className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl animate-fade-in">
           <nav className="container py-4 flex flex-col gap-1">
-            {navLinks.map((link) => (
+            {navLinkKeys.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
@@ -95,7 +101,7 @@ export function Header() {
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
           </nav>
