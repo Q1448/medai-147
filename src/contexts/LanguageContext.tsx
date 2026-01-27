@@ -30,25 +30,114 @@ export const translations: Translations = {
   
   // Symptoms page
   symptomChecker: { en: 'Symptom Checker', ru: 'Проверка симптомов', kk: 'Белгілерді тексеру' },
+  advancedSymptomAnalysis: { en: 'Advanced Symptom Analysis', ru: 'Расширенный анализ симптомов', kk: 'Кеңейтілген белгілерді талдау' },
+  analyzeYourSymptoms: { en: 'Analyze Your Symptoms', ru: 'Проанализируйте свои симптомы', kk: 'Белгілеріңізді талдаңыз' },
   selectSymptoms: { en: 'Select Your Symptoms', ru: 'Выберите симптомы', kk: 'Белгілеріңізді таңдаңыз' },
   symptomDescription: { en: 'Select multiple symptoms for more accurate analysis', ru: 'Выберите несколько симптомов для точного анализа', kk: 'Дәлірек талдау үшін бірнеше белгіні таңдаңыз' },
   analyzeSymptoms: { en: 'Analyze Symptoms', ru: 'Анализ симптомов', kk: 'Белгілерді талдау' },
+  analyzingSymptoms: { en: 'Analyzing Symptoms...', ru: 'Анализ симптомов...', kk: 'Белгілер талдануда...' },
   selectedSymptoms: { en: 'Selected symptoms', ru: 'Выбранные симптомы', kk: 'Таңдалған белгілер' },
+  describeInDetail: { en: 'Describe in Detail', ru: 'Опишите подробно', kk: 'Толық сипаттаңыз' },
+  moreDetailsMoreAccurate: { en: 'The more details you provide, the more accurate the analysis will be.', ru: 'Чем больше подробностей, тем точнее будет анализ.', kk: 'Көбірек мәлімет берсеңіз, талдау дәлірек болады.' },
+  describePlaceholder: { en: 'Describe your symptoms in detail: When did they start? How severe are they? Are there any triggers?', ru: 'Опишите симптомы подробно: Когда начались? Насколько сильные? Есть ли триггеры?', kk: 'Белгілеріңізді толық сипаттаңыз: Қашан басталды? Қаншалықты қатты? Триггерлер бар ма?' },
+  pleaseSelectSymptom: { en: 'Please select at least one symptom or describe your symptoms.', ru: 'Пожалуйста, выберите хотя бы один симптом или опишите их.', kk: 'Кем дегенде бір белгіні таңдаңыз немесе сипаттаңыз.' },
+  possibleConditions: { en: 'Possible Conditions', ru: 'Возможные заболевания', kk: 'Ықтимал аурулар' },
+  basedOnSymptoms: { en: 'Based on your symptoms, here are the most likely conditions', ru: 'На основе ваших симптомов, вот наиболее вероятные состояния', kk: 'Белгілеріңізге сүйене отырып, ықтимал жағдайлар' },
+  severity: { en: 'Severity', ru: 'Тяжесть', kk: 'Ауырлығы' },
+  possibleCause: { en: 'Possible Cause', ru: 'Возможная причина', kk: 'Ықтимал себеп' },
+  
+  // Symptom names
+  headache: { en: 'Headache', ru: 'Головная боль', kk: 'Бас ауруы' },
+  fever: { en: 'Fever', ru: 'Лихорадка', kk: 'Қызба' },
+  cough: { en: 'Cough', ru: 'Кашель', kk: 'Жөтел' },
+  fatigue: { en: 'Fatigue', ru: 'Усталость', kk: 'Шаршау' },
+  soreThroat: { en: 'Sore Throat', ru: 'Боль в горле', kk: 'Тамақ ауруы' },
+  bodyAches: { en: 'Body Aches', ru: 'Боли в теле', kk: 'Дене ауруы' },
+  nausea: { en: 'Nausea', ru: 'Тошнота', kk: 'Жүрек айну' },
+  dizziness: { en: 'Dizziness', ru: 'Головокружение', kk: 'Бас айналу' },
+  shortnessOfBreath: { en: 'Shortness of Breath', ru: 'Одышка', kk: 'Тыныс қысылу' },
+  chestPain: { en: 'Chest Pain', ru: 'Боль в груди', kk: 'Кеуде ауруы' },
+  runnyNose: { en: 'Runny Nose', ru: 'Насморк', kk: 'Мұрын ағу' },
+  lossOfAppetite: { en: 'Loss of Appetite', ru: 'Потеря аппетита', kk: 'Тәбеттің жоғалуы' },
   
   // AI Doctor
   askDoctor: { en: 'Ask AI Doctor', ru: 'Спросить ИИ Доктора', kk: 'AI Дәрігерден сұрау' },
   typeMessage: { en: 'Type your message...', ru: 'Введите сообщение...', kk: 'Хабарламаңызды жазыңыз...' },
+  poweredByAI: { en: 'Powered by Advanced AI', ru: 'На основе продвинутого ИИ', kk: 'Озық AI негізінде' },
+  aiDoctorAssistant: { en: 'AI Doctor Assistant', ru: 'ИИ Доктор Ассистент', kk: 'AI Дәрігер Көмекшісі' },
+  getComprehensiveHealth: { en: 'Get comprehensive health information from our powerful AI medical assistant.', ru: 'Получите исчерпывающую информацию о здоровье от нашего мощного ИИ медицинского ассистента.', kk: 'Біздің қуатты AI медициналық көмекшісінен денсаулық туралы толық ақпарат алыңыз.' },
+  onlineReady: { en: 'Online • Ready to help 24/7', ru: 'Онлайн • Готов помочь 24/7', kk: 'Онлайн • 24/7 көмектесуге дайын' },
+  sources: { en: 'Sources', ru: 'Источники', kk: 'Дереккөздер' },
+  quickQuestions: { en: 'Quick questions:', ru: 'Быстрые вопросы:', kk: 'Жылдам сұрақтар:' },
+  askPlaceholder: { en: 'Ask about symptoms, conditions, treatments, or any health-related questions...', ru: 'Спросите о симптомах, заболеваниях, лечении или любых вопросах о здоровье...', kk: 'Белгілер, аурулар, емдеу немесе денсаулыққа қатысты кез келген сұрақ қойыңыз...' },
+  
+  // Suggested questions
+  suggestQ1: { en: 'What are the symptoms of the flu?', ru: 'Каковы симптомы гриппа?', kk: 'Тұмаудың белгілері қандай?' },
+  suggestQ2: { en: 'How can I improve my sleep quality?', ru: 'Как улучшить качество сна?', kk: 'Ұйқы сапасын қалай жақсартуға болады?' },
+  suggestQ3: { en: 'What should I do for a headache?', ru: 'Что делать при головной боли?', kk: 'Бас ауырғанда не істеу керек?' },
+  suggestQ4: { en: 'When should I see a doctor for a cough?', ru: 'Когда обратиться к врачу при кашле?', kk: 'Жөтелмен қашан дәрігерге бару керек?' },
+  
+  // AI Analysis
+  precisionAIAnalysis: { en: 'Precision AI Analysis', ru: 'Точный ИИ анализ', kk: 'Нақты AI талдау' },
+  aiImageAnalysis: { en: 'AI Image Analysis', ru: 'ИИ Анализ изображений', kk: 'AI Сурет талдау' },
+  uploadPhotoDescription: { en: 'Upload a photo of skin conditions for detailed AI-powered visual analysis with high accuracy.', ru: 'Загрузите фото состояния кожи для детального ИИ анализа с высокой точностью.', kk: 'Жоғары дәлдікпен AI талдауы үшін тері жағдайының суретін жүктеңіз.' },
+  uploadImage: { en: 'Upload Image', ru: 'Загрузить изображение', kk: 'Суретті жүктеу' },
+  clickToUpload: { en: 'Click to upload or drag and drop', ru: 'Нажмите для загрузки или перетащите', kk: 'Жүктеу үшін басыңыз немесе сүйреңіз' },
+  upTo10MB: { en: 'PNG, JPG, WEBP up to 10MB', ru: 'PNG, JPG, WEBP до 10МБ', kk: 'PNG, JPG, WEBP 10МБ дейін' },
+  forBestResults: { en: 'For best results, use clear, well-lit images', ru: 'Для лучших результатов используйте четкие, хорошо освещенные фото', kk: 'Жақсы нәтиже үшін анық, жарық суреттер қолданыңыз' },
+  analyzeImage: { en: 'Analyze Image', ru: 'Анализировать изображение', kk: 'Суретті талдау' },
+  analyzingImage: { en: 'Analyzing Image...', ru: 'Анализ изображения...', kk: 'Сурет талдануда...' },
+  aiObservations: { en: 'AI Observations', ru: 'Наблюдения ИИ', kk: 'AI бақылаулары' },
+  aiRecommendation: { en: 'AI Recommendation', ru: 'Рекомендация ИИ', kk: 'AI ұсынысы' },
+  likelihood: { en: 'Likelihood', ru: 'Вероятность', kk: 'Ықтималдық' },
   
   // Medicines
+  healthMarket: { en: 'Health Market', ru: 'Медицинский магазин', kk: 'Денсаулық дүкені' },
+  findMedicinesTitle: { en: 'Find Medicines for Your Condition', ru: 'Найдите лекарства для вашего заболевания', kk: 'Ауруыңызға дәрі табыңыз' },
   medicineShop: { en: 'Medicine Information', ru: 'Информация о лекарствах', kk: 'Дәрілер туралы ақпарат' },
   searchCondition: { en: 'Search by condition or symptom', ru: 'Поиск по заболеванию или симптому', kk: 'Ауру немесе белгі бойынша іздеу' },
   findMedicines: { en: 'Find Medicines', ru: 'Найти лекарства', kk: 'Дәрілерді табу' },
+  findingMedicines: { en: 'Finding Medicines...', ru: 'Поиск лекарств...', kk: 'Дәрілер ізделуде...' },
+  whatsYourCondition: { en: "What's your condition or disease?", ru: 'Какое у вас заболевание?', kk: 'Сіздің ауруыңыз қандай?' },
+  conditionPlaceholder: { en: 'e.g., Headache, Flu, Allergies, Back Pain...', ru: 'например, Головная боль, Грипп, Аллергия...', kk: 'мысалы, Бас ауруы, Тұмау, Аллергия...' },
+  medicinesFor: { en: 'Medicines for', ru: 'Лекарства для', kk: 'Дәрілер' },
+  foundMedicines: { en: 'recommended medicines', ru: 'рекомендуемых лекарств', kk: 'ұсынылған дәрілер' },
+  filters: { en: 'Filters', ru: 'Фильтры', kk: 'Сүзгілер' },
+  allPrices: { en: 'All Prices', ru: 'Все цены', kk: 'Барлық бағалар' },
+  budget: { en: 'Budget', ru: 'Бюджет', kk: 'Бюджет' },
+  medium: { en: 'Medium', ru: 'Средний', kk: 'Орташа' },
+  premium: { en: 'Premium', ru: 'Премиум', kk: 'Премиум' },
+  genericsOnly: { en: 'Generics Only', ru: 'Только дженерики', kk: 'Тек генериктер' },
+  dosage: { en: 'Dosage', ru: 'Дозировка', kk: 'Дозалау' },
+  instructions: { en: 'Instructions', ru: 'Инструкции', kk: 'Нұсқаулар' },
+  duration: { en: 'Duration', ru: 'Длительность', kk: 'Ұзақтығы' },
+  warnings: { en: 'Warnings', ru: 'Предупреждения', kk: 'Ескертулер' },
+  inStock: { en: 'In Stock', ru: 'В наличии', kk: 'Қолда бар' },
+  outOfStock: { en: 'Out of Stock', ru: 'Нет в наличии', kk: 'Қолда жоқ' },
+  generic: { en: 'Generic', ru: 'Дженерик', kk: 'Генерик' },
+  analogues: { en: 'Analogues', ru: 'Аналоги', kk: 'Аналогтар' },
+  drugInteractionWarning: { en: 'Drug Interaction Warning', ru: 'Предупреждение о взаимодействии', kk: 'Дәрі әрекеттесу ескертуі' },
+  mayInteractWith: { en: 'May interact with', ru: 'Может взаимодействовать с', kk: 'Әрекеттесуі мүмкін' },
+  nearbyPharmacies: { en: 'Nearby Pharmacies', ru: 'Ближайшие аптеки', kk: 'Жақын аптекалар' },
+  generalAdvice: { en: 'General Advice', ru: 'Общие рекомендации', kk: 'Жалпы кеңестер' },
   
   // Hospitals
   pharmaciesHospitals: { en: 'Pharmacies & Hospitals', ru: 'Аптеки и Больницы', kk: 'Дәріханалар мен Ауруханалар' },
+  healthcareLocations: { en: 'Healthcare Locations', ru: 'Медицинские учреждения', kk: 'Медициналық мекемелер' },
+  pharmaciesHospitalsAstana: { en: 'Pharmacies & Hospitals in Astana', ru: 'Аптеки и Больницы в Астане', kk: 'Астанадағы Дәріханалар мен Ауруханалар' },
+  clickForDirections: { en: 'Click on any location to get directions automatically via Google Maps', ru: 'Нажмите на любую локацию для автоматического построения маршрута', kk: 'Маршрутты автоматты түрде алу үшін кез келген орынды басыңыз' },
   getDirections: { en: 'Get Directions', ru: 'Построить маршрут', kk: 'Бағытты көрсету' },
+  clickToGetDirections: { en: 'Click to get directions', ru: 'Нажмите для маршрута', kk: 'Маршрут үшін басыңыз' },
   callPharmacy: { en: 'Call', ru: 'Позвонить', kk: 'Қоңырау шалу' },
   emergency: { en: 'Emergency', ru: 'Экстренная помощь', kk: 'Шұғыл көмек' },
+  emergencyAmbulance: { en: 'Emergency (Ambulance)', ru: 'Скорая помощь', kk: 'Жедел жәрдем' },
+  generalEmergency: { en: 'General Emergency', ru: 'Общая экстренная служба', kk: 'Жалпы шұғыл қызмет' },
+  pharmacies: { en: 'Pharmacies', ru: 'Аптеки', kk: 'Дәріханалар' },
+  hospitalsTitle: { en: 'Hospitals', ru: 'Больницы', kk: 'Ауруханалар' },
+  astanaHealthcareMap: { en: 'Astana Healthcare Map', ru: 'Карта медучреждений Астаны', kk: 'Астана медициналық мекемелер картасы' },
+  openFullMap: { en: 'Open Full Map', ru: 'Открыть полную карту', kk: 'Толық картаны ашу' },
+  walkTime: { en: 'walk', ru: 'пешком', kk: 'жаяу' },
+  driveTime: { en: 'drive', ru: 'на авто', kk: 'көлікпен' },
   
   // About
   ourTeam: { en: 'Our Team', ru: 'Наша команда', kk: 'Біздің команда' },
@@ -65,6 +154,7 @@ export const translations: Translations = {
   suggestionPlaceholder: { en: 'Share your ideas for improving our product...', ru: 'Поделитесь идеями по улучшению продукта...', kk: 'Өнімді жақсарту бойынша идеяларыңызбен бөлісіңіз...' },
   submitSuggestion: { en: 'Submit Suggestion', ru: 'Отправить предложение', kk: 'Ұсынысты жіберу' },
   thankYou: { en: 'Thank you for your feedback!', ru: 'Спасибо за ваш отзыв!', kk: 'Пікіріңіз үшін рахмет!' },
+  yourFeedbackHelps: { en: 'Your feedback helps us improve MedAI+', ru: 'Ваш отзыв помогает нам улучшить MedAI+', kk: 'Пікіріңіз MedAI+ жақсартуға көмектеседі' },
   
   // Categories
   catGeneral: { en: 'General', ru: 'Общее', kk: 'Жалпы' },
@@ -82,6 +172,8 @@ export const translations: Translations = {
   allergies: { en: 'Allergies', ru: 'Аллергии', kk: 'Аллергиялар' },
   medications: { en: 'Current Medications', ru: 'Текущие лекарства', kk: 'Қазіргі дәрілер' },
   chronicConditions: { en: 'Chronic Conditions', ru: 'Хронические заболевания', kk: 'Созылмалы аурулар' },
+  analysisPersonalized: { en: 'Analysis will consider your profile', ru: 'Анализ учтет ваш профиль', kk: 'Талдау профиліңізді ескереді' },
+  responsesPersonalized: { en: 'Responses personalized for your profile', ru: 'Ответы персонализированы для вашего профиля', kk: 'Жауаптар профиліңізге бейімделген' },
   
   // Disclaimer
   disclaimer: { en: 'Medical Disclaimer', ru: 'Медицинский отказ от ответственности', kk: 'Медициналық жауапкершіліктен бас тарту' },
@@ -90,6 +182,37 @@ export const translations: Translations = {
   // Evidence
   evidenceBased: { en: 'Evidence-Based Sources', ru: 'Научные источники', kk: 'Ғылыми дереккөздер' },
   whatIsThisBased: { en: 'What is this based on?', ru: 'На чём это основано?', kk: 'Бұл неге негізделген?' },
+  
+  // Conditions (for popular conditions)
+  conditionHeadache: { en: 'Headache', ru: 'Головная боль', kk: 'Бас ауруы' },
+  conditionColdFlu: { en: 'Cold & Flu', ru: 'Простуда и грипп', kk: 'Суық тию және тұмау' },
+  conditionFever: { en: 'Fever', ru: 'Жар', kk: 'Қызба' },
+  conditionAllergies: { en: 'Allergies', ru: 'Аллергия', kk: 'Аллергия' },
+  conditionStomachPain: { en: 'Stomach Pain', ru: 'Боль в животе', kk: 'Асқазан ауруы' },
+  conditionSoreThroat: { en: 'Sore Throat', ru: 'Боль в горле', kk: 'Тамақ ауруы' },
+  conditionBackPain: { en: 'Back Pain', ru: 'Боль в спине', kk: 'Арқа ауруы' },
+  conditionCough: { en: 'Cough', ru: 'Кашель', kk: 'Жөтел' },
+  conditionInsomnia: { en: 'Insomnia', ru: 'Бессонница', kk: 'Ұйқысыздық' },
+  conditionMusclePain: { en: 'Muscle Pain', ru: 'Мышечная боль', kk: 'Бұлшықет ауруы' },
+
+  // Error messages
+  errorSelectImage: { en: 'Please select an image file.', ru: 'Пожалуйста, выберите изображение.', kk: 'Сурет файлын таңдаңыз.' },
+  errorImageSize: { en: 'Image size must be less than 10MB.', ru: 'Размер изображения должен быть менее 10МБ.', kk: 'Сурет өлшемі 10МБ-тан аз болуы керек.' },
+  errorUploadFirst: { en: 'Please upload an image first.', ru: 'Сначала загрузите изображение.', kk: 'Алдымен суретті жүктеңіз.' },
+  errorAnalysisFailed: { en: 'Failed to analyze. Please try again.', ru: 'Не удалось проанализировать. Попробуйте снова.', kk: 'Талдау сәтсіз. Қайта көріңіз.' },
+  errorEnterCondition: { en: 'Please enter a condition or disease.', ru: 'Введите заболевание.', kk: 'Ауруды енгізіңіз.' },
+  errorFindMedicines: { en: 'Failed to find medicines. Please try again.', ru: 'Не удалось найти лекарства. Попробуйте снова.', kk: 'Дәрілер табылмады. Қайта көріңіз.' },
+  errorEnterSuggestion: { en: 'Please enter your suggestion', ru: 'Введите ваше предложение', kk: 'Ұсынысыңызды енгізіңіз' },
+  errorSubmitFailed: { en: 'Failed to submit feedback. Please try again.', ru: 'Не удалось отправить отзыв. Попробуйте снова.', kk: 'Пікір жіберілмеді. Қайта көріңіз.' },
+  rateLimitError: { en: 'Rate limit exceeded. Please try again later.', ru: 'Превышен лимит запросов. Попробуйте позже.', kk: 'Сұраныс лимиті асып кетті. Кейінірек қайталаңыз.' },
+  serviceUnavailable: { en: 'Service temporarily unavailable. Please try again later.', ru: 'Сервис временно недоступен. Попробуйте позже.', kk: 'Қызмет уақытша қолжетімсіз. Кейінірек көріңіз.' },
+};
+
+// Language names for system prompts
+export const languageNames: Record<Language, string> = {
+  en: 'English',
+  ru: 'Russian',
+  kk: 'Kazakh',
 };
 
 interface LanguageContextType {

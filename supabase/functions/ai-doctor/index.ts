@@ -9,11 +9,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, profileContext } = await req.json();
+    const { messages, profileContext, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const patientContext = profileContext || "";
+    
+    // Language instruction
+    const langInstruction = language === 'ru' 
+      ? 'ВАЖНО: Отвечай ТОЛЬКО на русском языке. Все ответы должны быть на русском.'
+      : language === 'kk'
+      ? 'МАҢЫЗДЫ: Тек қазақ тілінде жауап бер. Барлық жауаптар қазақша болуы керек.'
+      : 'Respond in English.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -23,7 +30,9 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are MedAI+, an elite AI medical consultant designed for users in Kazakhstan. You combine deep medical knowledge with empathetic communication.
+            content: `${langInstruction}
+
+You are MedAI+, an elite AI medical consultant designed for users in Kazakhstan. You combine deep medical knowledge with empathetic communication.
 
 IMPORTANT FORMATTING RULES:
 - DO NOT use markdown formatting symbols like **, *, #, ##, or any other markdown

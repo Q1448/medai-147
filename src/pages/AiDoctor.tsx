@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
 import { Bot, User, Send, Stethoscope, AlertCircle, Sparkles, Brain, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,19 +16,53 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-doctor`;
 
-const suggestedQuestions = [
-  "What are the symptoms of the flu?",
-  "How can I improve my sleep quality?",
-  "What should I do for a headache?",
-  "When should I see a doctor for a cough?",
-];
-
 export default function AiDoctor() {
   const { profile, getProfileContext } = useMedicalProfile();
+  const { t, language } = useLanguage();
+  
+  const getWelcomeMessage = () => {
+    if (language === 'ru') {
+      return `Здравствуйте! Я ваш продвинутый ИИ медицинский ассистент на базе новейших технологий. Я могу предоставить информацию о:
+
+• Симптомы и заболевания - Подробные объяснения медицинских симптомов
+• Варианты лечения - Общая информация о лечении и домашние средства
+• Информация о лекарствах - Как работают лекарства и их эффекты
+• Рекомендации специалистов - К какому врачу обратиться
+• Профилактика - Советы по поддержанию здоровья
+
+Важно: Я предоставляю только образовательную информацию. При экстренных ситуациях звоните 103. Всегда консультируйтесь с врачом для диагностики и лечения.
+
+Чем могу помочь?`;
+    } else if (language === 'kk') {
+      return `Сәлеметсіз бе! Мен сіздің озық AI медициналық көмекшіңізбін. Мен келесі ақпаратты бере аламын:
+
+• Белгілер мен аурулар - Медициналық белгілердің толық түсіндірмелері
+• Емдеу нұсқалары - Жалпы емдеу ақпараты және үй емдері
+• Дәрі-дәрмек ақпараты - Дәрілердің қалай жұмыс істейтіні
+• Маман кеңестері - Қай дәрігерге бару керек
+• Алдын алу - Денсаулықты сақтау кеңестері
+
+Маңызды: Мен тек білім беру ақпаратын ұсынамын. Шұғыл жағдайларда 103 нөміріне қоңырау шалыңыз. Диагноз және емдеу үшін әрқашан дәрігермен кеңесіңіз.
+
+Сізге қалай көмектесе аламын?`;
+    }
+    return `Hello! I'm your advanced AI medical assistant powered by the latest AI technology. I can provide comprehensive information about:
+
+• Symptoms & Conditions - Detailed explanations of medical symptoms
+• Treatment Options - General treatment information and home remedies
+• Medication Info - How medicines work and their effects
+• Specialist Guidance - Which doctor to consult for specific issues
+• Preventive Care - Tips for maintaining good health
+
+Important: I provide educational information only. For medical emergencies, call 103 immediately. Always consult a healthcare professional for diagnosis and treatment.
+
+How can I help you today?`;
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your advanced AI medical assistant powered by the latest AI technology. I can provide comprehensive information about:\n\n• **Symptoms & Conditions** - Detailed explanations of medical symptoms\n• **Treatment Options** - General treatment information and home remedies\n• **Medication Info** - How medicines work and their effects\n• **Specialist Guidance** - Which doctor to consult for specific issues\n• **Preventive Care** - Tips for maintaining good health\n\n**Important:** I provide educational information only. For medical emergencies, call 103 immediately. Always consult a healthcare professional for diagnosis and treatment.\n\nHow can I help you today?",
+      content: getWelcomeMessage(),
     },
   ]);
   const [input, setInput] = useState("");
@@ -35,11 +70,26 @@ export default function AiDoctor() {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages([{
+      role: "assistant",
+      content: getWelcomeMessage(),
+    }]);
+  }, [language]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const suggestedQuestions = [
+    t('suggestQ1'),
+    t('suggestQ2'),
+    t('suggestQ3'),
+    t('suggestQ4'),
+  ];
 
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
@@ -64,15 +114,16 @@ export default function AiDoctor() {
         body: JSON.stringify({ 
           messages: [...messages, userMessage],
           profileContext,
+          language,
         }),
       });
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error("Rate limit exceeded. Please try again later.");
+          throw new Error(t('rateLimitError'));
         }
         if (response.status === 402) {
-          throw new Error("Service temporarily unavailable. Please try again later.");
+          throw new Error(t('serviceUnavailable'));
         }
         throw new Error("Failed to get response");
       }
@@ -144,13 +195,15 @@ export default function AiDoctor() {
         <div className="max-w-3xl mx-auto text-center mb-8">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Brain className="h-4 w-4 text-medical-blue" />
-            <span className="text-gradient">Powered by Advanced AI</span>
+            <span className="text-gradient">{t('poweredByAI')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            AI <span className="text-gradient">Doctor</span> Assistant
+            {t('aiDoctorAssistant').split(' ').map((word, i) => 
+              i === 0 ? <span key={i} className="text-gradient">{word} </span> : word + ' '
+            )}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Get comprehensive health information from our powerful AI medical assistant.
+            {t('getComprehensiveHealth')}
           </p>
         </div>
 
@@ -161,9 +214,9 @@ export default function AiDoctor() {
               <p className="text-sm text-muted-foreground flex items-center gap-2">
                 <Info className="h-4 w-4 text-primary shrink-0" />
                 <span>
-                  Responses personalized for your profile
-                  {profile.age && ` • Age: ${profile.age}`}
-                  {profile.chronicConditions.length > 0 && ` • ${profile.chronicConditions.length} conditions`}
+                  {t('responsesPersonalized')}
+                  {profile.age && ` • ${t('age')}: ${profile.age}`}
+                  {profile.chronicConditions.length > 0 && ` • ${profile.chronicConditions.length} ${t('chronicConditions').toLowerCase()}`}
                 </span>
               </p>
             </div>
@@ -184,16 +237,16 @@ export default function AiDoctor() {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-                    AI Doctor
+                    {t('aiDoctor')}
                     <Sparkles className="h-4 w-4 text-primary" />
                   </h3>
-                  <p className="text-sm text-muted-foreground">Online • Ready to help 24/7</p>
+                  <p className="text-sm text-muted-foreground">{t('onlineReady')}</p>
                 </div>
               </div>
               <EvidenceModal>
                 <Button variant="ghost" size="sm">
                   <BookOpen className="h-4 w-4 mr-1" />
-                  Sources
+                  {t('sources')}
                 </Button>
               </EvidenceModal>
             </div>
@@ -252,7 +305,7 @@ export default function AiDoctor() {
             {/* Suggested Questions */}
             {messages.length === 1 && (
               <div className="px-5 pb-4">
-                <p className="text-xs text-muted-foreground mb-2 font-medium">Quick questions:</p>
+                <p className="text-xs text-muted-foreground mb-2 font-medium">{t('quickQuestions')}</p>
                 <div className="flex flex-wrap gap-2">
                   {suggestedQuestions.map((question, index) => (
                     <button
@@ -279,7 +332,7 @@ export default function AiDoctor() {
             <div className="p-5 border-t border-border bg-muted/30">
               <div className="flex gap-3">
                 <Textarea
-                  placeholder="Ask about symptoms, conditions, treatments, or any health-related questions..."
+                  placeholder={t('askPlaceholder')}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
