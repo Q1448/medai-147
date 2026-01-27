@@ -9,11 +9,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { image, profileContext } = await req.json();
+    const { image, profileContext, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const patientContext = profileContext || "";
+    
+    // Language instruction
+    const langInstruction = language === 'ru' 
+      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Наблюдения, названия состояний, описания и рекомендации - всё на русском.'
+      : language === 'kk'
+      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Бақылаулар, жағдай атаулары, сипаттамалар мен ұсыныстар - бәрі қазақша.'
+      : 'Respond in English.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -23,7 +30,9 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are an expert dermatology information assistant with advanced image analysis capabilities.
+            content: `${langInstruction}
+
+You are an expert dermatology information assistant with advanced image analysis capabilities.
 
 YOUR ANALYSIS APPROACH:
 1. Carefully examine the image for visual characteristics

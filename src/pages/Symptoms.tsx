@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { ConditionCardSkeleton, AnalyzingAnimation } from "@/components/ui/loading-skeleton";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
 import {
@@ -24,19 +25,19 @@ import {
   Info,
 } from "lucide-react";
 
-const commonSymptoms = [
-  { id: "headache", label: "Headache", icon: Brain },
-  { id: "fever", label: "Fever", icon: Thermometer },
-  { id: "cough", label: "Cough", icon: Wind },
-  { id: "fatigue", label: "Fatigue", icon: HeartPulse },
-  { id: "sore_throat", label: "Sore Throat", icon: Ear },
-  { id: "body_aches", label: "Body Aches", icon: Bone },
-  { id: "nausea", label: "Nausea", icon: Activity },
-  { id: "dizziness", label: "Dizziness", icon: Brain },
-  { id: "shortness_of_breath", label: "Shortness of Breath", icon: Wind },
-  { id: "chest_pain", label: "Chest Pain", icon: HeartPulse },
-  { id: "runny_nose", label: "Runny Nose", icon: Eye },
-  { id: "loss_of_appetite", label: "Loss of Appetite", icon: Activity },
+const symptomKeys = [
+  { id: "headache", labelKey: "headache", icon: Brain },
+  { id: "fever", labelKey: "fever", icon: Thermometer },
+  { id: "cough", labelKey: "cough", icon: Wind },
+  { id: "fatigue", labelKey: "fatigue", icon: HeartPulse },
+  { id: "sore_throat", labelKey: "soreThroat", icon: Ear },
+  { id: "body_aches", labelKey: "bodyAches", icon: Bone },
+  { id: "nausea", labelKey: "nausea", icon: Activity },
+  { id: "dizziness", labelKey: "dizziness", icon: Brain },
+  { id: "shortness_of_breath", labelKey: "shortnessOfBreath", icon: Wind },
+  { id: "chest_pain", labelKey: "chestPain", icon: HeartPulse },
+  { id: "runny_nose", labelKey: "runnyNose", icon: Eye },
+  { id: "loss_of_appetite", labelKey: "lossOfAppetite", icon: Activity },
 ];
 
 interface AnalysisResult {
@@ -50,6 +51,7 @@ interface AnalysisResult {
 
 export default function Symptoms() {
   const { profile, getProfileContext, addToHistory } = useMedicalProfile();
+  const { t, language } = useLanguage();
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [additionalSymptoms, setAdditionalSymptoms] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -66,7 +68,7 @@ export default function Symptoms() {
 
   const analyzeSymptoms = async () => {
     if (selectedSymptoms.length === 0 && !additionalSymptoms.trim()) {
-      setError("Please select at least one symptom or describe your symptoms.");
+      setError(t('pleaseSelectSymptom'));
       return;
     }
 
@@ -75,7 +77,7 @@ export default function Symptoms() {
     setResults(null);
 
     const selectedLabels = selectedSymptoms.map(
-      (id) => commonSymptoms.find((s) => s.id === id)?.label || id
+      (id) => t(symptomKeys.find((s) => s.id === id)?.labelKey || id)
     );
 
     const allSymptoms = [
@@ -89,6 +91,7 @@ export default function Symptoms() {
         body: { 
           symptoms: allSymptoms,
           profileContext,
+          language,
         },
       });
 
@@ -104,7 +107,7 @@ export default function Symptoms() {
       }
     } catch (err) {
       console.error("Analysis error:", err);
-      setError("Failed to analyze symptoms. Please try again.");
+      setError(t('errorAnalysisFailed'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -150,13 +153,15 @@ export default function Symptoms() {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Activity className="h-4 w-4 text-primary" />
-            <span className="text-gradient">Advanced Symptom Analysis</span>
+            <span className="text-gradient">{t('advancedSymptomAnalysis')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Analyze Your <span className="text-gradient">Symptoms</span>
+            {t('analyzeYourSymptoms').split(' ').map((word, i) => 
+              i === 1 ? <span key={i} className="text-gradient">{word} </span> : word + ' '
+            )}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Select your symptoms and describe them in detail for more accurate condition identification.
+            {t('symptomDescription')}
           </p>
         </div>
 
@@ -167,10 +172,10 @@ export default function Symptoms() {
               <p className="text-sm text-muted-foreground flex items-start gap-2">
                 <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <span>
-                  Analysis will consider your profile
-                  {profile.age && ` (Age: ${profile.age})`}
-                  {profile.gender && `, ${profile.gender}`}
-                  {profile.chronicConditions.length > 0 && `, ${profile.chronicConditions.length} chronic conditions`}
+                  {t('analysisPersonalized')}
+                  {profile.age && ` (${t('age')}: ${profile.age})`}
+                  {profile.gender && `, ${t(profile.gender)}`}
+                  {profile.chronicConditions.length > 0 && `, ${profile.chronicConditions.length} ${t('chronicConditions').toLowerCase()}`}
                 </span>
               </p>
             </div>
@@ -180,10 +185,10 @@ export default function Symptoms() {
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
               <Stethoscope className="h-5 w-5 text-primary" />
-              Select Your Symptoms
+              {t('selectSymptoms')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {commonSymptoms.map((symptom) => {
+              {symptomKeys.map((symptom) => {
                 const Icon = symptom.icon;
                 const isSelected = selectedSymptoms.includes(symptom.id);
                 return (
@@ -201,7 +206,7 @@ export default function Symptoms() {
                     }`}>
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-sm font-medium">{symptom.label}</span>
+                    <span className="text-sm font-medium">{t(symptom.labelKey)}</span>
                   </button>
                 );
               })}
@@ -211,13 +216,13 @@ export default function Symptoms() {
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
               <Brain className="h-5 w-5 text-primary" />
-              Describe in Detail
+              {t('describeInDetail')}
             </h2>
             <p className="text-muted-foreground text-sm mb-4">
-              The more details you provide, the more accurate the analysis will be.
+              {t('moreDetailsMoreAccurate')}
             </p>
             <Textarea
-              placeholder="Describe your symptoms in detail: When did they start? How severe are they? Are there any triggers? Include any other relevant information..."
+              placeholder={t('describePlaceholder')}
               value={additionalSymptoms}
               onChange={(e) => setAdditionalSymptoms(e.target.value)}
               className="min-h-[140px] resize-none rounded-2xl text-base"
@@ -240,12 +245,12 @@ export default function Symptoms() {
             {isAnalyzing ? (
               <>
                 <div className="h-5 w-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Analyzing Symptoms...
+                {t('analyzingSymptoms')}
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-5 w-5" />
-                Analyze Symptoms
+                {t('analyzeSymptoms')}
               </>
             )}
           </Button>
@@ -262,10 +267,12 @@ export default function Symptoms() {
             <div className="mt-12 space-y-6 animate-fade-up">
               <div className="text-center">
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Possible <span className="text-gradient">Conditions</span>
+                  {t('possibleConditions').split(' ').map((word, i) => 
+                    i === 0 ? word + ' ' : <span key={i} className="text-gradient">{word}</span>
+                  )}
                 </h2>
                 <p className="text-muted-foreground">
-                  Based on your symptoms, here are the most likely conditions
+                  {t('basedOnSymptoms')}
                 </p>
               </div>
 
@@ -291,7 +298,7 @@ export default function Symptoms() {
                             </h3>
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${styles.bg} ${styles.text}`}>
                               <SeverityIcon className="h-3 w-3" />
-                              {condition.severity.charAt(0).toUpperCase() + condition.severity.slice(1)} Severity
+                              {condition.severity.charAt(0).toUpperCase() + condition.severity.slice(1)} {t('severity')}
                             </span>
                           </div>
                         </div>
@@ -306,7 +313,7 @@ export default function Symptoms() {
                       </p>
                       <div className="p-4 rounded-xl bg-muted/50">
                         <span className="font-semibold text-foreground text-sm">
-                          Possible Cause:
+                          {t('possibleCause')}:
                         </span>
                         <p className="text-muted-foreground text-sm mt-1">
                           {condition.possibleCause}

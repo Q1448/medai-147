@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { MedicineCardSkeleton, AnalyzingAnimation } from "@/components/ui/loading-skeleton";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
 import { 
@@ -125,6 +126,7 @@ type AvailabilityFilter = "all" | "inStock" | "outOfStock";
 
 export default function Medicines() {
   const { profile, getProfileContext } = useMedicalProfile();
+  const { t, language } = useLanguage();
   const [condition, setCondition] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<MedicineResult | null>(null);
@@ -135,7 +137,7 @@ export default function Medicines() {
 
   const searchMedicines = async () => {
     if (!condition.trim()) {
-      setError("Please enter a condition or disease.");
+      setError(t('errorEnterCondition'));
       return;
     }
 
@@ -153,6 +155,7 @@ export default function Medicines() {
           allergies: profile.allergies,
           currentMedications: profile.currentMedications,
           profileContext,
+          language,
         },
       });
 
@@ -164,7 +167,7 @@ export default function Medicines() {
           ...m,
           isGeneric: i % 2 === 0,
           inStock: Math.random() > 0.3,
-          analogues: i === 0 ? ["Generic Alternative", "Brand B"] : undefined,
+          analogues: i === 0 ? [t('generic') + " Alternative", "Brand B"] : undefined,
           incompatibleWith: profile.currentMedications.length > 0 ? 
             (Math.random() > 0.7 ? [profile.currentMedications[0]] : undefined) : undefined,
         }));
@@ -173,7 +176,7 @@ export default function Medicines() {
       setResults(data);
     } catch (err) {
       console.error("Search error:", err);
-      setError("Failed to find medicines. Please try again.");
+      setError(t('errorFindMedicines'));
     } finally {
       setIsSearching(false);
     }

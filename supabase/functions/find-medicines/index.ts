@@ -9,15 +9,24 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { condition, age, weight, allergies, currentMedications, profileContext } = await req.json();
+    const { condition, age, weight, allergies, currentMedications, profileContext, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const allergyWarning = allergies?.length > 0 ? `\nKNOWN ALLERGIES (AVOID THESE): ${allergies.join(", ")}` : "";
     const medicationWarning = currentMedications?.length > 0 ? `\nCURRENT MEDICATIONS (CHECK INTERACTIONS): ${currentMedications.join(", ")}` : "";
     const patientContext = profileContext || "";
+    
+    // Language instruction
+    const langInstruction = language === 'ru' 
+      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия лекарств, описания, инструкции и предупреждения - всё на русском.'
+      : language === 'kk'
+      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Дәрі атаулары, сипаттамалар, нұсқаулар мен ескертулер - бәрі қазақша.'
+      : 'Respond in English.';
 
-    const prompt = `Find medicine recommendations for: ${condition}. ${age ? `Patient age: ${age} years.` : ""} ${weight ? `Weight: ${weight} kg.` : ""} 
+    const prompt = `${langInstruction}
+
+Find medicine recommendations for: ${condition}. ${age ? `Patient age: ${age} years.` : ""} ${weight ? `Weight: ${weight} kg.` : ""} 
 ${allergyWarning}${medicationWarning}
 ${patientContext ? `\nAdditional patient context: ${patientContext}` : ""}
 

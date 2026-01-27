@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { ConditionCardSkeleton, AnalyzingAnimation } from "@/components/ui/loading-skeleton";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
 import {
@@ -32,6 +33,7 @@ interface AnalysisResult {
 
 export default function AiAnalysis() {
   const { profile, getProfileContext, addToHistory } = useMedicalProfile();
+  const { t, language } = useLanguage();
   const [image, setImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -44,12 +46,12 @@ export default function AiAnalysis() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file.");
+      setError(t('errorSelectImage'));
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setError("Image size must be less than 10MB.");
+      setError(t('errorImageSize'));
       return;
     }
 
@@ -76,7 +78,7 @@ export default function AiAnalysis() {
 
   const analyzeImage = async () => {
     if (!image) {
-      setError("Please upload an image first.");
+      setError(t('errorUploadFirst'));
       return;
     }
 
@@ -90,6 +92,7 @@ export default function AiAnalysis() {
         body: { 
           image,
           profileContext,
+          language,
         },
       });
 
@@ -105,7 +108,7 @@ export default function AiAnalysis() {
       }
     } catch (err) {
       console.error("Analysis error:", err);
-      setError("Failed to analyze image. Please try again.");
+      setError(t('errorAnalysisFailed'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -151,13 +154,15 @@ export default function AiAnalysis() {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Camera className="h-4 w-4 text-medical-purple" />
-            <span className="text-gradient">Precision AI Analysis</span>
+            <span className="text-gradient">{t('precisionAIAnalysis')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            AI <span className="text-gradient">Image</span> Analysis
+            {t('aiImageAnalysis').split(' ').map((word, i) => 
+              i === 1 ? <span key={i} className="text-gradient">{word} </span> : word + ' '
+            )}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Upload a photo of skin conditions for detailed AI-powered visual analysis with high accuracy.
+            {t('uploadPhotoDescription')}
           </p>
         </div>
 
@@ -168,9 +173,9 @@ export default function AiAnalysis() {
               <p className="text-sm text-muted-foreground flex items-start gap-2">
                 <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <span>
-                  Analysis will be personalized based on your profile
-                  {profile.age && ` (Age: ${profile.age})`}
-                  {profile.allergies.length > 0 && `, considering ${profile.allergies.length} known allergies`}
+                  {t('analysisPersonalized')}
+                  {profile.age && ` (${t('age')}: ${profile.age})`}
+                  {profile.allergies.length > 0 && `, ${profile.allergies.length} ${t('allergies').toLowerCase()}`}
                 </span>
               </p>
             </div>
@@ -180,7 +185,7 @@ export default function AiAnalysis() {
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
               <Upload className="h-5 w-5 text-primary" />
-              Upload Image
+              {t('uploadImage')}
             </h2>
 
             {!image ? (
@@ -193,13 +198,13 @@ export default function AiAnalysis() {
                     <Upload className="h-10 w-10 text-white" />
                   </div>
                   <p className="mb-2 text-lg text-foreground font-semibold">
-                    Click to upload or drag and drop
+                    {t('clickToUpload')}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    PNG, JPG, WEBP up to 10MB
+                    {t('upTo10MB')}
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
-                    For best results, use clear, well-lit images
+                    {t('forBestResults')}
                   </p>
                 </div>
                 <input
@@ -249,12 +254,12 @@ export default function AiAnalysis() {
             {isAnalyzing ? (
               <>
                 <div className="h-5 w-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Analyzing Image...
+                {t('analyzingImage')}
               </>
             ) : (
               <>
                 <Zap className="mr-2 h-5 w-5" />
-                Analyze Image
+                {t('analyzeImage')}
               </>
             )}
           </Button>
@@ -274,7 +279,7 @@ export default function AiAnalysis() {
                 <div className="glass-card p-6 rounded-2xl">
                   <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                     <Eye className="h-5 w-5 text-primary" />
-                    AI Observations
+                    {t('aiObservations')}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {results.observations.map((observation, index) => (
@@ -295,7 +300,9 @@ export default function AiAnalysis() {
               {results.conditions && results.conditions.length > 0 && (
                 <div>
                   <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">
-                    Possible <span className="text-gradient">Conditions</span>
+                    {t('possibleConditions').split(' ').map((word, i) => 
+                      i === 0 ? word + ' ' : <span key={i} className="text-gradient">{word}</span>
+                    )}
                   </h2>
                   <div className="space-y-4">
                     {results.conditions.map((condition, index) => {
@@ -319,7 +326,7 @@ export default function AiAnalysis() {
                                 </h3>
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${styles.bg} ${styles.text}`}>
                                   <LikelihoodIcon className="h-3 w-3" />
-                                  {condition.likelihood.charAt(0).toUpperCase() + condition.likelihood.slice(1)} Likelihood
+                                  {condition.likelihood.charAt(0).toUpperCase() + condition.likelihood.slice(1)} {t('likelihood')}
                                 </span>
                               </div>
                             </div>
@@ -349,12 +356,12 @@ export default function AiAnalysis() {
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-4">
                         <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                          AI Recommendation
+                          {t('aiRecommendation')}
                         </h3>
                         <EvidenceModal>
                           <Button variant="ghost" size="sm">
                             <BookOpen className="h-4 w-4 mr-1" />
-                            Sources
+                            {t('sources')}
                           </Button>
                         </EvidenceModal>
                       </div>
