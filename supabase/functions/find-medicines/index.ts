@@ -21,14 +21,26 @@ serve(async (req) => {
 ${allergyWarning}${medicationWarning}
 ${patientContext ? `\nAdditional patient context: ${patientContext}` : ""}
 
-Provide 3-4 common over-the-counter medicines available in Kazakhstan pharmacies with:
-- Accurate dosage based on age/weight if provided
-- Estimated price range in Kazakhstani Tenge (KZT)
+IMPORTANT: Provide realistic medicine recommendations available in Kazakhstan pharmacies (АльфаМед, БиоСфера, Bios, Аптека низких цен).
+
+Use REALISTIC PRICES based on actual Kazakhstan pharmacy prices:
+- Common painkillers (Paracetamol, Ibuprofen): 300-800 KZT
+- Cold medicines: 800-2,500 KZT
+- Antibiotics (prescription): 2,000-8,000 KZT
+- Vitamins: 1,500-5,000 KZT
+- Antihistamines: 500-2,000 KZT
+- Stomach medicines: 800-3,000 KZT
+- Eye/Ear drops: 1,000-4,000 KZT
+- Skin creams/ointments: 500-3,500 KZT
+
+Provide 3-4 medicines with:
+- Accurate dosage based on age/weight
+- Realistic price in KZT based on above ranges
 - Clear usage instructions
 - Duration of treatment
-- Important warnings
-- Check for interactions with current medications if any are listed
-- Avoid medicines containing allergens if allergies are listed`;
+- Warnings and contraindications
+- Check for drug interactions if medications listed`;
+
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
