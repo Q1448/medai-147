@@ -21,6 +21,39 @@ export const translations: Translations = {
   about: { en: 'About', ru: 'О нас', kk: 'Біз туралы' },
   feedback: { en: 'Feedback', ru: 'Отзывы', kk: 'Пікірлер' },
   
+  // Homepage
+  heroTagline: { en: 'Next-Gen Health Assistant', ru: 'Медицинский ИИ-помощник', kk: 'Жаңа буын денсаулық көмекшісі' },
+  heroTitle1: { en: 'Your AI-Powered', ru: 'Ваш ИИ-помощник', kk: 'Сіздің AI-қуатты' },
+  heroTitle2: { en: 'Medical', ru: 'по', kk: 'Медициналық' },
+  heroTitle3: { en: 'Companion', ru: 'здоровью', kk: 'Серігіңіз' },
+  heroDescription: { en: 'Get instant health insights, accurate symptom analysis, medicine recommendations, and find nearby healthcare facilities—all powered by advanced AI.', ru: 'Получайте мгновенные медицинские советы, точный анализ симптомов, рекомендации по лекарствам и находите ближайшие медучреждения — всё на основе ИИ.', kk: 'Лезде денсаулық кеңестері, дәл белгілер талдауы, дәрі ұсыныстары және жақын медициналық мекемелерді табыңыз — барлығы AI негізінде.' },
+  checkSymptoms: { en: 'Check Symptoms', ru: 'Проверить симптомы', kk: 'Белгілерді тексеру' },
+  talkToAI: { en: 'Talk to AI Doctor', ru: 'Спросить ИИ доктора', kk: 'AI дәрігермен сөйлесу' },
+  available247: { en: 'Available', ru: 'Доступно', kk: 'Қолжетімді' },
+  aiPowered: { en: 'Powered', ru: 'На базе', kk: 'Қуатты' },
+  privateSecure: { en: 'Private', ru: 'Приватно', kk: 'Құпия' },
+  fastResults: { en: 'Results', ru: 'Результаты', kk: 'Нәтижелер' },
+  exploreFeatures: { en: 'Explore Our Features', ru: 'Наши возможности', kk: 'Мүмкіндіктерімізді зерттеңіз' },
+  featuresDescription: { en: 'Comprehensive AI-powered tools designed to help you make informed health decisions', ru: 'Комплексные ИИ-инструменты для принятия обоснованных решений о здоровье', kk: 'Денсаулық шешімдерін қабылдауға көмектесетін жан-жақты AI құралдары' },
+  needHelp: { en: 'Need Immediate Help?', ru: 'Нужна срочная помощь?', kk: 'Шұғыл көмек керек пе?' },
+  emergencyDescription: { en: "If you're experiencing a medical emergency, please contact emergency services immediately.", ru: 'Если у вас неотложная медицинская ситуация, немедленно вызовите скорую помощь.', kk: 'Медициналық төтенше жағдай болса, дереу жедел жәрдемге хабарласыңыз.' },
+  callEmergency: { en: 'Call Emergency: 103', ru: 'Скорая помощь: 103', kk: 'Жедел жәрдем: 103' },
+  findHospitals: { en: 'Find Hospitals', ru: 'Найти больницы', kk: 'Ауруханаларды табу' },
+  
+  // Feature cards
+  featureSymptomTitle: { en: 'Symptoms Checker', ru: 'Проверка симптомов', kk: 'Белгілерді тексеру' },
+  featureSymptomDesc: { en: 'Advanced AI analysis of your symptoms for accurate condition identification', ru: 'Расширенный ИИ-анализ симптомов для точного определения заболевания', kk: 'Дәл ауруды анықтау үшін белгілердің AI талдауы' },
+  featureAIDoctorTitle: { en: 'AI Doctor', ru: 'ИИ Доктор', kk: 'AI Дәрігер' },
+  featureAIDoctorDesc: { en: 'Powerful AI medical assistant with comprehensive health knowledge', ru: 'Мощный ИИ медицинский ассистент с обширными знаниями о здоровье', kk: 'Денсаулық туралы терең білімі бар қуатты AI медициналық көмекшісі' },
+  featureImageTitle: { en: 'AI Image Analysis', ru: 'ИИ анализ изображений', kk: 'AI сурет талдау' },
+  featureImageDesc: { en: 'Precise visual analysis of skin conditions with detailed insights', ru: 'Точный визуальный анализ состояния кожи с детальными выводами', kk: 'Тері жағдайларының нақты визуалды талдауы' },
+  featureMedicineTitle: { en: 'Medicine Shop', ru: 'Аптека', kk: 'Дәріхана' },
+  featureMedicineDesc: { en: 'Find medicines for your condition with prices and instructions', ru: 'Найдите лекарства с ценами и инструкциями', kk: 'Бағалар мен нұсқаулармен дәрі табыңыз' },
+  featureHospitalTitle: { en: 'Pharmacies & Hospitals', ru: 'Аптеки и Больницы', kk: 'Дәріханалар мен Ауруханалар' },
+  featureHospitalDesc: { en: 'Navigate directly to pharmacies and hospitals in Astana', ru: 'Переходите напрямую к аптекам и больницам в Астане', kk: 'Астанадағы дәріханалар мен ауруханаларға тікелей өтіңіз' },
+  featureAboutTitle: { en: 'About Us', ru: 'О нас', kk: 'Біз туралы' },
+  featureAboutDesc: { en: 'Meet our team and learn about our mission', ru: 'Познакомьтесь с нашей командой и миссией', kk: 'Біздің команда және миссиямызбен танысыңыз' },
+  
   // Common
   search: { en: 'Search', ru: 'Поиск', kk: 'Іздеу' },
   submit: { en: 'Submit', ru: 'Отправить', kk: 'Жіберу' },
@@ -156,6 +189,14 @@ export const translations: Translations = {
   thankYou: { en: 'Thank you for your feedback!', ru: 'Спасибо за ваш отзыв!', kk: 'Пікіріңіз үшін рахмет!' },
   yourFeedbackHelps: { en: 'Your feedback helps us improve MedAI+', ru: 'Ваш отзыв помогает нам улучшить MedAI+', kk: 'Пікіріңіз MedAI+ жақсартуға көмектеседі' },
   
+  // Feedback Stats
+  feedbackStats: { en: 'Community Feedback', ru: 'Отзывы сообщества', kk: 'Қауымдастық пікірлері' },
+  feedbackStatsDescription: { en: 'See what others are suggesting', ru: 'Посмотрите предложения других', kk: 'Басқалардың ұсыныстарын қараңыз' },
+  totalSuggestions: { en: 'Total Suggestions', ru: 'Всего предложений', kk: 'Барлық ұсыныстар' },
+  thisWeek: { en: 'This Week', ru: 'За неделю', kk: 'Осы аптада' },
+  mostPopular: { en: 'Most Popular', ru: 'Самое популярное', kk: 'Ең танымал' },
+  byCategory: { en: 'By Category', ru: 'По категориям', kk: 'Санаттар бойынша' },
+  
   // Categories
   catGeneral: { en: 'General', ru: 'Общее', kk: 'Жалпы' },
   catUI: { en: 'User Interface', ru: 'Интерфейс', kk: 'Интерфейс' },
@@ -174,6 +215,14 @@ export const translations: Translations = {
   chronicConditions: { en: 'Chronic Conditions', ru: 'Хронические заболевания', kk: 'Созылмалы аурулар' },
   analysisPersonalized: { en: 'Analysis will consider your profile', ru: 'Анализ учтет ваш профиль', kk: 'Талдау профиліңізді ескереді' },
   responsesPersonalized: { en: 'Responses personalized for your profile', ru: 'Ответы персонализированы для вашего профиля', kk: 'Жауаптар профиліңізге бейімделген' },
+  
+  // About page
+  aboutDescription: { en: 'We are a dedicated team of students from NIS IB (Nazarbayev Intellectual School, International Baccalaureate program) passionate about using technology to improve healthcare accessibility.', ru: 'Мы - команда студентов NIS IB (Назарбаев Интеллектуальная Школа, программа IB), увлечённых использованием технологий для улучшения доступности медицины.', kk: 'Біз денсаулық сақтау қолжетімділігін жақсарту үшін технологияны қолдануға құмар NIS IB (Назарбаев Интеллектуалды Мектебі, IB бағдарламасы) студенттерінің командасымыз.' },
+  nisDescription: { en: 'Nazarbayev Intellectual School - International Baccalaureate', ru: 'Назарбаев Интеллектуальная Школа - Международный Бакалавриат', kk: 'Назарбаев Интеллектуалды Мектебі - Халықаралық Бакалавриат' },
+  projectDescription: { en: 'This project was developed as part of our educational initiative at NIS IB, combining our passion for technology with a desire to make healthcare information more accessible to everyone.', ru: 'Этот проект был разработан в рамках нашей образовательной инициативы в NIS IB, объединяя нашу страсть к технологиям с желанием сделать медицинскую информацию более доступной.', kk: 'Бұл жоба NIS IB-дегі біздің білім беру бастамамыздың бір бөлігі ретінде әзірленді, технологияға деген құмарлығымызды денсаулық сақтау туралы ақпаратты барлығына қолжетімді ету тілегімен біріктіреді.' },
+  sponsorship: { en: 'Sponsorship', ru: 'Спонсорство', kk: 'Демеушілік' },
+  sponsorshipDescription: { en: 'This section is reserved for future sponsors and partners who support our mission to improve healthcare accessibility through technology.', ru: 'Этот раздел зарезервирован для будущих спонсоров и партнёров, поддерживающих нашу миссию по улучшению доступности медицины с помощью технологий.', kk: 'Бұл бөлім технология арқылы денсаулық сақтау қолжетімділігін жақсарту миссиямызды қолдайтын болашақ демеушілер мен серіктестерге арналған.' },
+  comingSoon: { en: 'Coming Soon', ru: 'Скоро', kk: 'Жақында' },
   
   // Disclaimer
   disclaimer: { en: 'Medical Disclaimer', ru: 'Медицинский отказ от ответственности', kk: 'Медициналық жауапкершіліктен бас тарту' },

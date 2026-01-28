@@ -17,9 +17,9 @@ serve(async (req) => {
     
     // Language instruction
     const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания и причины - всё на русском.'
+      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины и цитаты из источников - всё на русском.'
       : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар мен себептер - бәрі қазақша.'
+      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар, себептер және дереккөз цитаталары - бәрі қазақша.'
       : 'Respond in English.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -46,11 +46,17 @@ IMPORTANT GUIDELINES:
 8. Consider patient demographics and history when provided
 9. NEVER diagnose - this is educational information only
 
+EVIDENCE-BASED REQUIREMENT:
+- Include citations from medical literature for each condition
+- Reference sources like BMC journals, PubMed, WHO guidelines, NICE guidelines
+- Mention specific studies or clinical guidelines that support each assessment
+- Include the citation in the description or possibleCause field
+
 ${patientContext ? `PATIENT CONTEXT - Use this to personalize your analysis:\n${patientContext}` : ""}
 
 Return exactly 3 conditions ranked by likelihood of matching the symptom pattern.` 
           },
-          { role: "user", content: `Analyze these symptoms thoroughly and identify the 3 most likely conditions: ${symptoms}. Consider how these symptoms interact and what conditions commonly present with this combination.` }
+          { role: "user", content: `Analyze these symptoms thoroughly and identify the 3 most likely conditions: ${symptoms}. Consider how these symptoms interact and what conditions commonly present with this combination. Include medical literature citations.` }
         ],
         tools: [{
           type: "function",
@@ -66,11 +72,12 @@ Return exactly 3 conditions ranked by likelihood of matching the symptom pattern
                     type: "object",
                     properties: {
                       name: { type: "string", description: "Medical condition name" },
-                      description: { type: "string", description: "Detailed description of the condition and why it matches the symptoms (2-3 sentences)" },
-                      possibleCause: { type: "string", description: "Detailed explanation of what causes this condition (2-3 sentences)" },
-                      severity: { type: "string", enum: ["low", "medium", "high"], description: "Severity level based on symptom combination" }
+                      description: { type: "string", description: "Detailed description of the condition and why it matches the symptoms. Include citation from medical literature (e.g., 'According to BMC Medicine 2023...')" },
+                      possibleCause: { type: "string", description: "Detailed explanation of what causes this condition with supporting evidence from medical journals" },
+                      severity: { type: "string", enum: ["low", "medium", "high"], description: "Severity level based on symptom combination" },
+                      sources: { type: "array", items: { type: "string" }, description: "List of 1-2 medical journal citations (e.g., 'BMC Medicine, 2023', 'WHO Guidelines 2024')" }
                     },
-                    required: ["name", "description", "possibleCause", "severity"]
+                    required: ["name", "description", "possibleCause", "severity", "sources"]
                   }
                 }
               },

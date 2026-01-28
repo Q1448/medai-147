@@ -30,7 +30,8 @@ import {
   BookOpen,
   Car,
   Footprints,
-  Store
+  Store,
+  FileText
 } from "lucide-react";
 
 interface Medicine {
@@ -46,6 +47,8 @@ interface Medicine {
   analogues?: string[];
   inStock?: boolean;
   incompatibleWith?: string[];
+  imageUrl?: string;
+  evidenceSource?: string;
 }
 
 interface MedicineResult {
@@ -65,64 +68,50 @@ interface NearbyPharmacy {
   inStock: boolean;
 }
 
-const popularConditions = [
-  "Headache",
-  "Cold & Flu",
-  "Fever",
-  "Allergies",
-  "Stomach Pain",
-  "Sore Throat",
-  "Back Pain",
-  "Cough",
-  "Insomnia",
-  "Muscle Pain",
-];
-
 const nearbyPharmacies: NearbyPharmacy[] = [
   {
-    name: "Darigar Pharmacy",
-    address: "Kabanbay Batyr Ave 53, Astana",
+    name: "АльфаМед",
+    address: "Astana",
     phone: "+7 (7172) 57-72-72",
     distance: "0.8 km",
     walkTime: "10 min",
     driveTime: "3 min",
-    coords: "51.1280,71.4306",
+    coords: "51.135935,71.422372",
     inStock: true,
   },
   {
-    name: "Apteka Plus",
-    address: "Turan Ave 24, Astana",
+    name: "БиоСфера",
+    address: "Astana",
     phone: "+7 (7172) 44-55-66",
     distance: "1.2 km",
     walkTime: "15 min",
     driveTime: "5 min",
-    coords: "51.1350,71.4200",
+    coords: "51.147796,71.47828",
     inStock: true,
   },
   {
-    name: "Pharmaline 24/7",
-    address: "Syganak St 29, Astana",
+    name: "Bios",
+    address: "Astana",
     phone: "+7 (7172) 33-44-55",
     distance: "2.1 km",
     walkTime: "26 min",
     driveTime: "7 min",
-    coords: "51.1420,71.4150",
-    inStock: false,
+    coords: "51.106039,71.400612",
+    inStock: true,
   },
   {
-    name: "Euroaptek",
-    address: "Dostyk St 5, Astana",
+    name: "Аптека низких цен",
+    address: "Astana",
     phone: "+7 (7172) 22-33-44",
     distance: "3.5 km",
     walkTime: "44 min",
     driveTime: "12 min",
-    coords: "51.1500,71.4400",
+    coords: "51.182959,71.376425",
     inStock: true,
   },
 ];
 
 type PriceFilter = "all" | "cheap" | "medium" | "expensive";
-type AvailabilityFilter = "all" | "inStock" | "outOfStock";
 
 export default function Medicines() {
   const { profile, getProfileContext } = useMedicalProfile();
@@ -134,6 +123,19 @@ export default function Medicines() {
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("all");
   const [showGenerics, setShowGenerics] = useState(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<NearbyPharmacy | null>(null);
+
+  const popularConditions = [
+    { key: "conditionHeadache", en: "Headache" },
+    { key: "conditionColdFlu", en: "Cold & Flu" },
+    { key: "conditionFever", en: "Fever" },
+    { key: "conditionAllergies", en: "Allergies" },
+    { key: "conditionStomachPain", en: "Stomach Pain" },
+    { key: "conditionSoreThroat", en: "Sore Throat" },
+    { key: "conditionBackPain", en: "Back Pain" },
+    { key: "conditionCough", en: "Cough" },
+    { key: "conditionInsomnia", en: "Insomnia" },
+    { key: "conditionMusclePain", en: "Muscle Pain" },
+  ];
 
   const searchMedicines = async () => {
     if (!condition.trim()) {
@@ -215,13 +217,13 @@ export default function Medicines() {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <ShoppingBag className="h-4 w-4 text-medical-green" />
-            <span className="text-gradient">Health Market</span>
+            <span className="text-gradient">{t('healthMarket')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Find <span className="text-gradient">Medicines</span> for Your Condition
+            {t('findMedicinesTitle')}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Get personalized medicine recommendations based on your profile with prices, availability, and nearby pharmacies.
+            {t('medicineShop')}
           </p>
         </div>
 
@@ -232,13 +234,13 @@ export default function Medicines() {
               {/* Condition Input */}
               <div>
                 <Label htmlFor="condition" className="text-foreground text-base font-semibold mb-3 block">
-                  What's your condition or disease?
+                  {t('whatsYourCondition')}
                 </Label>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="condition"
-                    placeholder="e.g., Headache, Flu, Allergies, Back Pain..."
+                    placeholder={t('conditionPlaceholder')}
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && searchMedicines()}
@@ -248,15 +250,15 @@ export default function Medicines() {
                 <div className="flex flex-wrap gap-2 mt-4">
                   {popularConditions.map((c) => (
                     <button
-                      key={c}
-                      onClick={() => setCondition(c)}
+                      key={c.key}
+                      onClick={() => setCondition(t(c.key))}
                       className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                        condition === c
+                        condition === t(c.key)
                           ? "bg-primary text-primary-foreground shadow-md"
                           : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
-                      {c}
+                      {t(c.key)}
                     </button>
                   ))}
                 </div>
@@ -268,10 +270,10 @@ export default function Medicines() {
                   <p className="text-sm text-muted-foreground flex items-start gap-2">
                     <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>
-                      Recommendations will be personalized based on your profile
-                      {profile.age && ` (Age: ${profile.age})`}
-                      {profile.allergies.length > 0 && `, excluding ${profile.allergies.length} known allergies`}
-                      {profile.currentMedications.length > 0 && `, checking ${profile.currentMedications.length} medication interactions`}
+                      {t('analysisPersonalized')}
+                      {profile.age && ` (${t('age')}: ${profile.age})`}
+                      {profile.allergies.length > 0 && `, ${profile.allergies.length} ${t('allergies').toLowerCase()}`}
+                      {profile.currentMedications.length > 0 && `, ${profile.currentMedications.length} ${t('medications').toLowerCase()}`}
                     </span>
                   </p>
                 </div>
@@ -295,12 +297,12 @@ export default function Medicines() {
             {isSearching ? (
               <>
                 <div className="h-5 w-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Finding Medicines...
+                {t('findingMedicines')}
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-5 w-5" />
-                Find Medicines
+                {t('findMedicines')}
               </>
             )}
           </Button>
@@ -317,10 +319,10 @@ export default function Medicines() {
             <div className="mt-12 space-y-8 animate-fade-up">
               <div className="text-center">
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Medicines for <span className="text-gradient">{results.condition}</span>
+                  {t('medicinesFor')} <span className="text-gradient">{results.condition}</span>
                 </h2>
                 <p className="text-muted-foreground">
-                  Found {results.medicines?.length || 0} recommended medicines
+                  {results.medicines?.length || 0} {t('foundMedicines')}
                 </p>
               </div>
 
@@ -329,7 +331,7 @@ export default function Medicines() {
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">Filters:</span>
+                    <span className="text-sm font-medium text-foreground">{t('filters')}:</span>
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
@@ -338,7 +340,7 @@ export default function Medicines() {
                       className="cursor-pointer"
                       onClick={() => setPriceFilter("all")}
                     >
-                      All Prices
+                      {t('allPrices')}
                     </Badge>
                     <Badge
                       variant={priceFilter === "cheap" ? "default" : "outline"}
@@ -346,7 +348,7 @@ export default function Medicines() {
                       onClick={() => setPriceFilter("cheap")}
                     >
                       <DollarSign className="h-3 w-3 mr-1" />
-                      Budget (&lt;500 KZT)
+                      {t('budget')} (&lt;500 KZT)
                     </Badge>
                     <Badge
                       variant={priceFilter === "medium" ? "default" : "outline"}
@@ -355,7 +357,7 @@ export default function Medicines() {
                     >
                       <DollarSign className="h-3 w-3 mr-1" />
                       <DollarSign className="h-3 w-3 -ml-2" />
-                      Medium
+                      {t('medium')}
                     </Badge>
                     <Badge
                       variant={priceFilter === "expensive" ? "default" : "outline"}
@@ -365,7 +367,7 @@ export default function Medicines() {
                       <DollarSign className="h-3 w-3 mr-1" />
                       <DollarSign className="h-3 w-3 -ml-2" />
                       <DollarSign className="h-3 w-3 -ml-2" />
-                      Premium
+                      {t('premium')}
                     </Badge>
                   </div>
 
@@ -375,7 +377,7 @@ export default function Medicines() {
                     onClick={() => setShowGenerics(!showGenerics)}
                   >
                     <RefreshCcw className="h-3 w-3 mr-1" />
-                    Generics Only
+                    {t('genericsOnly')}
                   </Badge>
                 </div>
               </div>
@@ -385,12 +387,27 @@ export default function Medicines() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredMedicines.map((medicine, index) => (
                     <div key={index} className="medicine-shop-card">
-                      {/* Header */}
+                      {/* Header with Image */}
                       <div className="p-6 pb-4">
                         <div className="flex items-start gap-4">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-medical-green to-medical-mint">
-                            <Pill className="h-7 w-7 text-white" />
-                          </div>
+                          {medicine.imageUrl ? (
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl overflow-hidden bg-muted">
+                              <img 
+                                src={medicine.imageUrl} 
+                                alt={medicine.name}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '';
+                                  e.currentTarget.parentElement!.innerHTML = '<div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-medical-green to-medical-mint"><svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-medical-green to-medical-mint">
+                              <Pill className="h-7 w-7 text-white" />
+                            </div>
+                          )}
                           <div className="flex-1">
                             <div className="flex items-start justify-between">
                               <div>
@@ -403,7 +420,7 @@ export default function Medicines() {
                               </div>
                               {medicine.isGeneric && (
                                 <Badge variant="secondary" className="text-xs">
-                                  Generic
+                                  {t('generic')}
                                 </Badge>
                               )}
                             </div>
@@ -427,12 +444,12 @@ export default function Medicines() {
                           {medicine.inStock ? (
                             <>
                               <CheckCircle2 className="h-3 w-3" />
-                              In Stock
+                              {t('inStock')}
                             </>
                           ) : (
                             <>
                               <XCircle className="h-3 w-3" />
-                              Out of Stock
+                              {t('outOfStock')}
                             </>
                           )}
                         </div>
@@ -444,7 +461,7 @@ export default function Medicines() {
                           <Package className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                           <div>
                             <span className="font-medium text-foreground text-sm block mb-0.5">
-                              Dosage
+                              {t('dosage')}
                             </span>
                             <span className="text-muted-foreground text-sm">
                               {medicine.dosage}
@@ -456,7 +473,7 @@ export default function Medicines() {
                           <Info className="h-5 w-5 text-medical-blue shrink-0 mt-0.5" />
                           <div>
                             <span className="font-medium text-foreground text-sm block mb-0.5">
-                              Instructions
+                              {t('instructions')}
                             </span>
                             <span className="text-muted-foreground text-sm">
                               {medicine.instructions}
@@ -469,10 +486,25 @@ export default function Medicines() {
                             <Clock className="h-5 w-5 text-medical-purple shrink-0 mt-0.5" />
                             <div>
                               <span className="font-medium text-foreground text-sm block mb-0.5">
-                                Duration
+                                {t('duration')}
                               </span>
                               <span className="text-muted-foreground text-sm">
                                 {medicine.duration}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Evidence Source */}
+                        {medicine.evidenceSource && (
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-medical-blue/10 border border-medical-blue/20">
+                            <FileText className="h-4 w-4 text-medical-blue shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-medium text-medical-blue text-sm block mb-0.5">
+                                {t('evidenceBased')}
+                              </span>
+                              <span className="text-muted-foreground text-xs">
+                                {medicine.evidenceSource}
                               </span>
                             </div>
                           </div>
@@ -484,7 +516,7 @@ export default function Medicines() {
                             <RefreshCcw className="h-4 w-4 text-medical-blue shrink-0 mt-0.5" />
                             <div>
                               <span className="font-medium text-medical-blue text-sm block mb-1">
-                                Alternatives
+                                {t('analogues')}
                               </span>
                               <div className="flex flex-wrap gap-1">
                                 {medicine.analogues.map((a, i) => (
@@ -503,11 +535,11 @@ export default function Medicines() {
                             <div className="flex items-center gap-2 mb-1">
                               <AlertTriangle className="h-4 w-4 text-destructive" />
                               <span className="font-medium text-destructive text-sm">
-                                Interaction Warning
+                                {t('drugInteractionWarning')}
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              May interact with: {medicine.incompatibleWith.join(", ")}
+                              {t('mayInteractWith')}: {medicine.incompatibleWith.join(", ")}
                             </p>
                           </div>
                         )}
@@ -517,7 +549,7 @@ export default function Medicines() {
                             <div className="flex items-center gap-2 mb-2">
                               <AlertTriangle className="h-4 w-4 text-medical-warning" />
                               <span className="font-medium text-medical-warning text-sm">
-                                Warnings
+                                {t('warnings')}
                               </span>
                             </div>
                             <ul className="text-xs text-muted-foreground space-y-1">
@@ -535,7 +567,7 @@ export default function Medicines() {
                         <EvidenceModal condition={medicine.name}>
                           <Button variant="ghost" size="sm" className="w-full mt-2">
                             <BookOpen className="h-4 w-4 mr-2" />
-                            What is this based on?
+                            {t('whatIsThisBased')}
                           </Button>
                         </EvidenceModal>
                       </div>
@@ -552,7 +584,7 @@ export default function Medicines() {
               <div className="glass-card p-6 rounded-2xl">
                 <h3 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                   <Store className="h-5 w-5 text-primary" />
-                  Nearby Pharmacies in Astana
+                  {t('nearbyPharmacies')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {nearbyPharmacies.map((pharmacy, index) => (
@@ -571,7 +603,7 @@ export default function Medicines() {
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-semibold text-foreground">{pharmacy.name}</h4>
                             <Badge variant={pharmacy.inStock ? "default" : "secondary"} className="text-xs shrink-0">
-                              {pharmacy.inStock ? "In Stock" : "Check"}
+                              {pharmacy.inStock ? t('inStock') : "Check"}
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
@@ -585,11 +617,11 @@ export default function Medicines() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Footprints className="h-3 w-3" />
-                              {pharmacy.walkTime}
+                              {pharmacy.walkTime} {t('walkTime')}
                             </span>
                             <span className="flex items-center gap-1">
                               <Car className="h-3 w-3" />
-                              {pharmacy.driveTime}
+                              {pharmacy.driveTime} {t('driveTime')}
                             </span>
                           </div>
                           <div className="flex gap-2 mt-3">
@@ -603,7 +635,7 @@ export default function Medicines() {
                               }}
                             >
                               <Phone className="h-3 w-3 mr-1" />
-                              Call
+                              {t('callPharmacy')}
                             </Button>
                             <Button
                               size="sm"
@@ -614,7 +646,7 @@ export default function Medicines() {
                               }}
                             >
                               <Navigation className="h-3 w-3 mr-1" />
-                              Directions
+                              {t('getDirections')}
                             </Button>
                           </div>
                         </div>
@@ -633,7 +665,7 @@ export default function Medicines() {
                     </div>
                     <div>
                       <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                        General Advice
+                        {t('generalAdvice')}
                       </h3>
                       <p className="text-muted-foreground leading-relaxed">
                         {results.generalAdvice}
