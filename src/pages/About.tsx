@@ -1,22 +1,25 @@
 import { Layout } from "@/components/layout/Layout";
-import { Users, Code, Search, Building2, Heart, Award, Sparkles } from "lucide-react";
-
-const team = [
-  {
-    name: "Yerzhanuly Yerassyl",
-    role: "Developer",
-    icon: Code,
-    gradient: "from-primary to-medical-sky",
-  },
-  {
-    name: "Kadyr Altair",
-    role: "Researcher",
-    icon: Search,
-    gradient: "from-medical-purple to-medical-coral",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Users, Code, Search, Building2, Award, Sparkles } from "lucide-react";
 
 export default function About() {
+  const { t } = useLanguage();
+
+  const team = [
+    {
+      name: "Yerzhanuly Yerassyl",
+      role: t('developer'),
+      icon: Code,
+      gradient: "from-primary to-medical-sky",
+    },
+    {
+      name: "Kadyr Altair",
+      role: t('researcher'),
+      icon: Search,
+      gradient: "from-medical-purple to-medical-coral",
+    },
+  ];
+
   return (
     <Layout showFooterDisclaimer>
       <div className="container py-12 md:py-20">
@@ -24,14 +27,13 @@ export default function About() {
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Users className="h-4 w-4 text-primary" />
-            <span className="text-gradient">About Us</span>
+            <span className="text-gradient">{t('about')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Meet Our <span className="text-gradient">Team</span>
+            {t('ourTeam')}
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            We are a dedicated team of students from NIS IB (Nazarbayev Intellectual School, International Baccalaureate program) 
-            passionate about using technology to improve healthcare accessibility.
+            {t('aboutDescription')}
           </p>
         </div>
 
@@ -68,14 +70,11 @@ export default function About() {
               </div>
               <div>
                 <h2 className="font-display text-2xl font-bold text-foreground">NIS IB</h2>
-                <p className="text-muted-foreground">Nazarbayev Intellectual School - International Baccalaureate</p>
+                <p className="text-muted-foreground">{t('nisDescription')}</p>
               </div>
             </div>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              This project was developed as part of our educational initiative at NIS IB, 
-              combining our passion for technology with a desire to make healthcare information 
-              more accessible to everyone. The International Baccalaureate program encourages 
-              students to become innovative thinkers who make a positive impact on their communities.
+              {t('projectDescription')}
             </p>
             <div className="flex flex-wrap gap-3">
               <span className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
@@ -91,20 +90,19 @@ export default function About() {
           </div>
         </div>
 
-        {/* Sponsorship Section - Empty placeholder */}
+        {/* Sponsorship Section */}
         <div className="max-w-4xl mx-auto">
           <div className="rounded-3xl border-2 border-dashed border-border/60 bg-muted/30 p-8 md:p-12 text-center">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-6">
               <Award className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="font-display text-2xl font-bold text-foreground mb-3">Sponsorship</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-3">{t('sponsorship')}</h2>
             <p className="text-muted-foreground max-w-md mx-auto">
-              This section is reserved for future sponsors and partners who support our mission 
-              to improve healthcare accessibility through technology.
+              {t('sponsorshipDescription')}
             </p>
             <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
               <Sparkles className="h-4 w-4" />
-              Coming Soon
+              {t('comingSoon')}
             </div>
           </div>
         </div>

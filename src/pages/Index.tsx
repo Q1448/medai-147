@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { MedicalCard } from "@/components/ui/medical-card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Activity,
   Bot,
@@ -18,59 +19,61 @@ import {
   HeartPulse,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: Activity,
-    title: "Symptoms Checker",
-    description: "Advanced AI analysis of your symptoms for accurate condition identification",
-    href: "/symptoms",
-    gradient: "from-primary to-medical-sky",
-  },
-  {
-    icon: Bot,
-    title: "AI Doctor",
-    description: "Powerful AI medical assistant with comprehensive health knowledge",
-    href: "/ai-doctor",
-    gradient: "from-medical-blue to-medical-purple",
-  },
-  {
-    icon: Camera,
-    title: "AI Image Analysis",
-    description: "Precise visual analysis of skin conditions with detailed insights",
-    href: "/ai-analysis",
-    gradient: "from-medical-purple to-medical-coral",
-  },
-  {
-    icon: ShoppingBag,
-    title: "Medicine Shop",
-    description: "Find medicines for your condition with prices and instructions",
-    href: "/medicines",
-    gradient: "from-medical-green to-medical-mint",
-  },
-  {
-    icon: Building2,
-    title: "Pharmacies & Hospitals",
-    description: "Navigate directly to pharmacies and hospitals in Astana",
-    href: "/hospitals",
-    gradient: "from-medical-coral to-medical-peach",
-  },
-  {
-    icon: Users,
-    title: "About Us",
-    description: "Meet our team and learn about our mission",
-    href: "/about",
-    gradient: "from-medical-navy to-primary",
-  },
-];
-
-const stats = [
-  { value: "24/7", label: "Available", icon: Clock },
-  { value: "AI", label: "Powered", icon: Brain },
-  { value: "100%", label: "Private", icon: Shield },
-  { value: "Fast", label: "Results", icon: Zap },
-];
-
 export default function Index() {
+  const { t } = useLanguage();
+
+  const features = [
+    {
+      icon: Activity,
+      title: t('featureSymptomTitle'),
+      description: t('featureSymptomDesc'),
+      href: "/symptoms",
+      gradient: "from-primary to-medical-sky",
+    },
+    {
+      icon: Bot,
+      title: t('featureAIDoctorTitle'),
+      description: t('featureAIDoctorDesc'),
+      href: "/ai-doctor",
+      gradient: "from-medical-blue to-medical-purple",
+    },
+    {
+      icon: Camera,
+      title: t('featureImageTitle'),
+      description: t('featureImageDesc'),
+      href: "/ai-analysis",
+      gradient: "from-medical-purple to-medical-coral",
+    },
+    {
+      icon: ShoppingBag,
+      title: t('featureMedicineTitle'),
+      description: t('featureMedicineDesc'),
+      href: "/medicines",
+      gradient: "from-medical-green to-medical-mint",
+    },
+    {
+      icon: Building2,
+      title: t('featureHospitalTitle'),
+      description: t('featureHospitalDesc'),
+      href: "/hospitals",
+      gradient: "from-medical-coral to-medical-peach",
+    },
+    {
+      icon: Users,
+      title: t('featureAboutTitle'),
+      description: t('featureAboutDesc'),
+      href: "/about",
+      gradient: "from-medical-navy to-primary",
+    },
+  ];
+
+  const stats = [
+    { value: "24/7", label: t('available247'), icon: Clock },
+    { value: "AI", label: t('aiPowered'), icon: Brain },
+    { value: "100%", label: t('privateSecure'), icon: Shield },
+    { value: "Fast", label: t('fastResults'), icon: Zap },
+  ];
+
   return (
     <Layout showFooterDisclaimer>
       {/* Hero Section */}
@@ -80,29 +83,28 @@ export default function Index() {
           <div className="max-w-4xl mx-auto text-center animate-fade-up">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-8">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-gradient">Next-Gen Health Assistant</span>
+              <span className="text-gradient">{t('heroTagline')}</span>
             </div>
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-              Your AI-Powered{" "}
-              <span className="text-gradient">Medical</span>{" "}
-              <span className="text-gradient-accent">Companion</span>
+              {t('heroTitle1')}{" "}
+              <span className="text-gradient">{t('heroTitle2')}</span>{" "}
+              <span className="text-gradient-accent">{t('heroTitle3')}</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Get instant health insights, accurate symptom analysis, medicine recommendations, 
-              and find nearby healthcare facilities—all powered by advanced AI.
+              {t('heroDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="gradient-primary text-primary-foreground border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
                 <Link to="/symptoms">
                   <HeartPulse className="mr-2 h-5 w-5" />
-                  Check Symptoms
+                  {t('checkSymptoms')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-2xl px-8 h-14 text-base font-semibold border-2 hover:bg-primary/5">
                 <Link to="/ai-doctor">
                   <Bot className="mr-2 h-5 w-5" />
-                  Talk to AI Doctor
+                  {t('talkToAI')}
                 </Link>
               </Button>
             </div>
@@ -136,10 +138,10 @@ export default function Index() {
         <div className="container">
           <div className="text-center mb-14">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Explore Our <span className="text-gradient">Features</span>
+              {t('exploreFeatures').split(' ')[0]} <span className="text-gradient">{t('exploreFeatures').split(' ').slice(1).join(' ')}</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-              Comprehensive AI-powered tools designed to help you make informed health decisions
+              {t('featuresDescription')}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,10 +172,10 @@ export default function Index() {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
             <div className="relative">
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-                Need Immediate Help?
+                {t('needHelp')}
               </h2>
               <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto text-lg">
-                If you're experiencing a medical emergency, please contact emergency services immediately.
+                {t('emergencyDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -182,7 +184,7 @@ export default function Index() {
                   className="bg-white text-primary hover:bg-white/90 rounded-2xl px-8 h-14 text-base font-bold shadow-xl"
                 >
                   <a href="tel:103">
-                    Call Emergency: 103
+                    {t('callEmergency')}
                   </a>
                 </Button>
                 <Button
@@ -191,7 +193,7 @@ export default function Index() {
                   size="lg"
                   className="border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl px-8 h-14 text-base font-semibold"
                 >
-                  <Link to="/hospitals">Find Hospitals</Link>
+                  <Link to="/hospitals">{t('findHospitals')}</Link>
                 </Button>
               </div>
             </div>
