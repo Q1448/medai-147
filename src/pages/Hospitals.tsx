@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Building2,
   Phone,
@@ -11,83 +12,77 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const emergencyNumbers = [
-  { name: "Emergency (Ambulance)", number: "103", icon: Ambulance },
-  { name: "General Emergency", number: "112", icon: Phone },
-];
-
-const hospitals = [
-  {
-    name: "University Medical Center",
-    address: "Kabanbay Batyr Ave 53, Astana",
-    phone: "+7 (7172) 70-62-62",
-    hours: "24/7",
-    type: "Main Hospital",
-    coords: "51.124921,71.405314",
-  },
-  {
-    name: "National Coordination Center for Emergency Medicine",
-    address: "Turan Avenue, Astana",
-    phone: "+7 (7172) 70-29-00",
-    hours: "24/7",
-    type: "Emergency Center",
-    coords: "51.083884,71.380874",
-  },
-  {
-    name: "Multidisciplinary Children's Hospital №1",
-    address: "Saryarka District, Astana",
-    phone: "+7 (7172) 53-94-33",
-    hours: "24/7",
-    type: "Pediatric Hospital",
-    coords: "51.149337,71.455322",
-  },
-];
-
-const pharmacies = [
-  {
-    name: "АльфаМед",
-    address: "Astana, Kazakhstan",
-    phone: "+7 (7172) 55-22-33",
-    hours: "24/7",
-    coords: "51.135935,71.422372",
-    walkTime: "12 min",
-    driveTime: "4 min",
-  },
-  {
-    name: "БиоСфера",
-    address: "Astana, Kazakhstan",
-    phone: "+7 (7172) 44-11-22",
-    hours: "08:00 - 22:00",
-    coords: "51.147796,71.47828",
-    walkTime: "18 min",
-    driveTime: "7 min",
-  },
-  {
-    name: "Bios",
-    address: "Astana, Kazakhstan",
-    phone: "+7 (7172) 33-44-55",
-    hours: "24/7",
-    coords: "51.106039,71.400612",
-    walkTime: "25 min",
-    driveTime: "10 min",
-  },
-  {
-    name: "Аптека низких цен",
-    address: "Astana, Kazakhstan",
-    phone: "+7 (7172) 66-77-88",
-    hours: "09:00 - 21:00",
-    coords: "51.182959,71.376425",
-    walkTime: "30 min",
-    driveTime: "12 min",
-  },
-];
-
 const openDirections = (coords: string, name: string) => {
   const url = `https://www.google.com/maps/dir/?api=1&destination=${coords}&travelmode=driving`;
   window.open(url, '_blank');
 };
 
 export default function Hospitals() {
+  const { t } = useLanguage();
+
+  const emergencyNumbers = [
+    { name: t('emergencyAmbulance'), number: "103", icon: Ambulance },
+    { name: t('generalEmergency'), number: "112", icon: Phone },
+  ];
+
+  const hospitals = [
+    {
+      name: "University Medical Center",
+      address: "Kabanbay Batyr Ave 53, Astana",
+      phone: "+7 (7172) 70-62-62",
+      hours: "24/7",
+      type: t('mainHospital'),
+      coords: "51.124921,71.405314",
+    },
+    {
+      name: "National Coordination Center for Emergency Medicine",
+      address: "Turan Avenue, Astana",
+      phone: "+7 (7172) 70-29-00",
+      hours: "24/7",
+      type: t('emergencyCenter'),
+      coords: "51.083884,71.380874",
+    },
+    {
+      name: "Multidisciplinary Children's Hospital №1",
+      address: "Saryarka District, Astana",
+      phone: "+7 (7172) 53-94-33",
+      hours: "24/7",
+      type: t('pediatricHospital'),
+      coords: "51.149337,71.455322",
+    },
+  ];
+
+  const pharmacies = [
+    {
+      name: "АльфаМед",
+      address: "Astana, Kazakhstan",
+      phone: "+7 (7172) 55-22-33",
+      hours: "24/7",
+      coords: "51.135935,71.422372",
+    },
+    {
+      name: "БиоСфера",
+      address: "Astana, Kazakhstan",
+      phone: "+7 (7172) 44-11-22",
+      hours: "08:00 - 22:00",
+      coords: "51.147796,71.47828",
+    },
+    {
+      name: "Bios",
+      address: "Astana, Kazakhstan",
+      phone: "+7 (7172) 33-44-55",
+      hours: "24/7",
+      coords: "51.106039,71.400612",
+    },
+    {
+      name: "Аптека низких цен",
+      address: "Astana, Kazakhstan",
+      phone: "+7 (7172) 66-77-88",
+      hours: "09:00 - 21:00",
+      coords: "51.182959,71.376425",
+    },
+  ];
+
   return (
     <Layout showFooterDisclaimer>
       <div className="container py-12 md:py-16">
@@ -95,13 +90,13 @@ export default function Hospitals() {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Building2 className="h-4 w-4 text-medical-coral" />
-            <span className="text-gradient-accent">Healthcare Locations</span>
+            <span className="text-gradient-accent">{t('healthcareLocations')}</span>
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Pharmacies & Hospitals in <span className="text-gradient">Astana</span>
+            {t('pharmaciesHospitalsAstana')}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Click on any location to get directions automatically via Google Maps
+            {t('clickForDirections')}
           </p>
         </div>
 
@@ -137,7 +132,7 @@ export default function Hospitals() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-medical-green to-medical-mint">
                 <Pill className="h-5 w-5 text-white" />
               </div>
-              Pharmacies
+              {t('pharmacies')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pharmacies.map((pharmacy, index) => (
@@ -170,7 +165,7 @@ export default function Hospitals() {
                   </div>
                   <div className="mt-4 pt-3 border-t border-border/50 flex items-center gap-2 text-xs text-primary font-medium">
                     <Navigation className="h-3.5 w-3.5" />
-                    Click to get directions
+                    {t('clickToGetDirections')}
                   </div>
                 </button>
               ))}
@@ -183,7 +178,7 @@ export default function Hospitals() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-medical-sky">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
-              Hospitals
+              {t('hospitalsTitle')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {hospitals.map((hospital, index) => (
@@ -221,7 +216,7 @@ export default function Hospitals() {
                   </div>
                   <div className="mt-4 pt-3 border-t border-border/50 flex items-center gap-2 text-xs text-primary font-medium">
                     <Navigation className="h-3.5 w-3.5" />
-                    Click to get directions
+                    {t('clickToGetDirections')}
                   </div>
                 </button>
               ))}
@@ -233,7 +228,7 @@ export default function Hospitals() {
             <div className="p-6 border-b border-border/50">
               <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />
-                Astana Healthcare Map
+                {t('astanaHealthcareMap')}
               </h2>
             </div>
             <div className="aspect-video">
@@ -260,7 +255,7 @@ export default function Hospitals() {
                   rel="noopener noreferrer"
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  Open Full Map
+                  {t('openFullMap')}
                 </a>
               </Button>
             </div>

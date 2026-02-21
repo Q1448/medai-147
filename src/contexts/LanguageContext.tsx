@@ -227,6 +227,10 @@ export const translations: Translations = {
   // Disclaimer
   disclaimer: { en: 'Medical Disclaimer', ru: 'Медицинский отказ от ответственности', kk: 'Медициналық жауапкершіліктен бас тарту' },
   disclaimerText: { en: 'This AI tool provides general health information only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.', ru: 'Этот инструмент предоставляет только общую информацию о здоровье и не заменяет профессиональную медицинскую консультацию. Всегда консультируйтесь с врачом.', kk: 'Бұл құрал тек жалпы денсаулық туралы ақпарат береді және кәсіби медициналық кеңестің орнын баспайды. Әрқашан дәрігермен кеңесіңіз.' },
+  disclaimerFooterText: { en: 'This website provides general health information for educational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for medical concerns.', ru: 'Этот сайт предоставляет общую информацию о здоровье только в образовательных целях. Он не заменяет профессиональную медицинскую консультацию, диагностику или лечение. Всегда обращайтесь к квалифицированному медицинскому специалисту.', kk: 'Бұл веб-сайт тек білім беру мақсатында жалпы денсаулық туралы ақпарат береді. Ол кәсіби медициналық кеңестің, диагностиканың немесе емдеудің орнын баспайды. Әрқашан білікті дәрігерге жүгініңіз.' },
+  disclaimerFooterBold: { en: 'If your condition worsens, seek immediate medical attention.', ru: 'Если ваше состояние ухудшится, немедленно обратитесь за медицинской помощью.', kk: 'Жағдайыңыз нашарласа, дереу медициналық көмекке жүгініңіз.' },
+  importantNotice: { en: 'Important Notice', ru: 'Важное уведомление', kk: 'Маңызды ескерту' },
+  disclaimerBannerText: { en: 'This information is for reference only and does not replace a doctor\'s consultation. If your condition worsens, seek medical help immediately.', ru: 'Эта информация носит справочный характер и не заменяет консультацию врача. Если ваше состояние ухудшится, немедленно обратитесь за медицинской помощью.', kk: 'Бұл ақпарат тек анықтамалық сипатта және дәрігермен кеңесудің орнын баспайды. Жағдайыңыз нашарласа, дереу медициналық көмекке жүгініңіз.' },
   
   // Evidence
   evidenceBased: { en: 'Evidence-Based Sources', ru: 'Научные источники', kk: 'Ғылыми дереккөздер' },
@@ -243,6 +247,32 @@ export const translations: Translations = {
   conditionCough: { en: 'Cough', ru: 'Кашель', kk: 'Жөтел' },
   conditionInsomnia: { en: 'Insomnia', ru: 'Бессонница', kk: 'Ұйқысыздық' },
   conditionMusclePain: { en: 'Muscle Pain', ru: 'Мышечная боль', kk: 'Бұлшықет ауруы' },
+
+  // Footer
+  footerDescription: { en: 'AI-powered health information assistant. Get preliminary insights about symptoms, conditions, and medications. Always consult a doctor for proper medical advice.', ru: 'ИИ-помощник по медицинской информации. Получайте предварительные сведения о симптомах, заболеваниях и лекарствах. Всегда консультируйтесь с врачом.', kk: 'AI негізіндегі денсаулық туралы ақпарат көмекшісі. Белгілер, аурулар және дәрілер туралы алдын ала мәліметтер алыңыз. Әрқашан дәрігермен кеңесіңіз.' },
+  quickLinks: { en: 'Quick Links', ru: 'Быстрые ссылки', kk: 'Жылдам сілтемелер' },
+  symptomsChecker: { en: 'Symptoms Checker', ru: 'Проверка симптомов', kk: 'Белгілерді тексеру' },
+  imageAnalysis: { en: 'Image Analysis', ru: 'Анализ изображений', kk: 'Сурет талдау' },
+  aboutUs: { en: 'About Us', ru: 'О нас', kk: 'Біз туралы' },
+  forInfoOnly: { en: 'For informational purposes only.', ru: 'Только в информационных целях.', kk: 'Тек ақпараттық мақсатта.' },
+  madeWithLove: { en: 'Made with ❤️ by NIS IB Team', ru: 'Сделано с ❤️ командой NIS IB', kk: 'NIS IB командасы ❤️ жасаған' },
+  
+  // Medical Profile Sheet
+  basicInformation: { en: 'Basic Information', ru: 'Основная информация', kk: 'Негізгі ақпарат' },
+  weight: { en: 'Weight (kg)', ru: 'Вес (кг)', kk: 'Салмақ (кг)' },
+  other: { en: 'Other', ru: 'Другой', kk: 'Басқа' },
+  recentHistory: { en: 'Recent History', ru: 'Недавняя история', kk: 'Соңғы тарих' },
+  clear: { en: 'Clear', ru: 'Очистить', kk: 'Тазалау' },
+  profileStoredLocally: { en: 'Your profile is stored locally and helps AI provide more personalized recommendations. No data is sent to external servers.', ru: 'Ваш профиль хранится локально и помогает ИИ давать более персонализированные рекомендации. Данные не отправляются на внешние серверы.', kk: 'Профиліңіз жергілікті түрде сақталады және AI-ға жеке ұсыныстар беруге көмектеседі. Деректер сыртқы серверлерге жіберілмейді.' },
+
+  // Hospital types
+  mainHospital: { en: 'Main Hospital', ru: 'Главная больница', kk: 'Басты аурухана' },
+  emergencyCenter: { en: 'Emergency Center', ru: 'Центр экстренной помощи', kk: 'Шұғыл көмек орталығы' },
+  pediatricHospital: { en: 'Pediatric Hospital', ru: 'Детская больница', kk: 'Балалар ауруханасы' },
+
+  // NotFound
+  pageNotFound: { en: 'Oops! Page not found', ru: 'Упс! Страница не найдена', kk: 'Қате! Бет табылмады' },
+  returnHome: { en: 'Return to Home', ru: 'Вернуться на главную', kk: 'Басты бетке оралу' },
 
   // Error messages
   errorSelectImage: { en: 'Please select an image file.', ru: 'Пожалуйста, выберите изображение.', kk: 'Сурет файлын таңдаңыз.' },
