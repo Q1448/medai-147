@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { User, X, Plus, Trash2, History, AlertTriangle } from "lucide-react";
 import { ScrollArea } from "./scroll-area";
 
 export function MedicalProfileSheet() {
   const { profile, updateProfile, clearHistory } = useMedicalProfile();
+  const { t } = useLanguage();
   const [newCondition, setNewCondition] = useState("");
   const [newAllergy, setNewAllergy] = useState("");
   const [newMedication, setNewMedication] = useState("");
@@ -40,17 +42,17 @@ export function MedicalProfileSheet() {
         <SheetHeader>
           <SheetTitle className="font-display text-xl flex items-center gap-2">
             <User className="h-5 w-5 text-primary" />
-            Medical Profile
+            {t('medicalProfile')}
           </SheetTitle>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-100px)] pr-4 mt-6">
           <div className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-foreground text-sm">Basic Information</h3>
+              <h3 className="font-semibold text-foreground text-sm">{t('basicInformation')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="age" className="text-xs">Age</Label>
+                  <Label htmlFor="age" className="text-xs">{t('age')}</Label>
                   <Input
                     id="age"
                     type="number"
@@ -61,7 +63,7 @@ export function MedicalProfileSheet() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight" className="text-xs">Weight (kg)</Label>
+                  <Label htmlFor="weight" className="text-xs">{t('weight')}</Label>
                   <Input
                     id="weight"
                     type="number"
@@ -73,17 +75,21 @@ export function MedicalProfileSheet() {
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Gender</Label>
+                <Label className="text-xs">{t('gender')}</Label>
                 <div className="flex gap-2 mt-1">
-                  {(["male", "female", "other"] as const).map((g) => (
+                  {([
+                    { key: "male", label: t('male') },
+                    { key: "female", label: t('female') },
+                    { key: "other", label: t('other') },
+                  ] as const).map((g) => (
                     <Button
-                      key={g}
-                      variant={profile.gender === g ? "default" : "outline"}
+                      key={g.key}
+                      variant={profile.gender === g.key ? "default" : "outline"}
                       size="sm"
-                      onClick={() => updateProfile({ gender: g })}
-                      className="flex-1 capitalize"
+                      onClick={() => updateProfile({ gender: g.key })}
+                      className="flex-1"
                     >
-                      {g}
+                      {g.label}
                     </Button>
                   ))}
                 </div>
@@ -92,10 +98,10 @@ export function MedicalProfileSheet() {
 
             {/* Chronic Conditions */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground text-sm">Chronic Conditions</h3>
+              <h3 className="font-semibold text-foreground text-sm">{t('chronicConditions')}</h3>
               <div className="flex gap-2">
                 <Input
-                  placeholder="e.g., Diabetes, Hypertension"
+                  placeholder={t('chronicConditions')}
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("chronicConditions", newCondition, setNewCondition)}
@@ -121,11 +127,11 @@ export function MedicalProfileSheet() {
             <div className="space-y-3">
               <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-medical-warning" />
-                Allergies
+                {t('allergies')}
               </h3>
               <div className="flex gap-2">
                 <Input
-                  placeholder="e.g., Penicillin, Peanuts"
+                  placeholder={t('allergies')}
                   value={newAllergy}
                   onChange={(e) => setNewAllergy(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("allergies", newAllergy, setNewAllergy)}
@@ -149,10 +155,10 @@ export function MedicalProfileSheet() {
 
             {/* Current Medications */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground text-sm">Current Medications</h3>
+              <h3 className="font-semibold text-foreground text-sm">{t('medications')}</h3>
               <div className="flex gap-2">
                 <Input
-                  placeholder="e.g., Metformin, Lisinopril"
+                  placeholder={t('medications')}
                   value={newMedication}
                   onChange={(e) => setNewMedication(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("currentMedications", newMedication, setNewMedication)}
@@ -180,11 +186,11 @@ export function MedicalProfileSheet() {
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
                     <History className="h-4 w-4" />
-                    Recent History
+                    {t('recentHistory')}
                   </h3>
                   <Button variant="ghost" size="sm" onClick={clearHistory} className="text-destructive h-8">
                     <Trash2 className="h-3 w-3 mr-1" />
-                    Clear
+                    {t('clear')}
                   </Button>
                 </div>
                 <div className="space-y-2">
@@ -202,7 +208,7 @@ export function MedicalProfileSheet() {
 
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
               <p className="text-xs text-muted-foreground">
-                Your profile is stored locally and helps AI provide more personalized recommendations. No data is sent to external servers.
+                {t('profileStoredLocally')}
               </p>
             </div>
           </div>

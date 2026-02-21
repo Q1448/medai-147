@@ -1,6 +1,7 @@
 import { AlertTriangle, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DisclaimerBannerProps {
   className?: string;
@@ -9,6 +10,7 @@ interface DisclaimerBannerProps {
 
 export function DisclaimerBanner({ className, dismissible = true }: DisclaimerBannerProps) {
   const [dismissed, setDismissed] = useState(false);
+  const { t } = useLanguage();
 
   if (dismissed) return null;
 
@@ -19,10 +21,9 @@ export function DisclaimerBanner({ className, dismissible = true }: DisclaimerBa
     )}>
       <AlertTriangle className="h-5 w-5 text-medical-warning shrink-0 mt-0.5" />
       <div className="flex-1">
-        <p className="text-sm text-foreground font-medium mb-1">Important Notice</p>
+        <p className="text-sm text-foreground font-medium mb-1">{t('importantNotice')}</p>
         <p className="text-sm text-muted-foreground">
-          This information is for reference only and does not replace a doctor's consultation. 
-          If your condition worsens, seek medical help immediately.
+          {t('disclaimerBannerText')}
         </p>
       </div>
       {dismissible && (
