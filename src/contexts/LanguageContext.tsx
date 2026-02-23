@@ -285,6 +285,15 @@ export const translations: Translations = {
   errorSubmitFailed: { en: 'Failed to submit feedback. Please try again.', ru: 'Не удалось отправить отзыв. Попробуйте снова.', kk: 'Пікір жіберілмеді. Қайта көріңіз.' },
   rateLimitError: { en: 'Rate limit exceeded. Please try again later.', ru: 'Превышен лимит запросов. Попробуйте позже.', kk: 'Сұраныс лимиті асып кетті. Кейінірек қайталаңыз.' },
   serviceUnavailable: { en: 'Service temporarily unavailable. Please try again later.', ru: 'Сервис временно недоступен. Попробуйте позже.', kk: 'Қызмет уақытша қолжетімсіз. Кейінірек көріңіз.' },
+
+  // Feedback public list
+  allSuggestions: { en: 'All Suggestions', ru: 'Все предложения', kk: 'Барлық ұсыныстар' },
+  allSuggestionsDesc: { en: 'Browse and like suggestions from the community', ru: 'Просматривайте и голосуйте за предложения сообщества', kk: 'Қауымдастық ұсыныстарын қараңыз және дауыс беріңіз' },
+  anonymous: { en: 'Anonymous', ru: 'Аноним', kk: 'Анонім' },
+  likes: { en: 'likes', ru: 'голосов', kk: 'дауыс' },
+  noSuggestionsYet: { en: 'No suggestions yet. Be the first!', ru: 'Пока нет предложений. Будьте первым!', kk: 'Әлі ұсыныстар жоқ. Бірінші болыңыз!' },
+  addSuggestion: { en: 'Add Suggestion', ru: 'Добавить предложение', kk: 'Ұсыныс қосу' },
+  viewAllSuggestions: { en: 'View All Suggestions', ru: 'Все предложения', kk: 'Барлық ұсыныстар' },
 };
 
 // Language names for system prompts

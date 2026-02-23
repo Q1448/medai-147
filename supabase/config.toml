@@ -1,1 +1,13 @@
 project_id = "eqrhxrfbjyjqklyidbui"
+
+[functions.ai-doctor]
+verify_jwt = false
+
+[functions.analyze-symptoms]
+verify_jwt = false
+
+[functions.find-medicines]
+verify_jwt = false
+
+[functions.analyze-image]
+verify_jwt = false

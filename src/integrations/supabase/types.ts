@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      suggestion_likes: {
+        Row: {
+          created_at: string
+          id: string
+          suggestion_id: string
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          suggestion_id: string
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          suggestion_id?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_likes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suggestions: {
         Row: {
           category: string | null
