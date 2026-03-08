@@ -15,18 +15,17 @@ serve(async (req) => {
 
     const patientContext = profileContext || "";
     
-    // Language instruction
     const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Наблюдения, названия состояний, описания и рекомендации - всё на русском.'
+      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.'
       : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Бақылаулар, жағдай атаулары, сипаттамалар мен ұсыныстар - бәрі қазақша.'
+      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.'
       : 'Respond in English.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
+        model: "google/gemini-3.1-pro-preview",
         messages: [
           { 
             role: "system", 
@@ -42,28 +41,14 @@ YOUR ANALYSIS APPROACH:
 5. Assess based on clinical presentation patterns
 6. Consider patient age, known allergies, and medical history when provided
 
-PROVIDE:
-- Detailed visual observations (what you see)
-- 3 possible conditions ranked by likelihood
-- Clear reasoning for each condition
-- Specific recommendations for next steps
+${patientContext ? `PATIENT CONTEXT:\n${patientContext}` : ""}
 
-${patientContext ? `PATIENT CONTEXT - Use this to personalize your analysis:\n${patientContext}` : ""}
-
-IMPORTANT:
-- Be precise in your observations
-- Consider multiple possible causes
-- Always recommend professional dermatological consultation
-- This is educational information only, NOT a diagnosis
-- For any concerning features (rapid change, bleeding, irregular borders), emphasize urgent medical evaluation` 
+IMPORTANT: Be precise, consider multiple causes, always recommend professional consultation. This is educational only.` 
           },
           { 
             role: "user", 
             content: [
-              { 
-                type: "text", 
-                text: "Analyze this skin condition image in detail. Provide: 1) Specific visual observations about color, texture, pattern, borders, and distribution, 2) Three possible conditions with likelihood ratings and detailed explanations, 3) A clear recommendation for next steps." 
-              }, 
+              { type: "text", text: "Analyze this skin condition image in detail. Provide observations, three possible conditions with likelihood, and recommendations." }, 
               { type: "image_url", image_url: { url: image } }
             ] 
           }
@@ -76,24 +61,20 @@ IMPORTANT:
             parameters: {
               type: "object",
               properties: {
-                observations: { 
-                  type: "array", 
-                  items: { type: "string" },
-                  description: "List of specific visual observations about the skin condition"
-                },
+                observations: { type: "array", items: { type: "string" } },
                 conditions: { 
                   type: "array", 
                   items: { 
                     type: "object", 
                     properties: { 
-                      name: { type: "string", description: "Name of the possible condition" }, 
-                      description: { type: "string", description: "Detailed explanation of why this condition matches the visual presentation (2-3 sentences)" }, 
-                      likelihood: { type: "string", enum: ["low", "medium", "high"], description: "Likelihood based on visual match" } 
+                      name: { type: "string" }, 
+                      description: { type: "string" }, 
+                      likelihood: { type: "string", enum: ["low", "medium", "high"] } 
                     }, 
                     required: ["name", "description", "likelihood"] 
                   } 
                 },
-                recommendation: { type: "string", description: "Detailed recommendation for next steps (2-3 sentences)" }
+                recommendation: { type: "string" }
               },
               required: ["observations", "conditions", "recommendation"]
             }
@@ -103,7 +84,15 @@ IMPORTANT:
       }),
     });
 
-    if (!response.ok) throw new Error("AI gateway error");
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      throw new Error("AI gateway error");
+    }
     const data = await response.json();
     const args = data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
     const result = args ? JSON.parse(args) : { observations: [], conditions: [], recommendation: "" };
