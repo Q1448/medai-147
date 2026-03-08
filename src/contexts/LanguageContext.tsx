@@ -294,6 +294,30 @@ export const translations: Translations = {
   noSuggestionsYet: { en: 'No suggestions yet. Be the first!', ru: 'Пока нет предложений. Будьте первым!', kk: 'Әлі ұсыныстар жоқ. Бірінші болыңыз!' },
   addSuggestion: { en: 'Add Suggestion', ru: 'Добавить предложение', kk: 'Ұсыныс қосу' },
   viewAllSuggestions: { en: 'View All Suggestions', ru: 'Все предложения', kk: 'Барлық ұсыныстар' },
+
+  // Health Dashboard
+  healthScore: { en: 'Health Score', ru: 'Показатель здоровья', kk: 'Денсаулық көрсеткіші' },
+  riskScore: { en: 'Risk Score', ru: 'Показатель риска', kk: 'Тәуекел көрсеткіші' },
+  generalVerdict: { en: 'General Verdict', ru: 'Общий вердикт', kk: 'Жалпы үкім' },
+  shortTermMeasures: { en: 'Short-term Measures', ru: 'Краткосрочные меры', kk: 'Қысқа мерзімді шаралар' },
+  longTermMeasures: { en: 'Long-term Measures', ru: 'Долгосрочные меры', kk: 'Ұзақ мерзімді шаралар' },
+  healthy: { en: 'Healthy', ru: 'Здоров', kk: 'Сау' },
+  critical: { en: 'Critical', ru: 'Критично', kk: 'Сыни' },
+  lowRisk: { en: 'Low Risk', ru: 'Низкий риск', kk: 'Төмен тәуекел' },
+  highRisk: { en: 'High Risk', ru: 'Высокий риск', kk: 'Жоғары тәуекел' },
+
+  // Lifestyle Questions
+  lifestyleQuestions: { en: 'Lifestyle & Nutrition', ru: 'Образ жизни и питание', kk: 'Өмір салты және тамақтану' },
+  dietQuestion: { en: 'How would you describe your diet?', ru: 'Как бы вы описали своё питание?', kk: 'Тамақтануыңызды қалай сипаттар едіңіз?' },
+  dietPlaceholder: { en: 'e.g., I eat mostly fast food, skip breakfast, drink little water...', ru: 'например, Ем в основном фастфуд, пропускаю завтрак, пью мало воды...', kk: 'мысалы, Негізінен фастфуд жеймін, таңғы асты жібереді, аз су ішемін...' },
+  exerciseQuestion: { en: 'How active are you physically?', ru: 'Насколько вы физически активны?', kk: 'Физикалық белсенділігіңіз қандай?' },
+  exercisePlaceholder: { en: 'e.g., Sedentary work, walk 30 min daily, gym 3x/week...', ru: 'например, Сидячая работа, хожу 30 мин в день, зал 3 раза/нед...', kk: 'мысалы, Отырып жұмыс, күніне 30 мин жаяу, спорт залы аптасына 3 рет...' },
+  sleepQuestion: { en: 'How is your sleep quality?', ru: 'Как у вас качество сна?', kk: 'Ұйқы сапасыңыз қандай?' },
+  sleepPlaceholder: { en: 'e.g., I sleep 5-6 hours, wake up often, feel tired in the morning...', ru: 'например, Сплю 5-6 часов, часто просыпаюсь, утром чувствую усталость...', kk: 'мысалы, 5-6 сағат ұйықтаймын, жиі оянамын, таңертең шаршаймын...' },
+
+  // 2GIS
+  clickForDirections2gis: { en: 'Click on any location to open it in 2GIS', ru: 'Нажмите на любую локацию для открытия в 2ГИС', kk: '2ГИС-те ашу үшін кез келген орынды басыңыз' },
+  openIn2gis: { en: 'Open in 2GIS', ru: 'Открыть в 2ГИС', kk: '2ГИС-те ашу' },
 };
 
 // Language names for system prompts

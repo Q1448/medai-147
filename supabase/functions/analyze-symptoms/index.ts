@@ -15,25 +15,23 @@ serve(async (req) => {
 
     const patientContext = profileContext || "";
     
-    // Language instruction
     const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины и цитаты из источников - всё на русском.'
+      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины, вердикт и меры - всё на русском.'
       : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар, себептер және дереккөз цитаталары - бәрі қазақша.'
+      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар, себептер, үкім және шаралар - бәрі қазақша.'
       : 'Respond in English.';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
+        model: "google/gemini-3.1-pro-preview",
         messages: [
           { 
             role: "system", 
             content: `${langInstruction}
 
-You are an expert medical information assistant with deep knowledge of symptom analysis. 
-Your task is to analyze symptoms and provide accurate, detailed condition assessments.
+You are an elite medical information assistant with deep expertise in clinical symptom analysis, evidence-based medicine, and holistic health assessment.
 
 IMPORTANT GUIDELINES:
 1. Analyze ALL provided symptoms together to find conditions that match the symptom pattern
@@ -43,26 +41,35 @@ IMPORTANT GUIDELINES:
 5. Provide detailed, medically accurate descriptions
 6. Always include severity based on symptom combination risk
 7. Be thorough in explaining possible causes
-8. Consider patient demographics and history when provided
+8. Consider patient demographics, lifestyle, diet, exercise, and sleep patterns
 9. NEVER diagnose - this is educational information only
+
+LIFESTYLE ANALYSIS:
+- Consider diet patterns and nutritional deficiencies
+- Factor in exercise habits and physical activity level
+- Evaluate sleep quality and duration impact on symptoms
+- Assess overall lifestyle risk factors
+
+HEALTH SCORING:
+- healthScore: 0-100 scale where 100 = perfectly healthy, 0 = critical condition
+- riskScore: 0-100% indicating overall health risk
+- Base scores on symptom severity, combination patterns, and lifestyle factors
 
 EVIDENCE-BASED REQUIREMENT:
 - Include citations from medical literature for each condition
 - Reference sources like BMC journals, PubMed, WHO guidelines, NICE guidelines
-- Mention specific studies or clinical guidelines that support each assessment
-- Include the citation in the description or possibleCause field
 
-${patientContext ? `PATIENT CONTEXT - Use this to personalize your analysis:\n${patientContext}` : ""}
+${patientContext ? `PATIENT CONTEXT:\n${patientContext}` : ""}
 
-Return exactly 3 conditions ranked by likelihood of matching the symptom pattern.` 
+Return exactly 3 conditions ranked by likelihood, plus health dashboard data.` 
           },
-          { role: "user", content: `Analyze these symptoms thoroughly and identify the 3 most likely conditions: ${symptoms}. Consider how these symptoms interact and what conditions commonly present with this combination. Include medical literature citations.` }
+          { role: "user", content: `Analyze these symptoms thoroughly: ${symptoms}. Provide health score, risk assessment, and both short-term and long-term improvement measures. Include medical literature citations.` }
         ],
         tools: [{
           type: "function",
           function: {
-            name: "return_conditions",
-            description: "Return the analyzed conditions based on symptom pattern matching",
+            name: "return_analysis",
+            description: "Return comprehensive symptom analysis with health dashboard",
             parameters: {
               type: "object",
               properties: {
@@ -71,28 +78,50 @@ Return exactly 3 conditions ranked by likelihood of matching the symptom pattern
                   items: {
                     type: "object",
                     properties: {
-                      name: { type: "string", description: "Medical condition name" },
-                      description: { type: "string", description: "Detailed description of the condition and why it matches the symptoms. Include citation from medical literature (e.g., 'According to BMC Medicine 2023...')" },
-                      possibleCause: { type: "string", description: "Detailed explanation of what causes this condition with supporting evidence from medical journals" },
-                      severity: { type: "string", enum: ["low", "medium", "high"], description: "Severity level based on symptom combination" },
-                      sources: { type: "array", items: { type: "string" }, description: "List of 1-2 medical journal citations (e.g., 'BMC Medicine, 2023', 'WHO Guidelines 2024')" }
+                      name: { type: "string" },
+                      description: { type: "string", description: "Detailed description with medical citation" },
+                      possibleCause: { type: "string", description: "Cause with supporting evidence" },
+                      severity: { type: "string", enum: ["low", "medium", "high"] },
+                      sources: { type: "array", items: { type: "string" } }
                     },
                     required: ["name", "description", "possibleCause", "severity", "sources"]
                   }
+                },
+                healthScore: { type: "number", description: "0-100 health score (100=healthy, 0=critical)" },
+                riskScore: { type: "number", description: "0-100 risk percentage" },
+                verdict: { type: "string", description: "General health verdict summary (2-3 sentences)" },
+                shortTermMeasures: { 
+                  type: "array", 
+                  items: { type: "string" },
+                  description: "3-5 immediate actions to take within the next 1-7 days"
+                },
+                longTermMeasures: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "3-5 long-term lifestyle changes for sustained improvement"
                 }
               },
-              required: ["conditions"]
+              required: ["conditions", "healthScore", "riskScore", "verdict", "shortTermMeasures", "longTermMeasures"]
             }
           }
         }],
-        tool_choice: { type: "function", function: { name: "return_conditions" } }
+        tool_choice: { type: "function", function: { name: "return_analysis" } }
       }),
     });
 
-    if (!response.ok) throw new Error("AI gateway error");
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      throw new Error("AI gateway error");
+    }
+    
     const data = await response.json();
     const args = data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    const result = args ? JSON.parse(args) : { conditions: [] };
+    const result = args ? JSON.parse(args) : { conditions: [], healthScore: 50, riskScore: 50, verdict: "", shortTermMeasures: [], longTermMeasures: [] };
 
     return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
