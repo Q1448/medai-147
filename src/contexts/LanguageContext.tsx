@@ -176,6 +176,7 @@ export const translations: Translations = {
   ourTeam: { en: 'Our Team', ru: 'Наша команда', kk: 'Біздің команда' },
   developer: { en: 'Developer', ru: 'Разработчик', kk: 'Әзірлеуші' },
   researcher: { en: 'Researcher', ru: 'Исследователь', kk: 'Зерттеуші' },
+  assistantResearcher: { en: 'Assistant Researcher', ru: 'Помощник исследователя', kk: 'Зерттеуші көмекшісі' },
   
   // Feedback
   feedbackTitle: { en: 'Product Improvement Suggestions', ru: 'Предложения по улучшению', kk: 'Жақсарту ұсыныстары' },
