@@ -18,6 +18,12 @@ export default function About() {
       icon: Search,
       gradient: "from-medical-purple to-medical-coral",
     },
+    {
+      name: "Жумабай Айдар",
+      role: t('assistantResearcher'),
+      icon: Search,
+      gradient: "from-medical-green to-primary",
+    },
   ];
 
   return (
