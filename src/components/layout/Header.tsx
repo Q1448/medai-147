@@ -25,12 +25,12 @@ export function Header() {
   const { t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full liquid-glass-heavy border-b border-primary/8">
       <div className="container flex h-18 items-center justify-between py-3">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-transform group-hover:scale-105 shadow-lg">
+          <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg shadow-md">
             <Stethoscope className="h-6 w-6" />
-            <Heart className="absolute -right-1 -top-1 h-4 w-4 text-accent animate-pulse-soft" />
+            <Heart className="absolute -right-1 -top-1 h-4 w-4 text-primary-foreground animate-pulse-soft" />
           </div>
           <div className="flex flex-col">
             <span className="font-display text-xl font-bold text-foreground leading-tight">
@@ -43,17 +43,16 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
           {navLinkKeys.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               className={cn(
-                "px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
+                "px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300",
                 location.pathname === link.href
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "gradient-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:text-foreground hover:bg-primary/8"
               )}
             >
               {t(link.labelKey)}
@@ -61,14 +60,12 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-2">
           <MedicalProfileSheet />
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
 
-        {/* Mobile Actions */}
         <div className="flex lg:hidden items-center gap-2">
           <MedicalProfileSheet />
           <LanguageSwitcher />
@@ -85,9 +82,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isOpen && (
-        <div className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl animate-fade-in">
+        <div className="lg:hidden border-t border-primary/10 liquid-glass-heavy animate-fade-in">
           <nav className="container py-4 flex flex-col gap-1">
             {navLinkKeys.map((link) => (
               <Link
@@ -95,10 +91,10 @@ export function Header() {
                 to={link.href}
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  "px-4 py-3.5 text-sm font-medium rounded-xl transition-colors",
+                  "px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300",
                   location.pathname === link.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "gradient-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/8"
                 )}
               >
                 {t(link.labelKey)}
