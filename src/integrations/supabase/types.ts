@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          created_at: string
+          function_name: string
+          id: string
+          ip_address: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          id?: string
+          ip_address?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          id?: string
+          ip_address?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       suggestion_likes: {
         Row: {
           created_at: string
@@ -75,7 +99,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_rate_limit: {
+        Args: {
+          p_function_name: string
+          p_max_requests?: number
+          p_visitor_id: string
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
+      cleanup_old_usage: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
