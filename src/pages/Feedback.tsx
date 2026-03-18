@@ -157,8 +157,19 @@ export default function Feedback() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.suggestion.trim()) {
+    const suggestion = formData.suggestion.trim().replace(/<[^>]*>/g, "");
+    if (!suggestion || suggestion.length < 3) {
       toast({ title: t('errorEnterSuggestion'), variant: "destructive" });
+      return;
+    }
+    if (suggestion.length > 2000) {
+      toast({ title: "Suggestion too long (max 2000 chars)", variant: "destructive" });
+      return;
+    }
+    const name = formData.name.trim().replace(/<[^>]*>/g, "").slice(0, 100);
+    const email = formData.email.trim().slice(0, 255);
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: "Invalid email address", variant: "destructive" });
       return;
     }
     setIsSubmitting(true);
@@ -166,10 +177,10 @@ export default function Feedback() {
       const { error } = await supabase
         .from('suggestions')
         .insert({
-          name: formData.name || null,
-          email: formData.email || null,
+          name: name || null,
+          email: email || null,
           category: formData.category,
-          suggestion: formData.suggestion,
+          suggestion: suggestion,
         });
       if (error) throw error;
       setIsSubmitted(true);

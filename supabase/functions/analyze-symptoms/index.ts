@@ -1,20 +1,78 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation
+function validateInput(body: unknown): { symptoms: string; profileContext: string; language: string } {
+  if (!body || typeof body !== "object") throw new Error("Invalid request body");
+  const { symptoms, profileContext, language } = body as Record<string, unknown>;
+  
+  if (typeof symptoms !== "string" || symptoms.trim().length === 0) throw new Error("Symptoms are required");
+  if (symptoms.length > 5000) throw new Error("Input too long");
+  
+  const sanitizedSymptoms = symptoms.replace(/<[^>]*>/g, "").trim();
+  const sanitizedContext = typeof profileContext === "string" ? profileContext.slice(0, 3000).replace(/<[^>]*>/g, "") : "";
+  const validLangs = ["en", "ru", "kk"];
+  const lang = validLangs.includes(language as string) ? (language as string) : "en";
+  
+  return { symptoms: sanitizedSymptoms, profileContext: sanitizedContext, language: lang };
+}
+
+// Rate limiting via Supabase
+async function checkRateLimit(visitorId: string, functionName: string): Promise<boolean> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
+  const { data } = await supabase.rpc("check_rate_limit", {
+    p_visitor_id: visitorId,
+    p_function_name: functionName,
+    p_max_requests: 20,
+    p_window_minutes: 60,
+  });
+  
+  if (data === true) {
+    // Log usage
+    await supabase.from("ai_usage").insert({
+      visitor_id: visitorId,
+      function_name: functionName,
+    });
+  }
+  
+  return data === true;
+}
+
+// Extract visitor ID from request
+function getVisitorId(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || "unknown";
+  return ip;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { symptoms, profileContext, language } = await req.json();
+    const body = await req.json();
+    const { symptoms, profileContext, language } = validateInput(body);
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const patientContext = profileContext || "";
-    
+    // Rate limit check
+    const visitorId = getVisitorId(req);
+    const allowed = await checkRateLimit(visitorId, "analyze-symptoms");
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } }
+      );
+    }
+
     const langInstruction = language === 'ru' 
       ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины, вердикт и меры - всё на русском.'
       : language === 'kk'
@@ -25,7 +83,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           { 
             role: "system", 
@@ -59,7 +117,7 @@ EVIDENCE-BASED REQUIREMENT:
 - Include citations from medical literature for each condition
 - Reference sources like BMC journals, PubMed, WHO guidelines, NICE guidelines
 
-${patientContext ? `PATIENT CONTEXT:\n${patientContext}` : ""}
+${profileContext ? `PATIENT CONTEXT:\n${profileContext}` : ""}
 
 Return exactly 3 conditions ranked by likelihood, plus health dashboard data.` 
           },
@@ -111,7 +169,7 @@ Return exactly 3 conditions ranked by likelihood, plus health dashboard data.`
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Rate limits exceeded" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Payment required" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
