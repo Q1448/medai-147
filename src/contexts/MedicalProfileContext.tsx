@@ -4,6 +4,10 @@ export interface MedicalProfile {
   age: number | null;
   gender: "male" | "female" | "other" | null;
   weight: number | null;
+  height: number | null;
+  bloodType: string | null;
+  smokingStatus: string | null;
+  alcoholUse: string | null;
   chronicConditions: string[];
   allergies: string[];
   currentMedications: string[];
@@ -22,6 +26,10 @@ const defaultProfile: MedicalProfile = {
   age: null,
   gender: null,
   weight: null,
+  height: null,
+  bloodType: null,
+  smokingStatus: null,
+  alcoholUse: null,
   chronicConditions: [],
   allergies: [],
   currentMedications: [],
@@ -32,8 +40,17 @@ const MedicalProfileContext = createContext<MedicalProfileContextType | undefine
 
 export function MedicalProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<MedicalProfile>(() => {
-    const saved = localStorage.getItem("medai-profile");
-    return saved ? JSON.parse(saved) : defaultProfile;
+    try {
+      const saved = localStorage.getItem("medai-profile");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge with defaults to handle new fields
+        return { ...defaultProfile, ...parsed };
+      }
+    } catch {
+      // Corrupted data - reset
+    }
+    return defaultProfile;
   });
 
   useEffect(() => {
@@ -49,7 +66,7 @@ export function MedicalProfileProvider({ children }: { children: ReactNode }) {
       ...prev,
       symptomHistory: [
         { ...entry, date: new Date().toISOString() },
-        ...prev.symptomHistory.slice(0, 19), // Keep last 20
+        ...prev.symptomHistory.slice(0, 19),
       ],
     }));
   };
@@ -63,6 +80,10 @@ export function MedicalProfileProvider({ children }: { children: ReactNode }) {
     if (profile.age) parts.push(`Patient age: ${profile.age} years`);
     if (profile.gender) parts.push(`Gender: ${profile.gender}`);
     if (profile.weight) parts.push(`Weight: ${profile.weight} kg`);
+    if (profile.height) parts.push(`Height: ${profile.height} cm`);
+    if (profile.bloodType) parts.push(`Blood type: ${profile.bloodType}`);
+    if (profile.smokingStatus) parts.push(`Smoking: ${profile.smokingStatus}`);
+    if (profile.alcoholUse) parts.push(`Alcohol: ${profile.alcoholUse}`);
     if (profile.chronicConditions.length > 0) {
       parts.push(`Chronic conditions: ${profile.chronicConditions.join(", ")}`);
     }

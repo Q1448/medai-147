@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { SplineScene } from "@/components/ui/spline-scene";
 import { Spotlight } from "@/components/ui/spotlight";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   Activity,
   Bot,
@@ -25,7 +24,6 @@ import {
 
 export default function Index() {
   const { t } = useLanguage();
-  const scrollRef = useScrollReveal();
 
   const features = [
     { icon: Activity, title: t('featureSymptomTitle'), description: t('featureSymptomDesc'), href: "/symptoms", gradient: "from-primary to-[hsl(var(--primary-glow))]" },
@@ -45,7 +43,7 @@ export default function Index() {
 
   return (
     <Layout showFooterDisclaimer>
-      <div ref={scrollRef}>
+      <div>
         {/* Hero Section */}
         <section className="relative overflow-hidden gradient-hero">
           <div className="absolute inset-0 gradient-mesh opacity-60" />
@@ -98,8 +96,8 @@ export default function Index() {
         <section className="py-14 border-y border-primary/10">
           <div className="container">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map((stat, index) => (
-                <div key={stat.label} className="scroll-reveal text-center" style={{ transitionDelay: `${index * 80}ms` }}>
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
                   <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl gradient-primary text-primary-foreground mb-3 shadow-lg">
                     <stat.icon className="h-6 w-6" />
                   </div>
@@ -115,15 +113,15 @@ export default function Index() {
         <section className="py-20 relative">
           <div className="absolute inset-0 gradient-mesh opacity-30" />
           <div className="container relative">
-            <div className="text-center mb-14 scroll-reveal">
+            <div className="text-center mb-14">
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
                 {t('exploreFeatures').split(' ')[0]} <span className="text-gradient">{t('exploreFeatures').split(' ').slice(1).join(' ')}</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto text-lg">{t('featuresDescription')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, index) => (
-                <Link key={feature.href} to={feature.href} className="block scroll-reveal" style={{ transitionDelay: `${index * 80}ms` }}>
+              {features.map((feature) => (
+                <Link key={feature.href} to={feature.href} className="block">
                   <MedicalCard icon={feature.icon} gradient={feature.gradient} title={feature.title} description={feature.description} className="h-full" />
                 </Link>
               ))}
@@ -134,7 +132,7 @@ export default function Index() {
         {/* CTA Section */}
         <section className="py-20">
           <div className="container">
-            <div className="scroll-reveal relative overflow-hidden rounded-3xl gradient-primary p-10 md:p-16 text-center text-primary-foreground shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl gradient-primary p-10 md:p-16 text-center text-primary-foreground shadow-2xl">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.06%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-40" />
               <div className="relative">
                 <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">{t('needHelp')}</h2>

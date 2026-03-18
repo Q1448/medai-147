@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { User, X, Plus, Trash2, History, AlertTriangle } from "lucide-react";
+import { User, X, Plus, Trash2, History, AlertTriangle, Heart, Cigarette, Wine } from "lucide-react";
 import { ScrollArea } from "./scroll-area";
+
+const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const smokingOptions = ["never", "former", "current"];
+const alcoholOptions = ["none", "occasional", "moderate", "heavy"];
 
 export function MedicalProfileSheet() {
   const { profile, updateProfile, clearHistory } = useMedicalProfile();
@@ -21,8 +25,9 @@ export function MedicalProfileSheet() {
     value: string,
     setter: (v: string) => void
   ) => {
-    if (value.trim()) {
-      updateProfile({ [field]: [...profile[field], value.trim()] });
+    const trimmed = value.trim().slice(0, 100); // Limit length
+    if (trimmed && profile[field].length < 20) { // Max 20 items
+      updateProfile({ [field]: [...profile[field], trimmed] });
       setter("");
     }
   };
@@ -57,21 +62,68 @@ export function MedicalProfileSheet() {
                     id="age"
                     type="number"
                     placeholder="25"
+                    min={0}
+                    max={150}
                     value={profile.age || ""}
-                    onChange={(e) => updateProfile({ age: e.target.value ? Number(e.target.value) : null })}
+                    onChange={(e) => {
+                      const val = e.target.value ? Math.min(150, Math.max(0, Number(e.target.value))) : null;
+                      updateProfile({ age: val });
+                    }}
                     className="mt-1 h-10"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight" className="text-xs">{t('weight')}</Label>
+                  <Label htmlFor="weight" className="text-xs">{t('weight')} (kg)</Label>
                   <Input
                     id="weight"
                     type="number"
                     placeholder="70"
+                    min={0}
+                    max={500}
                     value={profile.weight || ""}
-                    onChange={(e) => updateProfile({ weight: e.target.value ? Number(e.target.value) : null })}
+                    onChange={(e) => {
+                      const val = e.target.value ? Math.min(500, Math.max(0, Number(e.target.value))) : null;
+                      updateProfile({ weight: val });
+                    }}
                     className="mt-1 h-10"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="height" className="text-xs">{t('height') || 'Height'} (cm)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    placeholder="170"
+                    min={0}
+                    max={300}
+                    value={profile.height || ""}
+                    onChange={(e) => {
+                      const val = e.target.value ? Math.min(300, Math.max(0, Number(e.target.value))) : null;
+                      updateProfile({ height: val });
+                    }}
+                    className="mt-1 h-10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs flex items-center gap-1">
+                    <Heart className="h-3 w-3 text-destructive" />
+                    {t('bloodType') || 'Blood Type'}
+                  </Label>
+                  <div className="grid grid-cols-4 gap-1 mt-1">
+                    {bloodTypes.map((bt) => (
+                      <button
+                        key={bt}
+                        onClick={() => updateProfile({ bloodType: profile.bloodType === bt ? null : bt })}
+                        className={`text-xs py-1.5 rounded-lg border transition-all ${
+                          profile.bloodType === bt
+                            ? "border-primary bg-primary/10 text-primary font-semibold"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        {bt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div>
@@ -96,6 +148,49 @@ export function MedicalProfileSheet() {
               </div>
             </div>
 
+            {/* Lifestyle */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground text-sm">{t('lifestyle') || 'Lifestyle'}</h3>
+              <div>
+                <Label className="text-xs flex items-center gap-1">
+                  <Cigarette className="h-3 w-3" />
+                  {t('smoking') || 'Smoking'}
+                </Label>
+                <div className="flex gap-2 mt-1">
+                  {smokingOptions.map((opt) => (
+                    <Button
+                      key={opt}
+                      variant={profile.smokingStatus === opt ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => updateProfile({ smokingStatus: opt })}
+                      className="flex-1 text-xs"
+                    >
+                      {t(opt) || opt}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs flex items-center gap-1">
+                  <Wine className="h-3 w-3" />
+                  {t('alcohol') || 'Alcohol'}
+                </Label>
+                <div className="flex gap-2 mt-1">
+                  {alcoholOptions.map((opt) => (
+                    <Button
+                      key={opt}
+                      variant={profile.alcoholUse === opt ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => updateProfile({ alcoholUse: opt })}
+                      className="flex-1 text-xs"
+                    >
+                      {t(opt) || opt}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Chronic Conditions */}
             <div className="space-y-3">
               <h3 className="font-semibold text-foreground text-sm">{t('chronicConditions')}</h3>
@@ -106,6 +201,7 @@ export function MedicalProfileSheet() {
                   onChange={(e) => setNewCondition(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("chronicConditions", newCondition, setNewCondition)}
                   className="h-10"
+                  maxLength={100}
                 />
                 <Button size="icon" onClick={() => addItem("chronicConditions", newCondition, setNewCondition)}>
                   <Plus className="h-4 w-4" />
@@ -136,6 +232,7 @@ export function MedicalProfileSheet() {
                   onChange={(e) => setNewAllergy(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("allergies", newAllergy, setNewAllergy)}
                   className="h-10"
+                  maxLength={100}
                 />
                 <Button size="icon" onClick={() => addItem("allergies", newAllergy, setNewAllergy)}>
                   <Plus className="h-4 w-4" />
@@ -163,6 +260,7 @@ export function MedicalProfileSheet() {
                   onChange={(e) => setNewMedication(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("currentMedications", newMedication, setNewMedication)}
                   className="h-10"
+                  maxLength={100}
                 />
                 <Button size="icon" onClick={() => addItem("currentMedications", newMedication, setNewMedication)}>
                   <Plus className="h-4 w-4" />

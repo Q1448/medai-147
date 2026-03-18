@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,7 +12,7 @@ import { EvidenceModal } from "@/components/ui/evidence-modal";
 import { HealthDashboard } from "@/components/health-dashboard";
 import {
   Activity, AlertCircle, Thermometer, HeartPulse, Brain, Bone, Eye, Ear, Wind, Sparkles,
-  Stethoscope, AlertTriangle, CheckCircle2, BookOpen, Info, Apple, Dumbbell,
+  Stethoscope, AlertTriangle, CheckCircle2, BookOpen, Info, Apple, Dumbbell, Clock, Droplets,
 } from "lucide-react";
 
 const symptomKeys = [
@@ -26,6 +28,20 @@ const symptomKeys = [
   { id: "chest_pain", labelKey: "chestPain", icon: HeartPulse },
   { id: "runny_nose", labelKey: "runnyNose", icon: Eye },
   { id: "loss_of_appetite", labelKey: "lossOfAppetite", icon: Activity },
+];
+
+const severityOptions = [
+  { value: "mild", labelKey: "mild" },
+  { value: "moderate", labelKey: "moderate" },
+  { value: "severe", labelKey: "severe" },
+];
+
+const durationOptions = [
+  { value: "today", labelKey: "today" },
+  { value: "2-3 days", labelKey: "fewDays" },
+  { value: "1 week", labelKey: "oneWeek" },
+  { value: "2+ weeks", labelKey: "twoWeeksPlus" },
+  { value: "1+ month", labelKey: "monthPlus" },
 ];
 
 interface AnalysisResult {
@@ -51,10 +67,18 @@ export default function Symptoms() {
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   
+  // Enhanced diagnostic questions
+  const [severity, setSeverity] = useState("");
+  const [duration, setDuration] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [recentTravel, setRecentTravel] = useState("");
+  
   // Lifestyle questions
   const [diet, setDiet] = useState("");
   const [exercise, setExercise] = useState("");
   const [sleep, setSleep] = useState("");
+  const [waterIntake, setWaterIntake] = useState("");
+  const [stressLevel, setStressLevel] = useState("");
 
   const toggleSymptom = (symptomId: string) => {
     setSelectedSymptoms((prev) =>
@@ -78,6 +102,16 @@ export default function Symptoms() {
 
     const allSymptoms = [...selectedLabels, additionalSymptoms.trim()].filter(Boolean).join(", ");
 
+    // Build enhanced context from diagnostic questions
+    const diagnosticContext = [
+      severity && `Severity: ${severity}`,
+      duration && `Duration: ${duration}`,
+      temperature && `Temperature: ${temperature}°C`,
+      recentTravel && `Recent travel: ${recentTravel}`,
+      waterIntake && `Water intake: ${waterIntake}`,
+      stressLevel && `Stress level: ${stressLevel}`,
+    ].filter(Boolean).join(". ");
+
     const lifestyleContext = [
       diet && `Diet: ${diet}`,
       exercise && `Exercise: ${exercise}`,
@@ -86,7 +120,7 @@ export default function Symptoms() {
 
     try {
       const profileContext = getProfileContext();
-      const fullContext = [profileContext, lifestyleContext].filter(Boolean).join("\n");
+      const fullContext = [profileContext, diagnosticContext, lifestyleContext].filter(Boolean).join("\n");
       
       const { data, error: funcError } = await supabase.functions.invoke("analyze-symptoms", {
         body: { symptoms: allSymptoms, profileContext: fullContext, language },
@@ -103,14 +137,18 @@ export default function Symptoms() {
       }
     } catch (err) {
       console.error("Analysis error:", err);
-      setError(t('errorAnalysisFailed'));
+      if (err instanceof Error && err.message.includes("429")) {
+        setError(t('rateLimitError') || "Too many requests. Please try again later.");
+      } else {
+        setError(t('errorAnalysisFailed'));
+      }
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const getSeverityStyles = (severity: string) => {
-    switch (severity) {
+  const getSeverityStyles = (sev: string) => {
+    switch (sev) {
       case "low": return { bg: "bg-medical-green/10", border: "border-medical-green/20", text: "text-medical-green", icon: CheckCircle2 };
       case "medium": return { bg: "bg-medical-warning/10", border: "border-medical-warning/20", text: "text-medical-warning", icon: AlertTriangle };
       case "high": return { bg: "bg-destructive/10", border: "border-destructive/20", text: "text-destructive", icon: AlertCircle };
@@ -176,6 +214,82 @@ export default function Symptoms() {
             </div>
           </div>
 
+          {/* Diagnostic Details */}
+          <div className="glass-card p-8 rounded-3xl mb-6">
+            <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Stethoscope className="h-5 w-5 text-primary" />{t('diagnosticDetails') || 'Diagnostic Details'}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+              {/* Severity */}
+              <div>
+                <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-medical-warning" />
+                  {t('symptomSeverity') || 'Symptom Severity'}
+                </Label>
+                <div className="flex gap-2 mt-2">
+                  {severityOptions.map((opt) => (
+                    <button key={opt.value} onClick={() => setSeverity(opt.value)}
+                      className={`flex-1 px-3 py-2.5 text-sm font-medium rounded-xl border-2 transition-all ${
+                        severity === opt.value ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+                      }`}>
+                      {t(opt.labelKey) || opt.value}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div>
+                <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-medical-blue" />
+                  {t('symptomDuration') || 'Duration'}
+                </Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {durationOptions.map((opt) => (
+                    <button key={opt.value} onClick={() => setDuration(opt.value)}
+                      className={`px-3 py-2 text-xs font-medium rounded-xl border-2 transition-all ${
+                        duration === opt.value ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+                      }`}>
+                      {t(opt.labelKey) || opt.value}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Temperature */}
+              <div>
+                <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <Thermometer className="h-4 w-4 text-destructive" />
+                  {t('bodyTemperature') || 'Body Temperature (°C)'}
+                </Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="36.6"
+                  value={temperature}
+                  onChange={(e) => setTemperature(e.target.value)}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+
+              {/* Recent Travel */}
+              <div>
+                <Label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-medical-purple" />
+                  {t('recentTravel') || 'Recent Travel'}
+                </Label>
+                <Input
+                  placeholder={t('recentTravelPlaceholder') || "e.g., South Asia, 2 weeks ago"}
+                  value={recentTravel}
+                  onChange={(e) => setRecentTravel(e.target.value)}
+                  className="mt-1 rounded-xl"
+                  maxLength={200}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Detail description */}
           <div className="glass-card p-8 rounded-3xl mb-6">
             <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
@@ -187,6 +301,7 @@ export default function Symptoms() {
               value={additionalSymptoms}
               onChange={(e) => setAdditionalSymptoms(e.target.value)}
               className="min-h-[140px] resize-none rounded-2xl text-base"
+              maxLength={5000}
             />
           </div>
 
@@ -205,6 +320,7 @@ export default function Symptoms() {
                   value={diet}
                   onChange={(e) => setDiet(e.target.value)}
                   className="min-h-[80px] resize-none rounded-2xl text-sm"
+                  maxLength={1000}
                 />
               </div>
               <div>
@@ -216,6 +332,7 @@ export default function Symptoms() {
                   value={exercise}
                   onChange={(e) => setExercise(e.target.value)}
                   className="min-h-[80px] resize-none rounded-2xl text-sm"
+                  maxLength={1000}
                 />
               </div>
               <div>
@@ -227,7 +344,37 @@ export default function Symptoms() {
                   value={sleep}
                   onChange={(e) => setSleep(e.target.value)}
                   className="min-h-[80px] resize-none rounded-2xl text-sm"
+                  maxLength={1000}
                 />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <Droplets className="h-4 w-4 text-medical-sky" />{t('waterIntake') || 'Daily Water Intake'}
+                  </label>
+                  <Input
+                    placeholder={t('waterIntakePlaceholder') || "e.g., 1.5 liters/day"}
+                    value={waterIntake}
+                    onChange={(e) => setWaterIntake(e.target.value)}
+                    className="mt-1 rounded-xl"
+                    maxLength={100}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-medical-coral" />{t('stressLevel') || 'Stress Level'}
+                  </label>
+                  <div className="flex gap-2 mt-1">
+                    {["low", "medium", "high"].map((level) => (
+                      <button key={level} onClick={() => setStressLevel(level)}
+                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-xl border-2 transition-all ${
+                          stressLevel === level ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+                        }`}>
+                        {t(level) || level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -252,7 +399,6 @@ export default function Symptoms() {
           {/* Results */}
           {results && results.conditions && !isAnalyzing && (
             <div className="mt-12 space-y-8 animate-fade-up">
-              {/* Health Dashboard */}
               {results.healthScore !== undefined && results.riskScore !== undefined && (
                 <HealthDashboard
                   data={{
@@ -265,7 +411,6 @@ export default function Symptoms() {
                 />
               )}
 
-              {/* Conditions */}
               <div className="text-center">
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                   {t('possibleConditions').split(' ').map((word, i) =>
