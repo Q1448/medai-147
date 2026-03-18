@@ -177,10 +177,10 @@ export default function Feedback() {
       const { error } = await supabase
         .from('suggestions')
         .insert({
-          name: formData.name || null,
-          email: formData.email || null,
+          name: name || null,
+          email: email || null,
           category: formData.category,
-          suggestion: formData.suggestion,
+          suggestion: suggestion,
         });
       if (error) throw error;
       setIsSubmitted(true);
