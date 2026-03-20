@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,6 +150,7 @@ export default function AiAnalysis() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="AI Image Analysis" description="Upload photos of skin conditions for AI-powered visual analysis with detailed insights and recommendations." path="/ai-analysis" />
       <div className="container py-12 md:py-16">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

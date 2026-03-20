@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -215,6 +216,7 @@ export default function Feedback() {
 
   return (
     <Layout>
+      <SEOHead title="Feedback" description="Share your suggestions to improve MedAI+. View community feedback and vote on ideas." path="/feedback" />
       <div className="container py-12 md:py-16">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

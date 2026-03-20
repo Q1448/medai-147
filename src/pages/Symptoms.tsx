@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -158,6 +159,7 @@ export default function Symptoms() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="Symptom Checker" description="Advanced AI-powered symptom analysis. Select symptoms and get accurate condition identification with evidence-based results." path="/symptoms" />
       <div className="container py-12 md:py-16">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

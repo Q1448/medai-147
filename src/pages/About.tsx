@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Users, Code, Search, Building2, Award, Sparkles } from "lucide-react";
 
@@ -28,6 +29,7 @@ export default function About() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="About Us" description="Meet the team behind MedAI+ — an AI-powered health assistant built at NIS IB." path="/about" />
       <div className="container py-12 md:py-20">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">

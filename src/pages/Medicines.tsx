@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -212,6 +213,7 @@ export default function Medicines() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="Medicine Finder" description="Find medicines for your condition with prices, dosages, instructions, and nearby pharmacy availability in Astana." path="/medicines" />
       <div className="container py-12 md:py-16">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">

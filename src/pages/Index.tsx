@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SplineScene } from "@/components/ui/spline-scene";
 import { Spotlight } from "@/components/ui/spotlight";
+import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Activity,
@@ -43,8 +44,13 @@ export default function Index() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead
+        title="AI-Powered Health Assistant"
+        description="Get instant health insights, accurate symptom analysis, medicine recommendations, and find nearby healthcare facilities—all powered by advanced AI."
+        path="/"
+      />
       <div>
-        {/* Hero Section */}
+        {/* Hero Section — Liquid Glass */}
         <section className="relative overflow-hidden gradient-hero">
           <div className="absolute inset-0 gradient-mesh opacity-60" />
           <div className="container relative py-12 md:py-20">
@@ -56,7 +62,7 @@ export default function Index() {
                     <Sparkles className="h-4 w-4 text-primary" />
                     <span className="text-gradient">{t('heroTagline')}</span>
                   </div>
-                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight animate-fade-up" style={{ animationDelay: '100ms' }}>
+                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] animate-fade-up" style={{ animationDelay: '100ms' }}>
                     {t('heroTitle1')}{" "}
                     <span className="text-gradient">{t('heroTitle2')}</span>{" "}
                     <span className="text-gradient-accent">{t('heroTitle3')}</span>
@@ -65,14 +71,14 @@ export default function Index() {
                     {t('heroDescription')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 animate-fade-up" style={{ animationDelay: '300ms' }}>
-                    <Button asChild size="lg" className="gradient-primary text-primary-foreground border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                    <Button asChild size="lg" className="gradient-primary text-primary-foreground border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
                       <Link to="/symptoms">
                         <HeartPulse className="mr-2 h-5 w-5" />
                         {t('checkSymptoms')}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
                     </Button>
-                    <Button asChild variant="outline" size="lg" className="rounded-2xl px-8 h-14 text-base font-semibold border-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all duration-300">
+                    <Button asChild variant="outline" size="lg" className="rounded-2xl px-8 h-14 text-base font-semibold border-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 active:scale-[0.97] transition-all duration-300">
                       <Link to="/ai-doctor">
                         <Bot className="mr-2 h-5 w-5" />
                         {t('talkToAI')}
@@ -96,8 +102,8 @@ export default function Index() {
         <section className="py-14 border-y border-primary/10">
           <div className="container">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
+              {stats.map((stat, i) => (
+                <div key={stat.label} className="text-center animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
                   <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl gradient-primary text-primary-foreground mb-3 shadow-lg">
                     <stat.icon className="h-6 w-6" />
                   </div>
@@ -120,8 +126,8 @@ export default function Index() {
               <p className="text-muted-foreground max-w-xl mx-auto text-lg">{t('featuresDescription')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature) => (
-                <Link key={feature.href} to={feature.href} className="block">
+              {features.map((feature, i) => (
+                <Link key={feature.href} to={feature.href} className="block animate-fade-up" style={{ animationDelay: `${i * 70}ms` }}>
                   <MedicalCard icon={feature.icon} gradient={feature.gradient} title={feature.title} description={feature.description} className="h-full" />
                 </Link>
               ))}
@@ -138,10 +144,10 @@ export default function Index() {
                 <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">{t('needHelp')}</h2>
                 <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto text-lg">{t('emergencyDescription')}</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 rounded-2xl px-8 h-14 text-base font-bold shadow-xl hover:scale-[1.02] transition-all duration-300">
+                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 rounded-2xl px-8 h-14 text-base font-bold shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
                     <a href="tel:103">{t('callEmergency')}</a>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl px-8 h-14 text-base font-semibold">
+                  <Button asChild variant="outline" size="lg" className="border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl px-8 h-14 text-base font-semibold active:scale-[0.97] transition-all">
                     <Link to="/hospitals">{t('findHospitals')}</Link>
                   </Button>
                 </div>
