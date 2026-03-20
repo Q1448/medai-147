@@ -41,6 +41,7 @@ export default function Hospitals() {
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="Pharmacies & Hospitals" description="Find pharmacies and hospitals in Astana with directions via 2GIS. Emergency numbers and healthcare locations." path="/hospitals" />
       <div className="container py-12 md:py-16">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">

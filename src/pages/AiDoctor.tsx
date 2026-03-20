@@ -191,6 +191,7 @@ How can I help you today?`;
 
   return (
     <Layout showFooterDisclaimer>
+      <SEOHead title="AI Doctor" description="Chat with our advanced AI medical assistant. Get comprehensive health information, treatment options, and specialist guidance." path="/ai-doctor" />
       <div className="container py-8 md:py-12">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-8">
