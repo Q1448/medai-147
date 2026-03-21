@@ -3,8 +3,8 @@ import { Layout } from "@/components/layout/Layout";
 import { MedicalCard } from "@/components/ui/medical-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SplineScene } from "@/components/ui/spline-scene";
 import { Spotlight } from "@/components/ui/spotlight";
+import { TextRotate } from "@/components/ui/text-rotate";
 import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
@@ -24,7 +24,13 @@ import {
 } from "lucide-react";
 
 export default function Index() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const rotatingTexts = language === 'ru' 
+    ? ['Здоровью', 'Диагностике', 'Лечению', 'Профилактике']
+    : language === 'kk'
+    ? ['Денсаулыққа', 'Диагностикаға', 'Емдеуге', 'Алдын алуға']
+    : ['Health', 'Diagnostics', 'Treatment', 'Prevention'];
 
   const features = [
     { icon: Activity, title: t('featureSymptomTitle'), description: t('featureSymptomDesc'), href: "/symptoms", gradient: "from-primary to-[hsl(var(--primary-glow))]" },
@@ -56,18 +62,19 @@ export default function Index() {
           <div className="container relative py-12 md:py-20">
             <Card className="w-full liquid-glass-heavy overflow-hidden rounded-3xl border-0">
               <Spotlight className="from-primary/20 via-primary/5 to-transparent" size={400} />
-              <div className="flex flex-col lg:flex-row min-h-[500px]">
-                <div className="flex-1 p-8 md:p-12 lg:p-16 relative z-10 flex flex-col justify-center">
+              <div className="flex flex-col min-h-[420px]">
+                <div className="flex-1 p-8 md:p-12 lg:p-16 relative z-10 flex flex-col justify-center items-center text-center">
                   <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass-subtle text-sm font-semibold mb-6 w-fit animate-fade-up">
                     <Sparkles className="h-4 w-4 text-primary" />
                     <span className="text-gradient">{t('heroTagline')}</span>
                   </div>
                   <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] animate-fade-up" style={{ animationDelay: '100ms' }}>
                     {t('heroTitle1')}{" "}
-                    <span className="text-gradient">{t('heroTitle2')}</span>{" "}
-                    <span className="text-gradient-accent">{t('heroTitle3')}</span>
+                    <span className="text-gradient">
+                      <TextRotate texts={rotatingTexts} interval={2500} />
+                    </span>
                   </h1>
-                  <p className="text-lg text-muted-foreground mb-8 max-w-xl leading-relaxed animate-fade-up" style={{ animationDelay: '200ms' }}>
+                  <p className="text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed animate-fade-up" style={{ animationDelay: '200ms' }}>
                     {t('heroDescription')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 animate-fade-up" style={{ animationDelay: '300ms' }}>
@@ -85,13 +92,6 @@ export default function Index() {
                       </Link>
                     </Button>
                   </div>
-                </div>
-
-                <div className="flex-1 relative min-h-[350px] lg:min-h-[500px]">
-                  <SplineScene
-                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                    className="w-full h-full"
-                  />
                 </div>
               </div>
             </Card>
@@ -147,7 +147,7 @@ export default function Index() {
                   <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 rounded-2xl px-8 h-14 text-base font-bold shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
                     <a href="tel:103">{t('callEmergency')}</a>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl px-8 h-14 text-base font-semibold active:scale-[0.97] transition-all">
+                  <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 rounded-2xl px-8 h-14 text-base font-bold shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
                     <Link to="/hospitals">{t('findHospitals')}</Link>
                   </Button>
                 </div>
