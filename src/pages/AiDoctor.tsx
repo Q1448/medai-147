@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SplineScene } from "@/components/ui/spline-scene";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
@@ -25,11 +26,11 @@ export default function AiDoctor() {
     if (language === 'ru') {
       return `Здравствуйте! Я ваш продвинутый ИИ медицинский ассистент на базе новейших технологий. Я могу предоставить информацию о:
 
-• Симптомы и заболевания - Подробные объяснения медицинских симптомов
-• Варианты лечения - Общая информация о лечении и домашние средства
-• Информация о лекарствах - Как работают лекарства и их эффекты
-• Рекомендации специалистов - К какому врачу обратиться
-• Профилактика - Советы по поддержанию здоровья
+- Симптомы и заболевания - Подробные объяснения медицинских симптомов
+- Варианты лечения - Общая информация о лечении и домашние средства
+- Информация о лекарствах - Как работают лекарства и их эффекты
+- Рекомендации специалистов - К какому врачу обратиться
+- Профилактика - Советы по поддержанию здоровья
 
 Важно: Я предоставляю только образовательную информацию. При экстренных ситуациях звоните 103. Всегда консультируйтесь с врачом для диагностики и лечения.
 
@@ -37,23 +38,23 @@ export default function AiDoctor() {
     } else if (language === 'kk') {
       return `Сәлеметсіз бе! Мен сіздің озық AI медициналық көмекшіңізбін. Мен келесі ақпаратты бере аламын:
 
-• Белгілер мен аурулар - Медициналық белгілердің толық түсіндірмелері
-• Емдеу нұсқалары - Жалпы емдеу ақпараты және үй емдері
-• Дәрі-дәрмек ақпараты - Дәрілердің қалай жұмыс істейтіні
-• Маман кеңестері - Қай дәрігерге бару керек
-• Алдын алу - Денсаулықты сақтау кеңестері
+- Белгілер мен аурулар - Медициналық белгілердің толық түсіндірмелері
+- Емдеу нұсқалары - Жалпы емдеу ақпараты және үй емдері
+- Дәрі-дәрмек ақпараты - Дәрілердің қалай жұмыс істейтіні
+- Маман кеңестері - Қай дәрігерге бару керек
+- Алдын алу - Денсаулықты сақтау кеңестері
 
-Маңызды: Мен тек білім беру ақпаратын ұсынамын. Шұғыл жағдайларда 103 нөміріне қоңырау шалыңыз. Диагноз және емдеу үшін әрқашан дәрігермен кеңесіңіз.
+Маңызды: Мен тек білім беру ақпаратын ұсынамын. Шұғыл жағдайларда 103 нөміріне қоңырау шалыңыз.
 
 Сізге қалай көмектесе аламын?`;
     }
     return `Hello! I'm your advanced AI medical assistant powered by the latest AI technology. I can provide comprehensive information about:
 
-• Symptoms & Conditions - Detailed explanations of medical symptoms
-• Treatment Options - General treatment information and home remedies
-• Medication Info - How medicines work and their effects
-• Specialist Guidance - Which doctor to consult for specific issues
-• Preventive Care - Tips for maintaining good health
+- Symptoms & Conditions - Detailed explanations of medical symptoms
+- Treatment Options - General treatment information and home remedies
+- Medication Info - How medicines work and their effects
+- Specialist Guidance - Which doctor to consult for specific issues
+- Preventive Care - Tips for maintaining good health
 
 Important: I provide educational information only. For medical emergencies, call 103 immediately. Always consult a healthcare professional for diagnosis and treatment.
 
@@ -61,22 +62,15 @@ How can I help you today?`;
   };
 
   const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: getWelcomeMessage(),
-    },
+    { role: "assistant", content: getWelcomeMessage() },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Update welcome message when language changes
   useEffect(() => {
-    setMessages([{
-      role: "assistant",
-      content: getWelcomeMessage(),
-    }]);
+    setMessages([{ role: "assistant", content: getWelcomeMessage() }]);
   }, [language]);
 
   useEffect(() => {
@@ -85,12 +79,7 @@ How can I help you today?`;
     }
   }, [messages]);
 
-  const suggestedQuestions = [
-    t('suggestQ1'),
-    t('suggestQ2'),
-    t('suggestQ3'),
-    t('suggestQ4'),
-  ];
+  const suggestedQuestions = [t('suggestQ1'), t('suggestQ2'), t('suggestQ3'), t('suggestQ4')];
 
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
@@ -112,20 +101,12 @@ How can I help you today?`;
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ 
-          messages: [...messages, userMessage],
-          profileContext,
-          language,
-        }),
+        body: JSON.stringify({ messages: [...messages, userMessage], profileContext, language }),
       });
 
       if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(t('rateLimitError'));
-        }
-        if (response.status === 402) {
-          throw new Error(t('serviceUnavailable'));
-        }
+        if (response.status === 429) throw new Error(t('rateLimitError'));
+        if (response.status === 402) throw new Error(t('serviceUnavailable'));
         throw new Error("Failed to get response");
       }
 
@@ -138,18 +119,15 @@ How can I help you today?`;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         textBuffer += decoder.decode(value, { stream: true });
 
         let newlineIndex: number;
         while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
           let line = textBuffer.slice(0, newlineIndex);
           textBuffer = textBuffer.slice(newlineIndex + 1);
-
           if (line.endsWith("\r")) line = line.slice(0, -1);
           if (line.startsWith(":") || line.trim() === "") continue;
           if (!line.startsWith("data: ")) continue;
-
           const jsonStr = line.slice(6).trim();
           if (jsonStr === "[DONE]") break;
 
@@ -161,9 +139,7 @@ How can I help you today?`;
               setMessages((prev) => {
                 const last = prev[prev.length - 1];
                 if (last?.role === "assistant") {
-                  return prev.map((m, i) =>
-                    i === prev.length - 1 ? { ...m, content: assistantContent } : m
-                  );
+                  return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantContent } : m);
                 }
                 return [...prev, { role: "assistant", content: assistantContent }];
               });
@@ -191,22 +167,32 @@ How can I help you today?`;
 
   return (
     <Layout showFooterDisclaimer>
-      <SEOHead title="AI Doctor" description="Chat with our advanced AI medical assistant. Get comprehensive health information, treatment options, and specialist guidance." path="/ai-doctor" />
+      <SEOHead title="AI Doctor" description="Chat with our advanced AI medical assistant." path="/ai-doctor" />
       <div className="container py-8 md:py-12">
-        {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
-            <Brain className="h-4 w-4 text-medical-blue" />
-            <span className="text-gradient">{t('poweredByAI')}</span>
+        {/* Header with 3D Robot */}
+        <div className="max-w-5xl mx-auto mb-8">
+          <div className="liquid-glass-heavy rounded-3xl overflow-hidden">
+            <div className="flex flex-col lg:flex-row min-h-[300px]">
+              <div className="flex-1 p-8 md:p-12 relative z-10 flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass-subtle text-sm font-semibold mb-4 w-fit">
+                  <Brain className="h-4 w-4 text-primary" />
+                  <span className="text-gradient">{t('poweredByAI')}</span>
+                </div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+                  {t('aiDoctorAssistant').split(' ').map((word, i) =>
+                    i === 0 ? <span key={i} className="text-gradient">{word} </span> : word + ' '
+                  )}
+                </h1>
+                <p className="text-muted-foreground">{t('getComprehensiveHealth')}</p>
+              </div>
+              <div className="flex-1 relative min-h-[250px] lg:min-h-[300px]">
+                <SplineScene
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {t('aiDoctorAssistant').split(' ').map((word, i) => 
-              i === 0 ? <span key={i} className="text-gradient">{word} </span> : word + ' '
-            )}
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {t('getComprehensiveHealth')}
-          </p>
         </div>
 
         {/* Profile Context Notice */}
@@ -228,8 +214,7 @@ How can I help you today?`;
         {/* Chat Container */}
         <div className="max-w-4xl mx-auto">
           <div className="glass-card rounded-3xl overflow-hidden shadow-xl">
-            {/* Chat Header */}
-            <div className="flex items-center justify-between gap-4 p-5 border-b border-border bg-gradient-to-r from-primary/5 to-medical-blue/5">
+            <div className="flex items-center justify-between gap-4 p-5 border-b border-border bg-gradient-to-r from-primary/5 to-primary/3">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-primary text-primary-foreground shadow-lg">
@@ -253,20 +238,16 @@ How can I help you today?`;
               </EvidenceModal>
             </div>
 
-            {/* Messages */}
             <ScrollArea className="h-[450px] p-5" ref={scrollRef}>
               <div className="space-y-5">
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={cn(
-                      "flex gap-3 animate-fade-up",
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    )}
+                    className={cn("flex gap-3 animate-fade-up", message.role === "user" ? "justify-end" : "justify-start")}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {message.role === "assistant" && (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                         <Bot className="h-5 w-5" />
                       </div>
                     )}
@@ -274,7 +255,7 @@ How can I help you today?`;
                       className={cn(
                         "max-w-[80%] rounded-2xl px-5 py-4 text-sm leading-relaxed",
                         message.role === "user"
-                          ? "bg-gradient-to-br from-primary to-medical-sky text-white rounded-br-md shadow-lg"
+                          ? "bg-gradient-to-br from-primary to-primary/80 text-white rounded-br-md shadow-lg"
                           : "bg-muted text-foreground rounded-bl-md"
                       )}
                     >
@@ -289,7 +270,7 @@ How can I help you today?`;
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3 justify-start animate-fade-up">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-medical-blue/20 text-primary">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                       <Bot className="h-5 w-5" />
                     </div>
                     <div className="bg-muted rounded-2xl rounded-bl-md px-5 py-4">
@@ -304,17 +285,12 @@ How can I help you today?`;
               </div>
             </ScrollArea>
 
-            {/* Suggested Questions */}
             {messages.length === 1 && (
               <div className="px-5 pb-4">
                 <p className="text-xs text-muted-foreground mb-2 font-medium">{t('quickQuestions')}</p>
                 <div className="flex flex-wrap gap-2">
                   {suggestedQuestions.map((question, index) => (
-                    <button
-                      key={index}
-                      onClick={() => sendMessage(question)}
-                      className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                    >
+                    <button key={index} onClick={() => sendMessage(question)} className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
                       {question}
                     </button>
                   ))}
@@ -322,7 +298,6 @@ How can I help you today?`;
               </div>
             )}
 
-            {/* Error */}
             {error && (
               <div className="mx-5 mb-4 flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive text-sm font-medium">
                 <AlertCircle className="h-4 w-4 shrink-0" />
@@ -330,7 +305,6 @@ How can I help you today?`;
               </div>
             )}
 
-            {/* Input */}
             <div className="p-5 border-t border-border bg-muted/30">
               <div className="flex gap-3">
                 <Textarea
