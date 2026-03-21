@@ -296,6 +296,21 @@ export const translations: Translations = {
   addSuggestion: { en: 'Add Suggestion', ru: 'Добавить предложение', kk: 'Ұсыныс қосу' },
   viewAllSuggestions: { en: 'View All Suggestions', ru: 'Все предложения', kk: 'Барлық ұсыныстар' },
 
+  // Auth
+  login: { en: 'Sign In', ru: 'Войти', kk: 'Кіру' },
+  signup: { en: 'Sign Up', ru: 'Регистрация', kk: 'Тіркелу' },
+  password: { en: 'Password', ru: 'Пароль', kk: 'Құпия сөз' },
+  continueWithGoogle: { en: 'Continue with Google', ru: 'Продолжить через Google', kk: 'Google арқылы кіру' },
+  noAccount: { en: "Don't have an account?", ru: 'Нет аккаунта?', kk: 'Аккаунт жоқ па?' },
+  hasAccount: { en: 'Already have an account?', ru: 'Уже есть аккаунт?', kk: 'Аккаунт бар ма?' },
+  logout: { en: 'Sign Out', ru: 'Выйти', kk: 'Шығу' },
+
+  // About mission
+  ourMission: { en: 'Our Mission', ru: 'Наша миссия', kk: 'Біздің миссия' },
+  missionText: { en: 'We believe that access to reliable health information should be available to everyone. Our AI-powered platform bridges the gap between medical knowledge and everyday users, providing instant, accurate, and personalized health guidance in multiple languages.', ru: 'Мы верим, что доступ к надёжной медицинской информации должен быть у каждого. Наша платформа на базе ИИ устраняет разрыв между медицинскими знаниями и обычными пользователями, предоставляя мгновенные, точные и персонализированные медицинские рекомендации на нескольких языках.', kk: 'Біз сенімді денсаулық ақпаратына қол жеткізу барлығына қолжетімді болуы керек деп сенеміз. Біздің AI платформамыз медициналық білім мен күнделікті пайдаланушылар арасындағы алшақтықты жояды, бірнеше тілде лезде, дәл және жеке денсаулық кеңестерін ұсынады.' },
+  problemWeResolve: { en: 'The Problem We Solve', ru: 'Проблема, которую мы решаем', kk: 'Біз шешетін мәселе' },
+  problemText: { en: 'In Kazakhstan, many people face barriers to accessing quality healthcare information — language barriers, long waiting times, and limited access to specialists. MedAI+ provides 24/7 AI-powered medical guidance in Kazakh, Russian, and English, making healthcare knowledge accessible to everyone.', ru: 'В Казахстане многие сталкиваются с барьерами при получении качественной медицинской информации — языковые барьеры, долгое ожидание и ограниченный доступ к специалистам. MedAI+ предоставляет круглосуточную медицинскую помощь на базе ИИ на казахском, русском и английском языках.', kk: 'Қазақстанда көптеген адамдар сапалы денсаулық сақтау ақпаратына қол жеткізуде кедергілерге тап болады — тіл кедергілері, ұзақ күту және мамандарға шектеулі қол жеткізу. MedAI+ қазақ, орыс және ағылшын тілдерінде тәулік бойы AI негізіндегі медициналық көмек ұсынады.' },
+
   // Health Dashboard
   healthScore: { en: 'Health Score', ru: 'Показатель здоровья', kk: 'Денсаулық көрсеткіші' },
   riskScore: { en: 'Risk Score', ru: 'Показатель риска', kk: 'Тәуекел көрсеткіші' },

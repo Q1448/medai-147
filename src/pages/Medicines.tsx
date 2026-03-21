@@ -187,7 +187,7 @@ export default function Medicines() {
 
   const openPharmacyDirections = (pharmacy: NearbyPharmacy) => {
     window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${pharmacy.coords}&travelmode=driving`,
+      `https://2gis.kz/astana/search/${encodeURIComponent(pharmacy.name)}`,
       "_blank"
     );
   };
