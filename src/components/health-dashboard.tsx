@@ -36,7 +36,8 @@ interface HealthDashboardProps {
 
 export function HealthDashboard({ data }: HealthDashboardProps) {
   const { t } = useLanguage();
-  const { history } = useMedicalProfile();
+  const { profile } = useMedicalProfile();
+  const history = profile.symptomHistory;
 
   const getHealthColor = (score: number) => {
     if (score >= 70) return "text-medical-green";
