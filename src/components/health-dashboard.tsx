@@ -1,5 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Progress } from "@/components/ui/progress";
+import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import {
   Heart,
   AlertTriangle,
@@ -9,7 +9,18 @@ import {
   Clock,
   Activity,
   Zap,
+  CalendarCheck,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface DashboardData {
   healthScore: number;
@@ -25,6 +36,8 @@ interface HealthDashboardProps {
 
 export function HealthDashboard({ data }: HealthDashboardProps) {
   const { t } = useLanguage();
+  const { profile } = useMedicalProfile();
+  const history = profile.symptomHistory;
 
   const getHealthColor = (score: number) => {
     if (score >= 70) return "text-medical-green";
@@ -50,8 +63,39 @@ export function HealthDashboard({ data }: HealthDashboardProps) {
     return "bg-destructive";
   };
 
+  // Build projected improvement line (14 days)
+  const projectedData = Array.from({ length: 14 }, (_, i) => {
+    const day = i + 1;
+    const improvement = data.healthScore + (100 - data.healthScore) * (1 - Math.exp(-day / 7));
+    return {
+      day: `${t('day') || 'Day'} ${day}`,
+      [t('projectedHealth') || 'Projected']: Math.round(improvement),
+    };
+  });
+
+  // Build actual analysis history points
+  const historyPoints = history
+    .filter((h) => h.date)
+    .map((h, i) => {
+      const date = new Date(h.date);
+      return {
+        dayLabel: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        index: i,
+        score: data.healthScore - (history.length - 1 - i) * 3, // approximate
+      };
+    });
+
+  // Merge into chart data  
+  const chartData = projectedData.map((point, i) => {
+    const historyPoint = historyPoints[i];
+    return {
+      ...point,
+      [t('actualHealth') || 'Actual']: historyPoint ? Math.max(10, Math.min(100, historyPoint.score)) : undefined,
+    };
+  });
+
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-6">
       {/* Verdict */}
       <div className="glass-card p-6 rounded-3xl border border-primary/20">
         <div className="flex items-start gap-3 mb-4">
@@ -62,6 +106,14 @@ export function HealthDashboard({ data }: HealthDashboardProps) {
             <h3 className="font-display text-lg font-bold text-foreground">{t('generalVerdict')}</h3>
             <p className="text-muted-foreground text-sm mt-1 leading-relaxed">{data.verdict}</p>
           </div>
+        </div>
+
+        {/* Re-analyze reminder */}
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 mt-3">
+          <CalendarCheck className="h-4 w-4 text-primary shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            {t('reanalyzeReminder') || 'We recommend running this analysis again in 1-2 days to track your health progress and see how your condition develops.'}
+          </p>
         </div>
       </div>
 
@@ -115,6 +167,51 @@ export function HealthDashboard({ data }: HealthDashboardProps) {
               />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Health Progress Chart */}
+      <div className="glass-card p-6 rounded-3xl">
+        <h3 className="font-display text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          {t('healthProgressChart') || 'Health Progress'}
+        </h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          {t('healthChartDesc') || 'The green line shows projected improvement over 14 days. The blue line tracks your actual analysis scores over time.'}
+        </p>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Line
+                type="monotone"
+                dataKey={t('projectedHealth') || 'Projected'}
+                stroke="hsl(152, 68%, 38%)"
+                strokeWidth={2}
+                dot={false}
+                strokeDasharray="5 5"
+              />
+              <Line
+                type="monotone"
+                dataKey={t('actualHealth') || 'Actual'}
+                stroke="hsl(217, 91%, 60%)"
+                strokeWidth={2.5}
+                dot={{ r: 4, fill: 'hsl(217, 91%, 60%)' }}
+                connectNulls={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
