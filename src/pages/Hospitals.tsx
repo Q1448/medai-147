@@ -127,22 +127,23 @@ export default function Hospitals() {
             </div>
           </div>
 
-          {/* 2GIS Map */}
+          {/* 2GIS Map - Fixed embed */}
           <div className="glass-card rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-border/50">
               <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />{t('astanaHealthcareMap')}
               </h2>
             </div>
-            <div className="aspect-video">
+            <div className="aspect-video relative bg-muted">
               <iframe
-                src="https://widgets.2gis.com/widget?type=firmsonmap&options=%7B%22pos%22%3A%7B%22lat%22%3A51.1282%2C%22lon%22%3A71.4307%2C%22zoom%22%3A12%7D%2C%22opt%22%3A%7B%22city%22%3A%22astana%22%7D%2C%22org%22%3A%22pharmacy%22%7D"
+                src="https://2gis.kz/astana/search/%D0%B0%D0%BF%D1%82%D0%B5%D0%BA%D0%B0/rubricId/216?m=71.430691%2C51.128207%2F12"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 title="2GIS Astana Map"
+                referrerPolicy="no-referrer"
               />
             </div>
             <div className="p-4 flex justify-center bg-muted/30">

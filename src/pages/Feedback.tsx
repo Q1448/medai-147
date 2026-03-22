@@ -71,21 +71,52 @@ export default function Feedback() {
 
   const fetchSuggestions = useCallback(async () => {
     try {
-      const { data: suggestionsData, error: sugError } = await supabase
-        .from('suggestions')
-        .select('id, name, category, suggestion, created_at')
-        .order('created_at', { ascending: false });
+      // Fetch ALL suggestions using pagination to bypass 1000 limit
+      let allSuggestions: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let hasMore = true;
 
-      if (sugError) throw sugError;
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('suggestions')
+          .select('id, name, category, suggestion, created_at')
+          .order('created_at', { ascending: false })
+          .range(from, from + pageSize - 1);
 
-      const { data: likesData, error: likesError } = await supabase
-        .from('suggestion_likes')
-        .select('suggestion_id, visitor_id');
+        if (error) throw error;
+        if (data && data.length > 0) {
+          allSuggestions = [...allSuggestions, ...data];
+          from += pageSize;
+          hasMore = data.length === pageSize;
+        } else {
+          hasMore = false;
+        }
+      }
 
-      if (likesError) throw likesError;
+      // Fetch ALL likes with pagination
+      let allLikes: any[] = [];
+      from = 0;
+      hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('suggestion_likes')
+          .select('suggestion_id, visitor_id')
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+        if (data && data.length > 0) {
+          allLikes = [...allLikes, ...data];
+          from += pageSize;
+          hasMore = data.length === pageSize;
+        } else {
+          hasMore = false;
+        }
+      }
 
       const likesMap: Record<string, { count: number; myLike: boolean }> = {};
-      likesData?.forEach((like: { suggestion_id: string; visitor_id: string }) => {
+      allLikes.forEach((like: { suggestion_id: string; visitor_id: string }) => {
         if (!likesMap[like.suggestion_id]) {
           likesMap[like.suggestion_id] = { count: 0, myLike: false };
         }
@@ -95,11 +126,14 @@ export default function Feedback() {
         }
       });
 
-      const mapped: Suggestion[] = (suggestionsData || []).map((s) => ({
+      const mapped: Suggestion[] = allSuggestions.map((s) => ({
         ...s,
         likes_count: likesMap[s.id]?.count || 0,
         liked_by_me: likesMap[s.id]?.myLike || false,
       }));
+
+      // Sort by most liked first
+      mapped.sort((a, b) => b.likes_count - a.likes_count);
 
       setSuggestions(mapped);
 
@@ -149,7 +183,7 @@ export default function Feedback() {
           s.id === suggestionId
             ? { ...s, liked_by_me: !currentlyLiked, likes_count: s.likes_count + (currentlyLiked ? -1 : 1) }
             : s
-        )
+        ).sort((a, b) => b.likes_count - a.likes_count)
       );
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -213,6 +247,10 @@ export default function Feedback() {
   }).length;
 
   const topCategory = Object.entries(stats.byCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || 'general';
+
+  // Pagination for display
+  const [displayCount, setDisplayCount] = useState(50);
+  const displayedSuggestions = suggestions.slice(0, displayCount);
 
   return (
     <Layout>
@@ -368,7 +406,7 @@ export default function Feedback() {
             </div>
           ) : (
             <div className="space-y-3">
-              {suggestions.map((s) => {
+              {displayedSuggestions.map((s) => {
                 const catInfo = getCategoryInfo(s.category || 'general');
                 const CatIcon = catInfo.icon;
                 return (
@@ -401,6 +439,18 @@ export default function Feedback() {
                   </div>
                 );
               })}
+              
+              {displayCount < suggestions.length && (
+                <div className="text-center pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDisplayCount(prev => prev + 50)}
+                    className="rounded-xl"
+                  >
+                    {t('loading')} ({displayCount}/{suggestions.length})
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

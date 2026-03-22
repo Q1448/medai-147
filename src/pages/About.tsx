@@ -1,31 +1,43 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Users, Code, Search, Building2, Award, Sparkles } from "lucide-react";
+import { Users, Code, Search, Building2, Award, Sparkles, Target, Lightbulb } from "lucide-react";
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const team = [
     {
-      name: "Yerzhanuly Yerassyl",
+      nameEn: "Yerzhanuly Yerassyl",
+      nameRu: "Ержанулы Ерасыл",
+      nameKk: "Ержанұлы Ерасыл",
       role: t('developer'),
       icon: Code,
       gradient: "from-primary to-medical-sky",
     },
     {
-      name: "Kadyr Altair",
+      nameEn: "Kadyr Altair",
+      nameRu: "Кадыр Алтаир",
+      nameKk: "Қадыр Алтаир",
       role: t('researcher'),
       icon: Search,
       gradient: "from-medical-purple to-medical-coral",
     },
     {
-      name: "Жумабай Айдар",
+      nameEn: "Zhumabay Aidar",
+      nameRu: "Жумабай Айдар",
+      nameKk: "Жұмабай Айдар",
       role: t('assistantResearcher'),
       icon: Search,
       gradient: "from-medical-green to-primary",
     },
   ];
+
+  const getTeamName = (member: typeof team[0]) => {
+    if (language === 'ru') return member.nameRu;
+    if (language === 'kk') return member.nameKk;
+    return member.nameEn;
+  };
 
   return (
     <Layout showFooterDisclaimer>
@@ -45,24 +57,46 @@ export default function About() {
           </p>
         </div>
 
+        {/* Mission & Problem */}
+        <div className="max-w-4xl mx-auto mb-16 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="glass-card p-8 rounded-3xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-medical-mint">
+                <Target className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="font-display text-xl font-bold text-foreground">{t('ourMission')}</h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-sm">{t('missionText')}</p>
+          </div>
+          <div className="glass-card p-8 rounded-3xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-medical-coral to-medical-peach">
+                <Lightbulb className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="font-display text-xl font-bold text-foreground">{t('problemWeResolve')}</h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-sm">{t('problemText')}</p>
+          </div>
+        </div>
+
         {/* Team Section */}
         <div className="max-w-4xl mx-auto mb-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-8">{t('ourTeam')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {team.map((member, index) => (
               <div
-                key={member.name}
-                className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-8 transition-all duration-300 hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 animate-fade-up"
-                style={{ animationDelay: `${index * 100}ms` }}
+                key={index}
+                className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-8 transition-all duration-300 hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 text-center"
               >
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500 bg-gradient-to-br from-primary to-medical-sky" />
                 <div className="relative">
                   <div className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${member.gradient} mb-6 transition-transform group-hover:scale-110`}>
                     <member.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="font-display text-2xl font-bold text-foreground mb-2">
-                    {member.name}
+                  <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                    {getTeamName(member)}
                   </h3>
-                  <p className="text-primary font-semibold">{member.role}</p>
+                  <p className="text-primary font-semibold text-sm">{member.role}</p>
                 </div>
               </div>
             ))}

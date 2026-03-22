@@ -64,20 +64,20 @@ export default function Index() {
               <Spotlight className="from-primary/20 via-primary/5 to-transparent" size={400} />
               <div className="flex flex-col min-h-[420px]">
                 <div className="flex-1 p-8 md:p-12 lg:p-16 relative z-10 flex flex-col justify-center items-center text-center">
-                  <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass-subtle text-sm font-semibold mb-6 w-fit animate-fade-up">
+                  <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass-subtle text-sm font-semibold mb-6 w-fit">
                     <Sparkles className="h-4 w-4 text-primary" />
                     <span className="text-gradient">{t('heroTagline')}</span>
                   </div>
-                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] animate-fade-up" style={{ animationDelay: '100ms' }}>
+                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1]">
                     {t('heroTitle1')}{" "}
                     <span className="text-gradient">
                       <TextRotate texts={rotatingTexts} interval={2500} />
                     </span>
                   </h1>
-                  <p className="text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed animate-fade-up" style={{ animationDelay: '200ms' }}>
+                  <p className="text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed">
                     {t('heroDescription')}
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-4 animate-fade-up" style={{ animationDelay: '300ms' }}>
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <Button asChild size="lg" className="gradient-primary text-primary-foreground border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
                       <Link to="/symptoms">
                         <HeartPulse className="mr-2 h-5 w-5" />
@@ -102,8 +102,8 @@ export default function Index() {
         <section className="py-14 border-y border-primary/10">
           <div className="container">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map((stat, i) => (
-                <div key={stat.label} className="text-center animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
                   <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl gradient-primary text-primary-foreground mb-3 shadow-lg">
                     <stat.icon className="h-6 w-6" />
                   </div>
@@ -126,8 +126,8 @@ export default function Index() {
               <p className="text-muted-foreground max-w-xl mx-auto text-lg">{t('featuresDescription')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, i) => (
-                <Link key={feature.href} to={feature.href} className="block animate-fade-up" style={{ animationDelay: `${i * 70}ms` }}>
+              {features.map((feature) => (
+                <Link key={feature.href} to={feature.href} className="block">
                   <MedicalCard icon={feature.icon} gradient={feature.gradient} title={feature.title} description={feature.description} className="h-full" />
                 </Link>
               ))}
