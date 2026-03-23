@@ -128,6 +128,14 @@ export default function Medicines() {
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("all");
   const [showGenerics, setShowGenerics] = useState(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<NearbyPharmacy | null>(null);
+  
+  // Prescription scanner state
+  const [showScanner, setShowScanner] = useState(false);
+  const [prescriptionImage, setPrescriptionImage] = useState<string | null>(null);
+  const [prescriptionFileName, setPrescriptionFileName] = useState("");
+  const [isAnalyzingPrescription, setIsAnalyzingPrescription] = useState(false);
+  const [prescriptionResults, setPrescriptionResults] = useState<any>(null);
+  const prescriptionInputRef = useRef<HTMLInputElement>(null);
 
   const popularConditions = [
     { key: "conditionHeadache", en: "Headache" },
