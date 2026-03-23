@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,11 @@ import {
   Car,
   Footprints,
   Store,
-  FileText
+  FileText,
+  Camera,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface Medicine {
@@ -124,6 +128,14 @@ export default function Medicines() {
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("all");
   const [showGenerics, setShowGenerics] = useState(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<NearbyPharmacy | null>(null);
+  
+  // Prescription scanner state
+  const [showScanner, setShowScanner] = useState(false);
+  const [prescriptionImage, setPrescriptionImage] = useState<string | null>(null);
+  const [prescriptionFileName, setPrescriptionFileName] = useState("");
+  const [isAnalyzingPrescription, setIsAnalyzingPrescription] = useState(false);
+  const [prescriptionResults, setPrescriptionResults] = useState<any>(null);
+  const prescriptionInputRef = useRef<HTMLInputElement>(null);
 
   const popularConditions = [
     { key: "conditionHeadache", en: "Headache" },
@@ -211,6 +223,35 @@ export default function Medicines() {
     return true;
   });
 
+  const handlePrescriptionUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 10 * 1024 * 1024) return;
+    setPrescriptionFileName(file.name);
+    setPrescriptionResults(null);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPrescriptionImage(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const analyzePrescription = async () => {
+    if (!prescriptionImage) return;
+    setIsAnalyzingPrescription(true);
+    try {
+      const { data, error: funcError } = await supabase.functions.invoke("analyze-prescription", {
+        body: { image: prescriptionImage, language },
+      });
+      if (funcError) throw funcError;
+      setPrescriptionResults(data);
+    } catch (err) {
+      console.error("Prescription analysis error:", err);
+      setError(t('errorAnalysisFailed'));
+    } finally {
+      setIsAnalyzingPrescription(false);
+    }
+  };
+
   return (
     <Layout showFooterDisclaimer>
       <SEOHead title="Medicine Finder" description="Find medicines for your condition with prices, dosages, instructions, and nearby pharmacy availability in Astana." path="/medicines" />
@@ -224,10 +265,73 @@ export default function Medicines() {
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             {t('findMedicinesTitle')}
           </h1>
-          <p className="text-lg text-muted-foreground">
-            {t('medicineShop')}
-          </p>
+          <p className="text-lg text-muted-foreground">{t('medicineShop')}</p>
+          <Button onClick={() => setShowScanner(!showScanner)} variant="outline" className="mt-4 rounded-xl">
+            <Camera className="mr-2 h-4 w-4" />{t('showPrescriptionScanner')}
+          </Button>
         </div>
+
+        {/* Prescription Scanner */}
+        {showScanner && (
+          <div className="max-w-3xl mx-auto mb-10">
+            <div className="glass-card p-8 rounded-3xl">
+              <h2 className="font-display text-xl font-bold text-foreground mb-2 flex items-center gap-2">
+                <Camera className="h-5 w-5 text-primary" />{t('prescriptionScanner')}
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">{t('scanPrescriptionDesc')}</p>
+              {!prescriptionImage ? (
+                <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition-all bg-muted/30 hover:bg-muted/50">
+                  <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                  <span className="text-sm text-muted-foreground">{t('uploadPrescription')}</span>
+                  <input ref={prescriptionInputRef} type="file" accept="image/*" onChange={handlePrescriptionUpload} className="hidden" />
+                </label>
+              ) : (
+                <div className="relative mb-4">
+                  <img src={prescriptionImage} alt="Prescription" className="w-full max-h-[300px] object-contain rounded-2xl bg-muted" />
+                  <button onClick={() => { setPrescriptionImage(null); setPrescriptionResults(null); }} className="absolute top-2 right-2 p-2 rounded-xl bg-background/90 hover:bg-destructive hover:text-white transition-colors">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+              {prescriptionImage && (
+                <Button onClick={analyzePrescription} disabled={isAnalyzingPrescription} className="w-full mt-4 gradient-primary text-white rounded-xl h-12">
+                  {isAnalyzingPrescription ? (<><Sparkles className="mr-2 h-4 w-4 animate-spin" />{t('analyzingPrescription')}</>) : (<><Sparkles className="mr-2 h-4 w-4" />{t('scanPrescription')}</>)}
+                </Button>
+              )}
+              {prescriptionResults?.medicines?.length > 0 && (
+                <div className="mt-6 space-y-4">
+                  <h3 className="font-display text-lg font-bold text-foreground">{t('prescriptionResults')}</h3>
+                  {prescriptionResults.medicines.map((med: any, i: number) => (
+                    <div key={i} className="p-4 rounded-2xl bg-muted/50 border border-border/50">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-bold text-foreground">{med.name}</h4>
+                        <span className="text-medical-green font-bold text-sm">{med.estimatedPrice}</span>
+                      </div>
+                      {med.genericName && <p className="text-xs text-muted-foreground mb-1">{t('generic')}: {med.genericName}</p>}
+                      <p className="text-sm text-muted-foreground mb-2">{med.dosage} — {med.instructions}</p>
+                      {med.whereToBuy?.length > 0 && (
+                        <p className="text-xs text-primary mb-2"><MapPin className="inline h-3 w-3 mr-1" />{t('whereToBuy')}: {med.whereToBuy.join(", ")}</p>
+                      )}
+                      {med.alternatives?.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-border/50">
+                          <p className="text-xs font-semibold text-muted-foreground mb-1">{t('alternatives')}:</p>
+                          {med.alternatives.map((alt: any, j: number) => (
+                            <span key={j} className="inline-block mr-2 text-xs px-2 py-1 rounded-full bg-medical-green/10 text-medical-green">{alt.name} — {alt.price}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {prescriptionResults.doctorNotes && (
+                    <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+                      <p className="text-xs text-muted-foreground"><Info className="inline h-3 w-3 mr-1" />{t('doctorNotes')}: {prescriptionResults.doctorNotes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="max-w-5xl mx-auto">
           {/* Search Form */}

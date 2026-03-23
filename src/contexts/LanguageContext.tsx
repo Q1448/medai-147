@@ -359,6 +359,38 @@ export const translations: Translations = {
   diagnosticDetails: { en: 'Diagnostic Details', ru: 'Диагностические данные', kk: 'Диагностикалық мәліметтер' },
   low: { en: 'Low', ru: 'Низкий', kk: 'Төмен' },
   high: { en: 'High', ru: 'Высокий', kk: 'Жоғары' },
+
+  // Rash diagnostic questions
+  rashDiagnosticQuestions: { en: 'Rash Diagnostic Questions', ru: 'Диагностические вопросы о сыпи', kk: 'Бөртпе диагностикалық сұрақтары' },
+  rashDuration: { en: 'How long have you had this rash?', ru: 'Как давно у вас эта сыпь?', kk: 'Бұл бөртпе қашаннан бар?' },
+  rashItching: { en: 'Is there itching?', ru: 'Есть ли зуд?', kk: 'Қышыну бар ма?' },
+  noItching: { en: 'No itching', ru: 'Нет зуда', kk: 'Қышыну жоқ' },
+  mildItching: { en: 'Mild', ru: 'Лёгкий', kk: 'Жеңіл' },
+  severeItching: { en: 'Severe', ru: 'Сильный', kk: 'Қатты' },
+  rashBodyLocation: { en: 'Where on the body?', ru: 'Где на теле?', kk: 'Дененің қай жерінде?' },
+  rashLocationPlaceholder: { en: 'e.g., arms, face, back...', ru: 'например, руки, лицо, спина...', kk: 'мысалы, қолдар, бет, арқа...' },
+  rashSpreading: { en: 'Is it spreading?', ru: 'Распространяется ли?', kk: 'Таралуда ма?' },
+  notSpreading: { en: 'No', ru: 'Нет', kk: 'Жоқ' },
+  slowlySpreading: { en: 'Slowly', ru: 'Медленно', kk: 'Баяу' },
+  rapidlySpreading: { en: 'Rapidly', ru: 'Быстро', kk: 'Жылдам' },
+  rashAllergenContact: { en: 'Recent contact with allergens?', ru: 'Недавний контакт с аллергенами?', kk: 'Жақында аллергендермен байланыс болды ма?' },
+  rashAllergenPlaceholder: { en: 'e.g., new soap, food, plants...', ru: 'например, новое мыло, еда, растения...', kk: 'мысалы, жаңа сабын, тамақ, өсімдіктер...' },
+  rashPainLevel: { en: 'Pain level?', ru: 'Уровень боли?', kk: 'Ауырсыну деңгейі?' },
+  noPain: { en: 'No pain', ru: 'Без боли', kk: 'Ауырсынусыз' },
+  mildPain: { en: 'Mild', ru: 'Лёгкая', kk: 'Жеңіл' },
+  severePain: { en: 'Severe', ru: 'Сильная', kk: 'Қатты' },
+
+  // Prescription scanner
+  prescriptionScanner: { en: 'Prescription Scanner', ru: 'Сканер рецептов', kk: 'Рецепт сканері' },
+  scanPrescription: { en: 'Scan Prescription', ru: 'Сканировать рецепт', kk: 'Рецептті сканерлеу' },
+  scanPrescriptionDesc: { en: 'Upload a photo of your prescription to identify medicines, prices, and alternatives', ru: 'Загрузите фото рецепта для определения лекарств, цен и альтернатив', kk: 'Дәрілерді, бағаларды және баламаларды анықтау үшін рецепт суретін жүктеңіз' },
+  uploadPrescription: { en: 'Upload Prescription Photo', ru: 'Загрузить фото рецепта', kk: 'Рецепт суретін жүктеу' },
+  analyzingPrescription: { en: 'Analyzing prescription...', ru: 'Анализ рецепта...', kk: 'Рецепт талдануда...' },
+  prescriptionResults: { en: 'Prescription Analysis', ru: 'Анализ рецепта', kk: 'Рецепт талдауы' },
+  doctorNotes: { en: 'Doctor Notes', ru: 'Заметки врача', kk: 'Дәрігер жазбалары' },
+  alternatives: { en: 'Cheaper Alternatives', ru: 'Более дешёвые аналоги', kk: 'Арзанырақ баламалар' },
+  whereToBuy: { en: 'Where to Buy', ru: 'Где купить', kk: 'Қайдан сатып алуға болады' },
+  showPrescriptionScanner: { en: 'Scan Prescription', ru: 'Сканер рецептов', kk: 'Рецепт сканері' },
 };
 
 // Language names for system prompts
