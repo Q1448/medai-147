@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SEOHead } from "@/components/SEOHead";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,11 @@ import {
   Car,
   Footprints,
   Store,
-  FileText
+  FileText,
+  Camera,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface Medicine {
