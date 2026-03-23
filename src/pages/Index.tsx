@@ -4,7 +4,6 @@ import { MedicalCard } from "@/components/ui/medical-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Spotlight } from "@/components/ui/spotlight";
-import { TextRotate } from "@/components/ui/text-rotate";
 import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
@@ -25,12 +24,6 @@ import {
 
 export default function Index() {
   const { t, language } = useLanguage();
-
-  const rotatingTexts = language === 'ru' 
-    ? ['Здоровью', 'Диагностике', 'Лечению', 'Профилактике']
-    : language === 'kk'
-    ? ['Денсаулыққа', 'Диагностикаға', 'Емдеуге', 'Алдын алуға']
-    : ['Health', 'Diagnostics', 'Treatment', 'Prevention'];
 
   const features = [
     { icon: Activity, title: t('featureSymptomTitle'), description: t('featureSymptomDesc'), href: "/symptoms", gradient: "from-primary to-[hsl(var(--primary-glow))]" },
@@ -70,9 +63,8 @@ export default function Index() {
                   </div>
                   <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1]">
                     {t('heroTitle1')}{" "}
-                    <span className="text-gradient">
-                      <TextRotate texts={rotatingTexts} interval={2500} />
-                    </span>
+                    <span className="text-gradient">{t('heroTitle2')}</span>{" "}
+                    {t('heroTitle3')}
                   </h1>
                   <p className="text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed">
                     {t('heroDescription')}

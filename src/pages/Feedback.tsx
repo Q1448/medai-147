@@ -8,21 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  MessageSquarePlus,
-  Send,
-  Sparkles,
-  CheckCircle2,
-  Lightbulb,
-  Palette,
-  Zap,
-  Brain,
-  HelpCircle,
-  BarChart3,
-  TrendingUp,
-  Users,
-  ThumbsUp,
-  Clock,
-  Plus,
+  MessageSquarePlus, Send, Sparkles, CheckCircle2, Lightbulb, Palette,
+  Zap, Brain, HelpCircle, BarChart3, TrendingUp, Users, ThumbsUp, Clock, Plus,
 } from "lucide-react";
 
 const categories = [
@@ -59,71 +46,45 @@ export default function Feedback() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, byCategory: {} as Record<string, number> });
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    category: 'general',
-    suggestion: '',
+    name: '', email: '', category: 'general', suggestion: '',
   });
 
   const visitorId = getVisitorId();
 
+  const fetchAllPages = async (table: string, select: string) => {
+    let all: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data, error } = await supabase
+        .from(table as any)
+        .select(select)
+        .range(from, from + pageSize - 1);
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+      all = all.concat(data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return all;
+  };
+
   const fetchSuggestions = useCallback(async () => {
+    setIsLoading(true);
     try {
-      // Fetch ALL suggestions using pagination to bypass 1000 limit
-      let allSuggestions: any[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      let hasMore = true;
-
-      while (hasMore) {
-        const { data, error } = await supabase
-          .from('suggestions')
-          .select('id, name, category, suggestion, created_at')
-          .order('created_at', { ascending: false })
-          .range(from, from + pageSize - 1);
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          allSuggestions = [...allSuggestions, ...data];
-          from += pageSize;
-          hasMore = data.length === pageSize;
-        } else {
-          hasMore = false;
-        }
-      }
-
-      // Fetch ALL likes with pagination
-      let allLikes: any[] = [];
-      from = 0;
-      hasMore = true;
-
-      while (hasMore) {
-        const { data, error } = await supabase
-          .from('suggestion_likes')
-          .select('suggestion_id, visitor_id')
-          .range(from, from + pageSize - 1);
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          allLikes = [...allLikes, ...data];
-          from += pageSize;
-          hasMore = data.length === pageSize;
-        } else {
-          hasMore = false;
-        }
-      }
+      const [allSuggestions, allLikes] = await Promise.all([
+        fetchAllPages('suggestions', 'id, name, category, suggestion, created_at'),
+        fetchAllPages('suggestion_likes', 'suggestion_id, visitor_id'),
+      ]);
 
       const likesMap: Record<string, { count: number; myLike: boolean }> = {};
       allLikes.forEach((like: { suggestion_id: string; visitor_id: string }) => {
-        if (!likesMap[like.suggestion_id]) {
-          likesMap[like.suggestion_id] = { count: 0, myLike: false };
-        }
+        if (!likesMap[like.suggestion_id]) likesMap[like.suggestion_id] = { count: 0, myLike: false };
         likesMap[like.suggestion_id].count++;
-        if (like.visitor_id === visitorId) {
-          likesMap[like.suggestion_id].myLike = true;
-        }
+        if (like.visitor_id === visitorId) likesMap[like.suggestion_id].myLike = true;
       });
 
       const mapped: Suggestion[] = allSuggestions.map((s) => ({
@@ -134,7 +95,6 @@ export default function Feedback() {
 
       // Sort by most liked first
       mapped.sort((a, b) => b.likes_count - a.likes_count);
-
       setSuggestions(mapped);
 
       const byCategory: Record<string, number> = {};
@@ -146,12 +106,12 @@ export default function Feedback() {
       setStats({ total: mapped.length, byCategory });
     } catch (error) {
       console.error('Error fetching suggestions:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [visitorId]);
 
-  useEffect(() => {
-    fetchSuggestions();
-  }, [fetchSuggestions]);
+  useEffect(() => { fetchSuggestions(); }, [fetchSuggestions]);
 
   const getCategoryLabel = (id: string) => {
     const labels: Record<string, string> = {
@@ -161,22 +121,14 @@ export default function Feedback() {
     return labels[id] || id;
   };
 
-  const getCategoryInfo = (id: string) => {
-    return categories.find(c => c.id === id) || categories[0];
-  };
+  const getCategoryInfo = (id: string) => categories.find(c => c.id === id) || categories[0];
 
   const handleLike = async (suggestionId: string, currentlyLiked: boolean) => {
     try {
       if (currentlyLiked) {
-        await supabase
-          .from('suggestion_likes')
-          .delete()
-          .eq('suggestion_id', suggestionId)
-          .eq('visitor_id', visitorId);
+        await supabase.from('suggestion_likes').delete().eq('suggestion_id', suggestionId).eq('visitor_id', visitorId);
       } else {
-        await supabase
-          .from('suggestion_likes')
-          .insert({ suggestion_id: suggestionId, visitor_id: visitorId });
+        await supabase.from('suggestion_likes').insert({ suggestion_id: suggestionId, visitor_id: visitorId });
       }
       setSuggestions(prev =>
         prev.map(s =>
@@ -209,14 +161,9 @@ export default function Feedback() {
     }
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('suggestions')
-        .insert({
-          name: name || null,
-          email: email || null,
-          category: formData.category,
-          suggestion: suggestion,
-        });
+      const { error } = await supabase.from('suggestions').insert({
+        name: name || null, email: email || null, category: formData.category, suggestion,
+      });
       if (error) throw error;
       setIsSubmitted(true);
       toast({ title: t('thankYou'), description: t('yourFeedbackHelps') });
@@ -240,10 +187,9 @@ export default function Feedback() {
   };
 
   const weekCount = suggestions.filter(f => {
-    const date = new Date(f.created_at);
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    return date > weekAgo;
+    return new Date(f.created_at) > weekAgo;
   }).length;
 
   const topCategory = Object.entries(stats.byCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || 'general';
@@ -262,9 +208,7 @@ export default function Feedback() {
             <MessageSquarePlus className="h-4 w-4 text-primary" />
             <span className="text-gradient">{t('feedback')}</span>
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {t('feedbackTitle')}
-          </h1>
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">{t('feedbackTitle')}</h1>
           <p className="text-lg text-muted-foreground">{t('feedbackDescription')}</p>
         </div>
 
@@ -281,15 +225,10 @@ export default function Feedback() {
                   <p className="text-xs text-muted-foreground">{t('feedbackStatsDescription')}</p>
                 </div>
               </div>
-              <Button
-                onClick={() => setShowForm(!showForm)}
-                className="gradient-primary text-white rounded-xl"
-              >
-                <Plus className="mr-1.5 h-4 w-4" />
-                {t('addSuggestion')}
+              <Button onClick={() => setShowForm(!showForm)} className="gradient-primary text-white rounded-xl">
+                <Plus className="mr-1.5 h-4 w-4" />{t('addSuggestion')}
               </Button>
             </div>
-
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
               <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
                 <div className="flex items-center gap-2 mb-1">
@@ -313,7 +252,6 @@ export default function Feedback() {
                 <p className="font-display text-sm font-bold text-violet-500">{getCategoryLabel(topCategory)}</p>
               </div>
             </div>
-
             <div className="grid grid-cols-5 gap-2">
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -355,7 +293,6 @@ export default function Feedback() {
                     <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="john@example.com" className="rounded-xl border-border/50 bg-background/50" />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-3">{t('category')}</label>
                   <div className="grid grid-cols-5 gap-2">
@@ -374,12 +311,10 @@ export default function Feedback() {
                     })}
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">{t('suggestion')} *</label>
                   <Textarea value={formData.suggestion} onChange={(e) => setFormData({ ...formData, suggestion: e.target.value })} placeholder={t('suggestionPlaceholder')} rows={4} className="rounded-xl border-border/50 bg-background/50 resize-none" required />
                 </div>
-
                 <Button type="submit" disabled={isSubmitting} className="w-full h-12 rounded-xl gradient-primary text-white font-semibold text-lg">
                   {isSubmitting ? (<><Sparkles className="mr-2 h-5 w-5 animate-spin" />{t('loading')}</>) : (<><Send className="mr-2 h-5 w-5" />{t('submitSuggestion')}</>)}
                 </Button>
@@ -400,7 +335,12 @@ export default function Feedback() {
             </div>
           </div>
 
-          {suggestions.length === 0 ? (
+          {isLoading ? (
+            <div className="glass-card rounded-2xl p-10 text-center">
+              <div className="h-6 w-6 mx-auto border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-3" />
+              <p className="text-muted-foreground">{t('loading')}</p>
+            </div>
+          ) : suggestions.length === 0 ? (
             <div className="glass-card rounded-2xl p-10 text-center">
               <p className="text-muted-foreground">{t('noSuggestionsYet')}</p>
             </div>
@@ -428,9 +368,7 @@ export default function Feedback() {
                     <button
                       onClick={() => handleLike(s.id, s.liked_by_me)}
                       className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
-                        s.liked_by_me
-                          ? 'bg-primary/15 text-primary'
-                          : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                        s.liked_by_me ? 'bg-primary/15 text-primary' : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
                       }`}
                     >
                       <ThumbsUp className={`h-5 w-5 ${s.liked_by_me ? 'fill-primary' : ''}`} />
@@ -442,12 +380,8 @@ export default function Feedback() {
               
               {displayCount < suggestions.length && (
                 <div className="text-center pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setDisplayCount(prev => prev + 50)}
-                    className="rounded-xl"
-                  >
-                    {t('loading')} ({displayCount}/{suggestions.length})
+                  <Button variant="outline" onClick={() => setDisplayCount(prev => prev + 50)} className="rounded-xl">
+                    {t('viewAllSuggestions')} ({displayCount}/{suggestions.length})
                   </Button>
                 </div>
               )}
