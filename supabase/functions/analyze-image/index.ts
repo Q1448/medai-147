@@ -74,30 +74,39 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { 
             role: "system", 
             content: `${langInstruction}
 
-You are an expert dermatology information assistant with advanced image analysis capabilities.
+You are an elite dermatology information assistant with advanced image analysis and treatment knowledge.
 
 YOUR ANALYSIS APPROACH:
-1. Carefully examine the image for visual characteristics
-2. Note color variations, patterns, textures, borders, and distribution
-3. Consider size, shape, symmetry, and any visible inflammation
-4. Look for characteristic features of common skin conditions
-5. Assess based on clinical presentation patterns
-6. Consider patient age, known allergies, and medical history when provided
+1. Carefully examine the image for visual characteristics (color, pattern, texture, borders, distribution)
+2. Consider size, shape, symmetry, inflammation markers
+3. Look for characteristic features of common AND rare skin conditions
+4. Consider patient context: age, allergies, medical history
+5. Provide treatment recommendations with specific medications
+
+TREATMENT RECOMMENDATIONS:
+- For each condition, recommend specific medications (creams, ointments, oral medications)
+- Include both prescription and over-the-counter options
+- Mention dosage and application instructions
+- Describe the expected healing timeline with stages
+
+HEALING STAGES:
+- Describe how the condition typically heals over time (Week 1, Week 2, Week 3, Week 4+)
+- Include what the skin should look like at each stage
 
 ${profileContext ? `PATIENT CONTEXT:\n${profileContext}` : ""}
 
-IMPORTANT: Be precise, consider multiple causes, always recommend professional consultation. This is educational only.` 
+IMPORTANT: Be precise, consider multiple causes, always recommend professional consultation. This is educational only. Recommend re-analysis in 1-2 days to track progress.` 
           },
           { 
             role: "user", 
             content: [
-              { type: "text", text: "Analyze this skin condition image in detail. Provide observations, three possible conditions with likelihood, and recommendations." }, 
+              { type: "text", text: "Analyze this skin condition image in detail. Provide observations, possible conditions with likelihood, recommended medications/treatments, and healing stages timeline." }, 
               { type: "image_url", image_url: { url: image } }
             ] 
           }
@@ -106,7 +115,7 @@ IMPORTANT: Be precise, consider multiple causes, always recommend professional c
           type: "function",
           function: {
             name: "return_analysis",
-            description: "Return detailed skin condition analysis",
+            description: "Return detailed skin condition analysis with treatments and healing stages",
             parameters: {
               type: "object",
               properties: {
@@ -123,9 +132,37 @@ IMPORTANT: Be precise, consider multiple causes, always recommend professional c
                     required: ["name", "description", "likelihood"] 
                   } 
                 },
+                medications: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      type: { type: "string", description: "cream/ointment/oral/injection" },
+                      dosage: { type: "string" },
+                      instructions: { type: "string" },
+                      estimatedPrice: { type: "string" }
+                    },
+                    required: ["name", "type", "dosage", "instructions"]
+                  },
+                  description: "Recommended medications and treatments"
+                },
+                healingStages: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      week: { type: "string" },
+                      description: { type: "string" },
+                      appearance: { type: "string" }
+                    },
+                    required: ["week", "description", "appearance"]
+                  },
+                  description: "Expected healing timeline stages"
+                },
                 recommendation: { type: "string" }
               },
-              required: ["observations", "conditions", "recommendation"]
+              required: ["observations", "conditions", "medications", "healingStages", "recommendation"]
             }
           }
         }],
