@@ -22,6 +22,8 @@ interface AnalysisResult {
   }[];
   observations: string[];
   recommendation: string;
+  medications?: { name: string; type: string; dosage: string; instructions: string; estimatedPrice?: string }[];
+  healingStages?: { week: string; description: string; appearance: string }[];
 }
 
 export default function AiAnalysis() {
@@ -319,14 +321,55 @@ export default function AiAnalysis() {
                       <Sparkles className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-start justify-between gap-4">
-                        <h3 className="font-display text-lg font-bold text-foreground mb-2">{t('aiRecommendation')}</h3>
-                        <EvidenceModal>
-                          <Button variant="ghost" size="sm"><BookOpen className="h-4 w-4 mr-1" />{t('sources')}</Button>
-                        </EvidenceModal>
-                      </div>
+                      <h3 className="font-display text-lg font-bold text-foreground mb-2">{t('aiRecommendation')}</h3>
                       <p className="text-muted-foreground leading-relaxed">{results.recommendation}</p>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Medications */}
+              {results.medications && results.medications.length > 0 && (
+                <div className="glass-card p-6 rounded-2xl">
+                  <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-medical-green" />{t('recommendedMedications') || 'Recommended Medications'}
+                  </h2>
+                  <div className="space-y-3">
+                    {results.medications.map((med, i) => (
+                      <div key={i} className="p-4 rounded-xl bg-muted/50 border border-border/50">
+                        <div className="flex items-start justify-between mb-1">
+                          <h4 className="font-bold text-foreground">{med.name}</h4>
+                          <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">{med.type}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-1"><strong>{t('dosage') || 'Dosage'}:</strong> {med.dosage}</p>
+                        <p className="text-sm text-muted-foreground">{med.instructions}</p>
+                        {med.estimatedPrice && <p className="text-xs text-medical-green font-medium mt-1">~{med.estimatedPrice}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Healing Stages */}
+              {results.healingStages && results.healingStages.length > 0 && (
+                <div className="glass-card p-6 rounded-2xl">
+                  <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-medical-green" />{t('healingTimeline') || 'Healing Timeline'}
+                  </h2>
+                  <div className="space-y-4">
+                    {results.healingStages.map((stage, i) => (
+                      <div key={i} className="flex gap-4">
+                        <div className="flex flex-col items-center">
+                          <div className="w-8 h-8 rounded-full bg-medical-green/20 flex items-center justify-center text-medical-green font-bold text-xs">{i + 1}</div>
+                          {i < results.healingStages!.length - 1 && <div className="w-0.5 h-full bg-medical-green/20 mt-1" />}
+                        </div>
+                        <div className="flex-1 pb-4">
+                          <h4 className="font-bold text-foreground text-sm">{stage.week}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+                          <p className="text-xs text-primary mt-1 italic">{t('appearance') || 'Appearance'}: {stage.appearance}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
