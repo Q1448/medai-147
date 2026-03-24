@@ -183,8 +183,8 @@ export function HealthDashboard({ data }: HealthDashboardProps) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+              <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} label={{ value: t('days') || 'Days', position: 'insideBottom', offset: -5, fontSize: 11 }} />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} label={{ value: t('healthScoreLabel') || 'Health Score (0-100)', angle: -90, position: 'insideLeft', fontSize: 11 }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
