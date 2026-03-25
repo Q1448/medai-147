@@ -3,10 +3,12 @@ import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Crown, Zap, Brain, Shield, Infinity, Star, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { Crown, Zap, Brain, Shield, Infinity, Star, CheckCircle2, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useSearchParams } from "react-router-dom";
 
 export default function Premium() {
   const { t } = useLanguage();
@@ -14,6 +16,31 @@ export default function Premium() {
   const { toast } = useToast();
   const [authOpen, setAuthOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      toast({ title: "🎉 " + t('premiumActivated'), description: t('premiumActivatedDesc') });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!user) return;
+    const checkSub = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("check-subscription");
+        if (data?.subscribed) {
+          setSubscribed(true);
+          setSubscriptionEnd(data.subscription_end);
+        }
+      } catch {}
+    };
+    checkSub();
+    const interval = setInterval(checkSub, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const features = [
     { icon: Infinity, text: t('premiumFeature1') },
@@ -29,14 +56,32 @@ export default function Premium() {
       return;
     }
     setProcessing(true);
-    // For now show coming soon - Stripe integration needed
-    setTimeout(() => {
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
       setProcessing(false);
-      toast({
-        title: t('premiumComingSoon'),
-        description: t('premiumComingSoonDesc'),
-      });
-    }, 1500);
+    }
+  };
+
+  const handleManage = async () => {
+    setProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -56,11 +101,17 @@ export default function Premium() {
 
         <div className="max-w-lg mx-auto">
           <div className="relative overflow-hidden rounded-3xl border-2 border-amber-500/30 bg-gradient-to-br from-card to-amber-500/5 p-8 md:p-10 shadow-2xl">
-            <div className="absolute top-0 right-0 px-4 py-2 rounded-bl-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold">
+            {subscribed && (
+              <div className="absolute top-0 left-0 right-0 bg-emerald-500 text-white text-center py-2 text-sm font-bold flex items-center justify-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                {t('premiumActive')} {subscriptionEnd && `— ${new Date(subscriptionEnd).toLocaleDateString()}`}
+              </div>
+            )}
+            <div className={`absolute top-0 right-0 px-4 py-2 rounded-bl-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold ${subscribed ? 'hidden' : ''}`}>
               PREMIUM
             </div>
 
-            <div className="text-center mb-8">
+            <div className={`text-center mb-8 ${subscribed ? 'mt-6' : ''}`}>
               <div className="flex items-baseline justify-center gap-1 mb-2">
                 <span className="font-display text-5xl font-bold text-foreground">5 000</span>
                 <span className="text-xl text-muted-foreground">₸</span>
@@ -79,24 +130,34 @@ export default function Premium() {
               ))}
             </div>
 
-            <Button
-              onClick={handlePurchase}
-              disabled={processing}
-              className="w-full h-14 rounded-2xl text-base font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all"
-            >
-              {processing ? (
-                <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Crown className="mr-2 h-5 w-5" />
-                  {user ? t('purchasePremium') : t('loginToPurchase')}
-                </>
-              )}
-            </Button>
+            {subscribed ? (
+              <Button
+                onClick={handleManage}
+                disabled={processing}
+                className="w-full h-14 rounded-2xl text-base font-bold bg-muted text-foreground hover:bg-muted/80 border-0 transition-all"
+              >
+                {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : t('manageSubscription')}
+              </Button>
+            ) : (
+              <Button
+                onClick={handlePurchase}
+                disabled={processing}
+                className="w-full h-14 rounded-2xl text-base font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all"
+              >
+                {processing ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <Crown className="mr-2 h-5 w-5" />
+                    {user ? t('purchasePremium') : t('loginToPurchase')}
+                  </>
+                )}
+              </Button>
+            )}
 
             <p className="text-xs text-muted-foreground text-center mt-4 flex items-center justify-center gap-1">
               <Shield className="h-3 w-3" />
-              {t('securePayment')}
+              {t('securePayment')} — Stripe
             </p>
           </div>
 
