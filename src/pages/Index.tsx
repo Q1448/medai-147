@@ -2,28 +2,15 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { MedicalCard } from "@/components/ui/medical-card";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Spotlight } from "@/components/ui/spotlight";
 import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  Activity,
-  Bot,
-  Camera,
-  ShoppingBag,
-  Building2,
-  ArrowRight,
-  Shield,
-  Clock,
-  Brain,
-  Sparkles,
-  Users,
-  Zap,
-  HeartPulse,
+  Activity, Bot, Camera, ShoppingBag, Building2, ArrowRight, Shield, Clock,
+  Brain, Sparkles, Users, Zap, HeartPulse, Crown,
 } from "lucide-react";
 
 export default function Index() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const features = [
     { icon: Activity, title: t('featureSymptomTitle'), description: t('featureSymptomDesc'), href: "/symptoms", gradient: "from-primary to-[hsl(var(--primary-glow))]" },
@@ -43,50 +30,55 @@ export default function Index() {
 
   return (
     <Layout showFooterDisclaimer>
-      <SEOHead
-        title="AI-Powered Health Assistant"
-        description="Get instant health insights, accurate symptom analysis, medicine recommendations, and find nearby healthcare facilities—all powered by advanced AI."
-        path="/"
-      />
+      <SEOHead title="AI-Powered Health Assistant" description="Get instant health insights, accurate symptom analysis, medicine recommendations, and find nearby healthcare facilities—all powered by advanced AI." path="/" />
       <div>
-        {/* Hero Section — Liquid Glass */}
-        <section className="relative overflow-hidden gradient-hero">
-          <div className="absolute inset-0 gradient-mesh opacity-60" />
-          <div className="container relative py-12 md:py-20">
-            <Card className="w-full liquid-glass-heavy overflow-hidden rounded-3xl border-0">
-              <Spotlight className="from-primary/20 via-primary/5 to-transparent" size={400} />
-              <div className="flex flex-col min-h-[420px]">
-                <div className="flex-1 p-8 md:p-12 lg:p-16 relative z-10 flex flex-col justify-center items-center text-center">
-                  <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-glass-subtle text-sm font-semibold mb-6 w-fit">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span className="text-gradient">{t('heroTagline')}</span>
-                  </div>
-                  <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1]">
-                    {t('heroTitle1')}{" "}
-                    <span className="text-gradient">{t('heroTitle2')}</span>{" "}
-                    {t('heroTitle3')}
-                  </h1>
-                  <p className="text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed">
-                    {t('heroDescription')}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button asChild size="lg" className="gradient-primary text-primary-foreground border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
-                      <Link to="/symptoms">
-                        <HeartPulse className="mr-2 h-5 w-5" />
-                        {t('checkSymptoms')}
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" size="lg" className="rounded-2xl px-8 h-14 text-base font-semibold border-2 border-primary/20 hover:bg-primary/5 hover:border-primary/40 active:scale-[0.97] transition-all duration-300">
-                      <Link to="/ai-doctor">
-                        <Bot className="mr-2 h-5 w-5" />
-                        {t('talkToAI')}
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
+        {/* Hero Section — Nature/Medical Style */}
+        <section className="relative overflow-hidden min-h-[550px] md:min-h-[600px]">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+          
+          <div className="container relative py-16 md:py-24 flex flex-col items-center justify-center text-center">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-semibold mb-6">
+              <Sparkles className="h-4 w-4 text-emerald-400" />
+              <span className="text-white">{t('heroTagline')}</span>
+            </div>
+            
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] max-w-4xl">
+              {t('heroTitle1')}{" "}
+              <span className="text-emerald-400">{t('heroTitle2')}</span>{" "}
+              {t('heroTitle3')}
+            </h1>
+            
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl leading-relaxed">
+              {t('heroDescription')}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white border-0 rounded-2xl px-8 h-14 text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
+                <Link to="/symptoms">
+                  <HeartPulse className="mr-2 h-5 w-5" />
+                  {t('checkSymptoms')}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" className="bg-white/10 backdrop-blur-md text-white border-2 border-white/30 hover:bg-white/20 rounded-2xl px-8 h-14 text-base font-semibold hover:scale-[1.02] active:scale-[0.97] transition-all duration-300">
+                <Link to="/ai-doctor">
+                  <Bot className="mr-2 h-5 w-5" />
+                  {t('talkToAI')}
+                </Link>
+              </Button>
+            </div>
+
+            {/* Premium CTA */}
+            <Link to="/premium" className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-300 text-sm font-semibold hover:bg-amber-500/30 transition-colors">
+              <Crown className="h-4 w-4" />
+              {t('getPremium')} — 5000₸/{t('perMonth')}
+            </Link>
           </div>
         </section>
 

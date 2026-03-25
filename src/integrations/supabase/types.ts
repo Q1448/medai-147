@@ -94,6 +94,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_actions: {
+        Row: {
+          action_data: Json | null
+          created_at: string
+          function_name: string
+          id: string
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          created_at?: string
+          function_name: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          created_at?: string
+          function_name?: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      user_premium: {
+        Row: {
+          active: boolean
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          expires_at: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

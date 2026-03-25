@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { SEOHead } from "@/components/SEOHead";
+import { UsageBanner } from "@/components/UsageBanner";
+import { useUsageLimits } from "@/hooks/useUsageLimits";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,6 +64,7 @@ interface AnalysisResult {
 export default function Symptoms() {
   const { profile, getProfileContext, addToHistory } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { canUse, recordUsage } = useUsageLimits();
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [additionalSymptoms, setAdditionalSymptoms] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -90,6 +93,10 @@ export default function Symptoms() {
   const analyzeSymptoms = async () => {
     if (selectedSymptoms.length === 0 && !additionalSymptoms.trim()) {
       setError(t('pleaseSelectSymptom'));
+      return;
+    }
+    if (!canUse("symptoms")) {
+      setError(t('usageLimitReached'));
       return;
     }
 
@@ -129,6 +136,7 @@ export default function Symptoms() {
 
       if (funcError) throw funcError;
       setResults(data);
+      await recordUsage("symptoms", { symptoms: allSymptoms, result: data?.conditions?.map((c: { name: string }) => c.name).join(", ") });
 
       if (data?.conditions?.length > 0) {
         addToHistory({
@@ -161,6 +169,11 @@ export default function Symptoms() {
     <Layout showFooterDisclaimer>
       <SEOHead title="Symptom Checker" description="Advanced AI-powered symptom analysis. Select symptoms and get accurate condition identification with evidence-based results." path="/symptoms" />
       <div className="container py-12 md:py-16">
+        {/* Usage Banner */}
+        <div className="max-w-4xl mx-auto">
+          <UsageBanner feature="symptoms" />
+        </div>
+
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">

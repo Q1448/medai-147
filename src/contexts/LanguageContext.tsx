@@ -391,6 +391,38 @@ export const translations: Translations = {
   alternatives: { en: 'Cheaper Alternatives', ru: 'Более дешёвые аналоги', kk: 'Арзанырақ баламалар' },
   whereToBuy: { en: 'Where to Buy', ru: 'Где купить', kk: 'Қайдан сатып алуға болады' },
   showPrescriptionScanner: { en: 'Scan Prescription', ru: 'Сканер рецептов', kk: 'Рецепт сканері' },
+
+  // Usage limits
+  remainingUses: { en: 'Remaining uses', ru: 'Осталось использований', kk: 'Қалған пайдалану' },
+  unlimitedAccess: { en: 'Unlimited access', ru: 'Безлимитный доступ', kk: 'Шексіз қолжетімділік' },
+  getPremium: { en: 'Get Premium', ru: 'Получить Premium', kk: 'Premium алу' },
+  usageLimitReached: { en: 'Daily limit reached. Upgrade to Premium for unlimited access.', ru: 'Дневной лимит исчерпан. Перейдите на Premium для безлимитного доступа.', kk: 'Күнделікті лимит бітті. Шексіз қолжетімділік үшін Premium алыңыз.' },
+  perMonth: { en: 'month', ru: 'мес', kk: 'ай' },
+  dayUnit: { en: 'day', ru: 'день', kk: 'күн' },
+
+  // Premium page
+  premiumTitle: { en: 'Unlock Full Power', ru: 'Разблокируйте полную мощность', kk: 'Толық қуатты ашыңыз' },
+  premiumDesc: { en: 'Get unlimited access to all AI features with our most powerful models', ru: 'Получите безлимитный доступ ко всем ИИ функциям с нашими самыми мощными моделями', kk: 'Ең қуатты модельдермен барлық AI мүмкіндіктеріне шексіз қолжетімділік алыңыз' },
+  premiumFeature1: { en: 'Unlimited symptom analysis, AI doctor, & image analysis', ru: 'Безлимитный анализ симптомов, ИИ доктор и анализ изображений', kk: 'Шексіз белгілер талдауы, AI дәрігер және сурет талдау' },
+  premiumFeature2: { en: 'Most powerful AI model for deeper, more accurate analysis', ru: 'Самая мощная модель ИИ для глубокого и точного анализа', kk: 'Терең және дәл талдау үшін ең қуатты AI моделі' },
+  premiumFeature3: { en: 'Immunity improvement and preventive health tips', ru: 'Советы по улучшению иммунитета и профилактике', kk: 'Иммунитетті жақсарту және алдын алу кеңестері' },
+  premiumFeature4: { en: 'Priority processing and faster results', ru: 'Приоритетная обработка и быстрые результаты', kk: 'Басым өңдеу және жылдам нәтижелер' },
+  premiumFeature5: { en: 'Full usage history with detailed reports', ru: 'Полная история использования с детальными отчётами', kk: 'Толық пайдалану тарихы мен есептер' },
+  purchasePremium: { en: 'Purchase Premium', ru: 'Купить Premium', kk: 'Premium сатып алу' },
+  loginToPurchase: { en: 'Sign in to purchase', ru: 'Войдите для покупки', kk: 'Сатып алу үшін кіріңіз' },
+  securePayment: { en: 'Secure & anonymous payment', ru: 'Безопасный и анонимный платёж', kk: 'Қауіпсіз және анонимді төлем' },
+  premiumComingSoon: { en: 'Coming soon!', ru: 'Скоро!', kk: 'Жақында!' },
+  premiumComingSoonDesc: { en: 'Payment integration is being set up. Check back soon!', ru: 'Интеграция оплаты настраивается. Проверьте позже!', kk: 'Төлем интеграциясы орнатылуда. Кейінірек тексеріңіз!' },
+  freeVsPremium: { en: 'Free vs Premium', ru: 'Бесплатно vs Premium', kk: 'Тегін vs Premium' },
+  feature: { en: 'Feature', ru: 'Функция', kk: 'Мүмкіндік' },
+  aiModel: { en: 'AI Model', ru: 'Модель ИИ', kk: 'AI Моделі' },
+
+  // Profile page
+  totalActions: { en: 'Total Uses', ru: 'Всего использований', kk: 'Барлық пайдалану' },
+  usageHistory: { en: 'Usage History', ru: 'История использования', kk: 'Пайдалану тарихы' },
+  noHistoryYet: { en: 'No history yet. Start using features!', ru: 'Истории пока нет. Начните использовать функции!', kk: 'Тарих жоқ. Мүмкіндіктерді пайдалана бастаңыз!' },
+  dataSecurityTitle: { en: 'Your Data is Secure', ru: 'Ваши данные в безопасности', kk: 'Деректеріңіз қауіпсіз' },
+  dataSecurityDesc: { en: 'Your medical profile is stored locally. API keys and payment data are encrypted and never exposed.', ru: 'Ваш медицинский профиль хранится локально. API ключи и платёжные данные зашифрованы.', kk: 'Медициналық профиліңіз жергілікті түрде сақталады. API кілттері мен төлем деректері шифрланған.' },
 };
 
 // Language names for system prompts

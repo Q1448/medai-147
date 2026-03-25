@@ -8,6 +8,8 @@ import { SplineScene } from "@/components/ui/spline-scene";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
+import { UsageBanner } from "@/components/UsageBanner";
+import { useUsageLimits } from "@/hooks/useUsageLimits";
 import { Bot, User, Send, Stethoscope, AlertCircle, Sparkles, Brain, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +23,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-doctor`;
 export default function AiDoctor() {
   const { profile, getProfileContext } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { canUse, recordUsage } = useUsageLimits();
   
   const getWelcomeMessage = () => {
     if (language === 'ru') {
@@ -84,6 +87,10 @@ How can I help you today?`;
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
     if (!text || isLoading) return;
+    if (!canUse("aiDoctor")) {
+      setError(t('usageLimitReached'));
+      return;
+    }
 
     const profileContext = getProfileContext();
     const userMessage: Message = { role: "user", content: text };
@@ -155,6 +162,7 @@ How can I help you today?`;
       setError(err instanceof Error ? err.message : "Failed to send message");
     } finally {
       setIsLoading(false);
+      await recordUsage("aiDoctor", { query: text });
     }
   };
 
@@ -169,6 +177,7 @@ How can I help you today?`;
     <Layout showFooterDisclaimer>
       <SEOHead title="AI Doctor" description="Chat with our advanced AI medical assistant." path="/ai-doctor" />
       <div className="container py-8 md:py-12">
+        <div className="max-w-5xl mx-auto mb-4"><UsageBanner feature="aiDoctor" /></div>
         {/* Header with 3D Robot */}
         <div className="max-w-5xl mx-auto mb-8">
           <div className="liquid-glass-heavy rounded-3xl overflow-hidden">

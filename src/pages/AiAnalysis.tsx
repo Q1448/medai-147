@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
 import { SEOHead } from "@/components/SEOHead";
+import { UsageBanner } from "@/components/UsageBanner";
+import { useUsageLimits } from "@/hooks/useUsageLimits";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +31,7 @@ interface AnalysisResult {
 export default function AiAnalysis() {
   const { profile, getProfileContext, addToHistory } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { canUse, recordUsage } = useUsageLimits();
   const [image, setImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -68,6 +71,7 @@ export default function AiAnalysis() {
 
   const analyzeImage = async () => {
     if (!image) { setError(t('errorUploadFirst')); return; }
+    if (!canUse("aiAnalysis")) { setError(t('usageLimitReached')); return; }
     setIsAnalyzing(true);
     setError(null);
     setResults(null);
@@ -90,6 +94,7 @@ export default function AiAnalysis() {
       });
       if (funcError) throw funcError;
       setResults(data);
+      await recordUsage("aiAnalysis", { result: data?.conditions?.map((c: { name: string }) => c.name).join(", ") });
       if (data?.conditions?.length > 0) {
         addToHistory({
           symptoms: "Image analysis",
@@ -117,6 +122,7 @@ export default function AiAnalysis() {
     <Layout showFooterDisclaimer>
       <SEOHead title="AI Image Analysis" description="Upload photos of skin conditions for AI-powered visual analysis." path="/ai-analysis" />
       <div className="container py-12 md:py-16">
+        <div className="max-w-4xl mx-auto"><UsageBanner feature="aiAnalysis" /></div>
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
             <Camera className="h-4 w-4 text-medical-purple" />
