@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { SEOHead } from "@/components/SEOHead";
+import { UsageBanner } from "@/components/UsageBanner";
+import { useUsageLimits } from "@/hooks/useUsageLimits";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,6 +64,7 @@ interface AnalysisResult {
 export default function Symptoms() {
   const { profile, getProfileContext, addToHistory } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { canUse, recordUsage } = useUsageLimits();
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [additionalSymptoms, setAdditionalSymptoms] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
