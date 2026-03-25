@@ -8,6 +8,7 @@ import {
   Activity, Bot, Camera, ShoppingBag, Building2, ArrowRight, Shield, Clock,
   Brain, Sparkles, Users, Zap, HeartPulse, Crown,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Index() {
   const { t } = useLanguage();
@@ -40,8 +41,32 @@ export default function Index() {
             style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
           />
           {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
-          
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
+
+          {/* Hippocrates tooltip area — bottom-left */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 w-40 h-48 md:w-56 md:h-64 cursor-pointer z-10 rounded-xl" />
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-xs p-4 bg-background/95 backdrop-blur-md border border-primary/20 rounded-2xl shadow-2xl">
+              <p className="font-display font-bold text-foreground mb-1">Гиппократ (460–370 до н.э.)</p>
+              <p className="text-sm text-muted-foreground">Древнегреческий врач, «отец медицины». Создал клятву Гиппократа — этический кодекс врачей, актуальный и сегодня.</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* "live / check / recover" — right side */}
+          <div className="absolute bottom-12 right-8 md:bottom-16 md:right-16 z-10 text-right hidden sm:block">
+            <p className="font-display text-3xl md:text-5xl font-bold text-white/90 leading-tight tracking-wide drop-shadow-lg">
+              live<span className="text-emerald-400">.</span>
+            </p>
+            <p className="font-display text-3xl md:text-5xl font-bold text-white/90 leading-tight tracking-wide drop-shadow-lg">
+              check<span className="text-emerald-400">.</span>
+            </p>
+            <p className="font-display text-3xl md:text-5xl font-bold text-emerald-400 leading-tight tracking-wide drop-shadow-lg">
+              recover<span className="text-white/90">.</span>
+            </p>
+          </div>
+
           <div className="container relative py-16 md:py-24 flex flex-col items-center justify-center text-center">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-semibold mb-6">
               <Sparkles className="h-4 w-4 text-emerald-400" />
