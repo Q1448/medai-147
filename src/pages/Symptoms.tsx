@@ -95,6 +95,10 @@ export default function Symptoms() {
       setError(t('pleaseSelectSymptom'));
       return;
     }
+    if (!canUse("symptoms")) {
+      setError(t('usageLimitReached'));
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
