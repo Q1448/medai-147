@@ -87,6 +87,10 @@ How can I help you today?`;
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
     if (!text || isLoading) return;
+    if (!canUse("aiDoctor")) {
+      setError(t('usageLimitReached'));
+      return;
+    }
 
     const profileContext = getProfileContext();
     const userMessage: Message = { role: "user", content: text };
@@ -158,6 +162,7 @@ How can I help you today?`;
       setError(err instanceof Error ? err.message : "Failed to send message");
     } finally {
       setIsLoading(false);
+      await recordUsage("aiDoctor", { query: text });
     }
   };
 
@@ -172,6 +177,7 @@ How can I help you today?`;
     <Layout showFooterDisclaimer>
       <SEOHead title="AI Doctor" description="Chat with our advanced AI medical assistant." path="/ai-doctor" />
       <div className="container py-8 md:py-12">
+        <div className="max-w-5xl mx-auto mb-4"><UsageBanner feature="aiDoctor" /></div>
         {/* Header with 3D Robot */}
         <div className="max-w-5xl mx-auto mb-8">
           <div className="liquid-glass-heavy rounded-3xl overflow-hidden">
