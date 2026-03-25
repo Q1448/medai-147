@@ -398,7 +398,7 @@ export const translations: Translations = {
   getPremium: { en: 'Get Premium', ru: 'Получить Premium', kk: 'Premium алу' },
   usageLimitReached: { en: 'Daily limit reached. Upgrade to Premium for unlimited access.', ru: 'Дневной лимит исчерпан. Перейдите на Premium для безлимитного доступа.', kk: 'Күнделікті лимит бітті. Шексіз қолжетімділік үшін Premium алыңыз.' },
   perMonth: { en: 'month', ru: 'мес', kk: 'ай' },
-  day: { en: 'day', ru: 'день', kk: 'күн' },
+  dayUnit: { en: 'day', ru: 'день', kk: 'күн' },
 
   // Premium page
   premiumTitle: { en: 'Unlock Full Power', ru: 'Разблокируйте полную мощность', kk: 'Толық қуатты ашыңыз' },
