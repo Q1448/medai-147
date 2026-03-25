@@ -8,6 +8,8 @@ import { SplineScene } from "@/components/ui/spline-scene";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
+import { UsageBanner } from "@/components/UsageBanner";
+import { useUsageLimits } from "@/hooks/useUsageLimits";
 import { Bot, User, Send, Stethoscope, AlertCircle, Sparkles, Brain, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +23,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-doctor`;
 export default function AiDoctor() {
   const { profile, getProfileContext } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { canUse, recordUsage } = useUsageLimits();
   
   const getWelcomeMessage = () => {
     if (language === 'ru') {

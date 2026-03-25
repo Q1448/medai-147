@@ -169,6 +169,11 @@ export default function Symptoms() {
     <Layout showFooterDisclaimer>
       <SEOHead title="Symptom Checker" description="Advanced AI-powered symptom analysis. Select symptoms and get accurate condition identification with evidence-based results." path="/symptoms" />
       <div className="container py-12 md:py-16">
+        {/* Usage Banner */}
+        <div className="max-w-4xl mx-auto">
+          <UsageBanner feature="symptoms" />
+        </div>
+
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm font-semibold mb-6">
