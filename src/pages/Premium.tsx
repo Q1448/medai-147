@@ -109,15 +109,15 @@ export default function Premium() {
               <div className="text-center font-semibold text-amber-600 dark:text-amber-400">Premium</div>
 
               <div className="text-foreground">{t('symptoms')}</div>
-              <div className="text-center text-muted-foreground">3/{t('day')}</div>
+              <div className="text-center text-muted-foreground">3/{t('dayUnit')}</div>
               <div className="text-center text-amber-600 dark:text-amber-400 flex items-center justify-center"><Infinity className="h-4 w-4" /></div>
 
               <div className="text-foreground">{t('aiDoctor')}</div>
-              <div className="text-center text-muted-foreground">5/{t('day')}</div>
+              <div className="text-center text-muted-foreground">5/{t('dayUnit')}</div>
               <div className="text-center text-amber-600 dark:text-amber-400 flex items-center justify-center"><Infinity className="h-4 w-4" /></div>
 
               <div className="text-foreground">{t('aiAnalysis')}</div>
-              <div className="text-center text-muted-foreground">3/{t('day')}</div>
+              <div className="text-center text-muted-foreground">3/{t('dayUnit')}</div>
               <div className="text-center text-amber-600 dark:text-amber-400 flex items-center justify-center"><Infinity className="h-4 w-4" /></div>
 
               <div className="text-foreground">{t('aiModel')}</div>
