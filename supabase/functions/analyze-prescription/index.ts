@@ -28,47 +28,59 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           {
             role: "system",
             content: `${langInstruction}
-You are a prescription analyzer AI. Analyze the uploaded prescription image and extract all medicines listed.
+You are an expert prescription analyzer with OCR capabilities. You MUST carefully read every character, word, and number on the prescription image. Pay special attention to:
+- Handwritten text (doctor's handwriting can be messy)
+- Latin and Cyrillic characters
+- Drug dosages (mg, ml, g)
+- Frequency instructions (1x, 2x, 3 times daily, etc.)
 
-For each medicine found, provide:
-1. Medicine name (both brand and generic if possible)
-2. Dosage prescribed
-3. Instructions from prescription
-4. Estimated price in KZT (Kazakhstani Tenge) - use realistic pharmacy prices
-5. Where to buy (pharmacy names in Astana)
-6. 1-2 cheaper alternatives/generics with their prices
+For each medicine found, provide DETAILED information:
+1. Medicine name (brand name as written + international generic name INN)
+2. Dosage prescribed (exactly as written)
+3. Full instructions from prescription
+4. Estimated price in KZT (Kazakhstani Tenge) - use realistic pharmacy prices for Kazakhstan market:
+   - Common generics: 300-800 KZT
+   - Brand drugs: 800-3000 KZT
+   - Specialized: 3000-15000 KZT
+5. Where to buy in Astana: АльфаМед, БиоСфера, Bios, Аптека низких цен, Фармаком, Euro Apteka, Pharmacom
+6. 2-3 cheaper alternatives/generics with their prices and manufacturer
 
 Return JSON in this exact format:
 {
   "medicines": [
     {
-      "name": "Medicine Name",
-      "genericName": "Generic equivalent",
-      "dosage": "As prescribed",
-      "instructions": "Usage instructions from prescription",
+      "name": "Medicine Brand Name",
+      "genericName": "INN Generic Name",
+      "dosage": "500mg",
+      "instructions": "1 tablet 3 times daily after meals for 7 days",
       "estimatedPrice": "1500 KZT",
-      "whereToBuy": ["АльфаМед", "БиоСфера"],
+      "whereToBuy": ["АльфаМед", "БиоСфера", "Bios"],
       "alternatives": [
-        { "name": "Alternative Name", "price": "800 KZT" }
-      ]
+        { "name": "Generic Alternative 1", "price": "600 KZT", "manufacturer": "SANTO" },
+        { "name": "Generic Alternative 2", "price": "450 KZT", "manufacturer": "Нобел" }
+      ],
+      "pharmacologicalGroup": "e.g., NSAID, Antibiotic, etc.",
+      "activeIngredient": "e.g., Ibuprofen"
     }
   ],
   "doctorNotes": "Any additional notes from the prescription",
-  "warnings": ["Any drug interaction warnings"]
+  "warnings": ["Drug interaction warnings", "Contraindications"],
+  "totalEstimatedCost": "5000 KZT",
+  "totalWithGenerics": "2500 KZT"
 }
 
-If you cannot read the prescription clearly, indicate which parts are unclear.
+If you cannot read parts of the prescription clearly, indicate which parts are unclear but still try your best to identify the medicines.
 DO NOT use markdown formatting. Return only valid JSON.`
           },
           {
             role: "user",
             content: [
-              { type: "text", text: "Analyze this prescription and extract all medicines with prices and alternatives." },
+              { type: "text", text: "Carefully read and analyze this prescription image. Extract ALL medicines with exact dosages, instructions, prices in Kazakhstan, and cheaper alternatives. Read every word carefully, even if handwriting is messy." },
               { type: "image_url", image_url: { url: image } }
             ]
           }
@@ -93,7 +105,6 @@ DO NOT use markdown formatting. Return only valid JSON.`
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "{}";
     
-    // Try to parse JSON from content
     let parsed;
     try {
       const jsonMatch = content.match(/\{[\s\S]*\}/);
