@@ -136,6 +136,7 @@ export default function Symptoms() {
 
       if (funcError) throw funcError;
       setResults(data);
+      await recordUsage("symptoms", { symptoms: allSymptoms, result: data?.conditions?.map((c: { name: string }) => c.name).join(", ") });
 
       if (data?.conditions?.length > 0) {
         addToHistory({
