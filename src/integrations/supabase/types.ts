@@ -67,6 +67,44 @@ export type Database = {
           },
         ]
       }
+      suggestion_replies: {
+        Row: {
+          author_name: string | null
+          created_at: string
+          id: string
+          is_creator: boolean
+          reply_text: string
+          suggestion_id: string
+          visitor_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          is_creator?: boolean
+          reply_text: string
+          suggestion_id: string
+          visitor_id: string
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string
+          id?: string
+          is_creator?: boolean
+          reply_text?: string
+          suggestion_id?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_replies_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suggestions: {
         Row: {
           category: string | null
