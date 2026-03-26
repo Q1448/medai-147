@@ -295,6 +295,12 @@ export const translations: Translations = {
   noSuggestionsYet: { en: 'No suggestions yet. Be the first!', ru: 'Пока нет предложений. Будьте первым!', kk: 'Әлі ұсыныстар жоқ. Бірінші болыңыз!' },
   addSuggestion: { en: 'Add Suggestion', ru: 'Добавить предложение', kk: 'Ұсыныс қосу' },
   viewAllSuggestions: { en: 'View All Suggestions', ru: 'Все предложения', kk: 'Барлық ұсыныстар' },
+  reply: { en: 'Reply', ru: 'Ответить', kk: 'Жауап беру' },
+  replyPlaceholder: { en: 'Write a reply...', ru: 'Напишите ответ...', kk: 'Жауап жазыңыз...' },
+  creatorBadge: { en: 'Creator', ru: 'Создатель', kk: 'Жасаушы' },
+  replies: { en: 'replies', ru: 'ответов', kk: 'жауап' },
+  showReplies: { en: 'Show replies', ru: 'Показать ответы', kk: 'Жауаптарды көрсету' },
+  hideReplies: { en: 'Hide replies', ru: 'Скрыть ответы', kk: 'Жауаптарды жасыру' },
 
   // Auth
   login: { en: 'Sign In', ru: 'Войти', kk: 'Кіру' },
