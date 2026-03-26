@@ -10,7 +10,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   MessageSquarePlus, Send, Sparkles, CheckCircle2, Lightbulb, Palette,
   Zap, Brain, HelpCircle, BarChart3, TrendingUp, Users, ThumbsUp, Clock, Plus,
+  MessageCircle, ChevronDown, ChevronUp, Shield,
 } from "lucide-react";
+
+const CREATOR_VISITOR_ID = "creator-medai-admin-2024";
 
 const categories = [
   { id: 'general', icon: Lightbulb, color: 'from-amber-500 to-orange-500' },
@@ -20,6 +23,14 @@ const categories = [
   { id: 'other', icon: HelpCircle, color: 'from-gray-500 to-slate-500' },
 ];
 
+interface Reply {
+  id: string;
+  reply_text: string;
+  author_name: string | null;
+  is_creator: boolean;
+  created_at: string;
+}
+
 interface Suggestion {
   id: string;
   name: string | null;
@@ -28,6 +39,7 @@ interface Suggestion {
   created_at: string;
   likes_count: number;
   liked_by_me: boolean;
+  replies: Reply[];
 }
 
 function getVisitorId(): string {
@@ -51,8 +63,14 @@ export default function Feedback() {
   const [formData, setFormData] = useState({
     name: '', email: '', category: 'general', suggestion: '',
   });
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replyName, setReplyName] = useState('');
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [submittingReply, setSubmittingReply] = useState(false);
 
   const visitorId = getVisitorId();
+  const isCreator = visitorId === CREATOR_VISITOR_ID;
 
   const fetchAllPages = async (table: string, select: string) => {
     let all: any[] = [];
@@ -75,9 +93,10 @@ export default function Feedback() {
   const fetchSuggestions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [allSuggestions, allLikes] = await Promise.all([
+      const [allSuggestions, allLikes, allReplies] = await Promise.all([
         fetchAllPages('suggestions', 'id, name, category, suggestion, created_at'),
         fetchAllPages('suggestion_likes', 'suggestion_id, visitor_id'),
+        fetchAllPages('suggestion_replies', 'id, suggestion_id, reply_text, author_name, is_creator, created_at'),
       ]);
 
       const likesMap: Record<string, { count: number; myLike: boolean }> = {};
@@ -87,13 +106,25 @@ export default function Feedback() {
         if (like.visitor_id === visitorId) likesMap[like.suggestion_id].myLike = true;
       });
 
+      const repliesMap: Record<string, Reply[]> = {};
+      allReplies.forEach((r: any) => {
+        if (!repliesMap[r.suggestion_id]) repliesMap[r.suggestion_id] = [];
+        repliesMap[r.suggestion_id].push({
+          id: r.id,
+          reply_text: r.reply_text,
+          author_name: r.author_name,
+          is_creator: r.is_creator,
+          created_at: r.created_at,
+        });
+      });
+
       const mapped: Suggestion[] = allSuggestions.map((s) => ({
         ...s,
         likes_count: likesMap[s.id]?.count || 0,
         liked_by_me: likesMap[s.id]?.myLike || false,
+        replies: (repliesMap[s.id] || []).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
       }));
 
-      // Sort by most liked first
       mapped.sort((a, b) => b.likes_count - a.likes_count);
       setSuggestions(mapped);
 
@@ -140,6 +171,56 @@ export default function Feedback() {
     } catch (error) {
       console.error('Error toggling like:', error);
     }
+  };
+
+  const handleReply = async (suggestionId: string) => {
+    const text = replyText.trim().replace(/<[^>]*>/g, "");
+    if (!text || text.length < 2) return;
+    if (text.length > 1000) {
+      toast({ title: "Reply too long (max 1000 chars)", variant: "destructive" });
+      return;
+    }
+    setSubmittingReply(true);
+    try {
+      const name = replyName.trim().replace(/<[^>]*>/g, "").slice(0, 100) || null;
+      const { error } = await supabase.from('suggestion_replies' as any).insert({
+        suggestion_id: suggestionId,
+        reply_text: text,
+        author_name: isCreator ? 'MedAI+ Team' : name,
+        is_creator: isCreator,
+        visitor_id: visitorId,
+      });
+      if (error) throw error;
+
+      const newReply: Reply = {
+        id: crypto.randomUUID(),
+        reply_text: text,
+        author_name: isCreator ? 'MedAI+ Team' : name,
+        is_creator: isCreator,
+        created_at: new Date().toISOString(),
+      };
+
+      setSuggestions(prev => prev.map(s =>
+        s.id === suggestionId ? { ...s, replies: [...s.replies, newReply] } : s
+      ));
+      setExpandedReplies(prev => new Set(prev).add(suggestionId));
+      setReplyText('');
+      setReplyName('');
+      setReplyingTo(null);
+    } catch (error) {
+      console.error('Error submitting reply:', error);
+      toast({ title: "Failed to submit reply", variant: "destructive" });
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
+  const toggleReplies = (id: string) => {
+    setExpandedReplies(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,7 +275,6 @@ export default function Feedback() {
 
   const topCategory = Object.entries(stats.byCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || 'general';
 
-  // Pagination for display
   const [displayCount, setDisplayCount] = useState(50);
   const displayedSuggestions = suggestions.slice(0, displayCount);
 
@@ -210,6 +290,12 @@ export default function Feedback() {
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">{t('feedbackTitle')}</h1>
           <p className="text-lg text-muted-foreground">{t('feedbackDescription')}</p>
+          {isCreator && (
+            <div className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/30">
+              <Shield className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-semibold text-emerald-500">{t('creatorBadge')} Mode</span>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -349,31 +435,111 @@ export default function Feedback() {
               {displayedSuggestions.map((s) => {
                 const catInfo = getCategoryInfo(s.category || 'general');
                 const CatIcon = catInfo.icon;
+                const isExpanded = expandedReplies.has(s.id);
+                const hasCreatorReply = s.replies.some(r => r.is_creator);
                 return (
-                  <div key={s.id} className="glass-card rounded-2xl p-5 flex items-start gap-4 transition-all hover:shadow-md">
-                    <div className={`w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
-                      <CatIcon className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-sm text-foreground">{s.name || t('anonymous')}</span>
-                        <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">{getCategoryLabel(s.category || 'general')}</span>
+                  <div key={s.id} className={`glass-card rounded-2xl p-5 transition-all hover:shadow-md ${hasCreatorReply ? 'ring-1 ring-emerald-500/30' : ''}`}>
+                    <div className="flex items-start gap-4">
+                      <div className={`w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
+                        <CatIcon className="h-5 w-5 text-white" />
                       </div>
-                      <p className="text-sm text-foreground/80 mb-2">{s.suggestion}</p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        {formatDate(s.created_at)}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-sm text-foreground">{s.name || t('anonymous')}</span>
+                          <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">{getCategoryLabel(s.category || 'general')}</span>
+                          {hasCreatorReply && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 font-semibold flex items-center gap-1">
+                              <Shield className="h-3 w-3" /> {t('creatorBadge')}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-foreground/80 mb-2">{s.suggestion}</p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(s.created_at)}</span>
+                          {s.replies.length > 0 && (
+                            <button onClick={() => toggleReplies(s.id)} className="flex items-center gap-1 hover:text-primary transition-colors">
+                              <MessageCircle className="h-3 w-3" />
+                              {s.replies.length} {t('replies')}
+                              {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setReplyingTo(replyingTo === s.id ? null : s.id)}
+                            className="flex items-center gap-1 hover:text-primary transition-colors"
+                          >
+                            <MessageCircle className="h-3 w-3" />
+                            {t('reply')}
+                          </button>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => handleLike(s.id, s.liked_by_me)}
+                        className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+                          s.liked_by_me ? 'bg-primary/15 text-primary' : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                        }`}
+                      >
+                        <ThumbsUp className={`h-5 w-5 ${s.liked_by_me ? 'fill-primary' : ''}`} />
+                        <span className="text-xs font-bold">{s.likes_count}</span>
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleLike(s.id, s.liked_by_me)}
-                      className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
-                        s.liked_by_me ? 'bg-primary/15 text-primary' : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
-                      }`}
-                    >
-                      <ThumbsUp className={`h-5 w-5 ${s.liked_by_me ? 'fill-primary' : ''}`} />
-                      <span className="text-xs font-bold">{s.likes_count}</span>
-                    </button>
+
+                    {/* Replies */}
+                    {isExpanded && s.replies.length > 0 && (
+                      <div className="mt-4 ml-14 space-y-3 border-l-2 border-border/50 pl-4">
+                        {s.replies.map((r) => (
+                          <div key={r.id} className={`p-3 rounded-xl ${r.is_creator ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-muted/30'}`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-xs font-semibold ${r.is_creator ? 'text-emerald-600' : 'text-foreground'}`}>
+                                {r.author_name || t('anonymous')}
+                              </span>
+                              {r.is_creator && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 font-bold flex items-center gap-0.5">
+                                  <Shield className="h-2.5 w-2.5" /> {t('creatorBadge')}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-muted-foreground">{formatDate(r.created_at)}</span>
+                            </div>
+                            <p className="text-sm text-foreground/80">{r.reply_text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Reply Form */}
+                    {replyingTo === s.id && (
+                      <div className="mt-4 ml-14 space-y-2">
+                        {!isCreator && (
+                          <Input
+                            value={replyName}
+                            onChange={(e) => setReplyName(e.target.value)}
+                            placeholder={t('yourName')}
+                            className="rounded-xl border-border/50 bg-background/50 h-9 text-sm"
+                          />
+                        )}
+                        <div className="flex gap-2">
+                          <Textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder={t('replyPlaceholder')}
+                            rows={2}
+                            className="rounded-xl border-border/50 bg-background/50 resize-none text-sm flex-1"
+                          />
+                          <Button
+                            size="sm"
+                            disabled={submittingReply || !replyText.trim()}
+                            onClick={() => handleReply(s.id)}
+                            className={`rounded-xl self-end ${isCreator ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'gradient-primary text-white'}`}
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {isCreator && (
+                          <p className="text-[10px] text-emerald-500 flex items-center gap-1">
+                            <Shield className="h-3 w-3" /> {t('creatorBadge')} — your reply will be highlighted
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
