@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Users, Code, Search, Building2, Award, Sparkles, Target, Lightbulb } from "lucide-react";
+import { Users, Code, Search, Building2, Award, Sparkles, Target, Lightbulb, Mail, Phone } from "lucide-react";
 
 export default function About() {
   const { t, language } = useLanguage();
@@ -118,10 +118,16 @@ export default function About() {
               <Award className="h-8 w-8 text-muted-foreground" />
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground mb-3">{t('sponsorship')}</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">{t('sponsorshipDescription')}</p>
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
-              <Sparkles className="h-4 w-4" />
-              {t('comingSoon')}
+            <p className="text-muted-foreground max-w-md mx-auto mb-6">{t('sponsorshipDescription')}</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a href="mailto:yerzhanuly.y@nisa.edu.kz" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+                <Mail className="h-4 w-4" />
+                yerzhanuly.y@nisa.edu.kz
+              </a>
+              <a href="tel:+77027458807" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+                <Phone className="h-4 w-4" />
+                +7 702 745 8807
+              </a>
             </div>
           </div>
         </div>
