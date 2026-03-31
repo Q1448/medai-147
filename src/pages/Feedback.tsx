@@ -96,7 +96,7 @@ export default function Feedback() {
     setIsLoading(true);
     try {
       const [allSuggestions, allLikes, allReplies] = await Promise.all([
-        fetchAllPages('suggestions', 'id, name, category, suggestion, created_at'),
+        fetchAllPages('suggestions_public' as any, 'id, name, category, suggestion, created_at'),
         fetchAllPages('suggestion_likes', 'suggestion_id, visitor_id'),
         fetchAllPages('suggestion_replies', 'id, suggestion_id, reply_text, author_name, is_creator, created_at'),
       ]);
