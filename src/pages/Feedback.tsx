@@ -55,6 +55,7 @@ function getVisitorId(): string {
 export default function Feedback() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -71,7 +72,7 @@ export default function Feedback() {
   const [submittingReply, setSubmittingReply] = useState(false);
 
   const visitorId = getVisitorId();
-  const isCreator = visitorId === CREATOR_VISITOR_ID;
+  const isCreator = !!user && user.email === CREATOR_EMAIL;
 
   const fetchAllPages = async (table: string, select: string) => {
     let all: any[] = [];
