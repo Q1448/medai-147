@@ -7,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageSquarePlus, Send, Sparkles, CheckCircle2, Lightbulb, Palette,
   Zap, Brain, HelpCircle, BarChart3, TrendingUp, Users, ThumbsUp, Clock, Plus,
   MessageCircle, ChevronDown, ChevronUp, Shield,
 } from "lucide-react";
 
-const CREATOR_VISITOR_ID = "creator-medai-admin-2024";
+const CREATOR_EMAIL = "yerzhanuly.y@nisa.edu.kz";
 
 const categories = [
   { id: 'general', icon: Lightbulb, color: 'from-amber-500 to-orange-500' },
