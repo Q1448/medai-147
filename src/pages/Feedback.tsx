@@ -185,14 +185,25 @@ export default function Feedback() {
     setSubmittingReply(true);
     try {
       const name = replyName.trim().replace(/<[^>]*>/g, "").slice(0, 100) || null;
-      const { error } = await supabase.from('suggestion_replies' as any).insert({
-        suggestion_id: suggestionId,
-        reply_text: text,
-        author_name: isCreator ? 'MedAI+ Team' : name,
-        is_creator: isCreator,
-        visitor_id: visitorId,
-      });
-      if (error) throw error;
+      
+      if (isCreator) {
+        // Use SECURITY DEFINER function for creator replies
+        const { error } = await supabase.rpc('insert_creator_reply' as any, {
+          p_suggestion_id: suggestionId,
+          p_reply_text: text,
+          p_author_name: 'MedAI+ Team',
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('suggestion_replies' as any).insert({
+          suggestion_id: suggestionId,
+          reply_text: text,
+          author_name: name,
+          is_creator: false,
+          visitor_id: visitorId,
+        });
+        if (error) throw error;
+      }
 
       const newReply: Reply = {
         id: crypto.randomUUID(),
