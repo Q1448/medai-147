@@ -7,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   MessageSquarePlus, Send, Sparkles, CheckCircle2, Lightbulb, Palette,
   Zap, Brain, HelpCircle, BarChart3, TrendingUp, Users, ThumbsUp, Clock, Plus,
   MessageCircle, ChevronDown, ChevronUp, Shield,
 } from "lucide-react";
 
-const CREATOR_VISITOR_ID = "creator-medai-admin-2024";
+const CREATOR_EMAIL = "yerzhanuly.y@nisa.edu.kz";
 
 const categories = [
   { id: 'general', icon: Lightbulb, color: 'from-amber-500 to-orange-500' },
@@ -54,6 +55,7 @@ function getVisitorId(): string {
 export default function Feedback() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -70,7 +72,7 @@ export default function Feedback() {
   const [submittingReply, setSubmittingReply] = useState(false);
 
   const visitorId = getVisitorId();
-  const isCreator = visitorId === CREATOR_VISITOR_ID;
+  const isCreator = !!user && user.email === CREATOR_EMAIL;
 
   const fetchAllPages = async (table: string, select: string) => {
     let all: any[] = [];
@@ -94,7 +96,7 @@ export default function Feedback() {
     setIsLoading(true);
     try {
       const [allSuggestions, allLikes, allReplies] = await Promise.all([
-        fetchAllPages('suggestions', 'id, name, category, suggestion, created_at'),
+        fetchAllPages('suggestions_public' as any, 'id, name, category, suggestion, created_at'),
         fetchAllPages('suggestion_likes', 'suggestion_id, visitor_id'),
         fetchAllPages('suggestion_replies', 'id, suggestion_id, reply_text, author_name, is_creator, created_at'),
       ]);
@@ -183,14 +185,25 @@ export default function Feedback() {
     setSubmittingReply(true);
     try {
       const name = replyName.trim().replace(/<[^>]*>/g, "").slice(0, 100) || null;
-      const { error } = await supabase.from('suggestion_replies' as any).insert({
-        suggestion_id: suggestionId,
-        reply_text: text,
-        author_name: isCreator ? 'MedAI+ Team' : name,
-        is_creator: isCreator,
-        visitor_id: visitorId,
-      });
-      if (error) throw error;
+      
+      if (isCreator) {
+        // Use SECURITY DEFINER function for creator replies
+        const { error } = await supabase.rpc('insert_creator_reply' as any, {
+          p_suggestion_id: suggestionId,
+          p_reply_text: text,
+          p_author_name: 'MedAI+ Team',
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('suggestion_replies' as any).insert({
+          suggestion_id: suggestionId,
+          reply_text: text,
+          author_name: name,
+          is_creator: false,
+          visitor_id: visitorId,
+        });
+        if (error) throw error;
+      }
 
       const newReply: Reply = {
         id: crypto.randomUUID(),
