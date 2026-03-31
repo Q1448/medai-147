@@ -65,6 +65,13 @@ export type Database = {
             referencedRelation: "suggestions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "suggestion_likes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       suggestion_replies: {
@@ -101,6 +108,13 @@ export type Database = {
             columns: ["suggestion_id"]
             isOneToOne: false
             referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_replies_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions_public"
             referencedColumns: ["id"]
           },
         ]
@@ -188,7 +202,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      suggestions_public: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          suggestion: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          suggestion?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          suggestion?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_rate_limit: {
@@ -201,6 +238,14 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_usage: { Args: never; Returns: undefined }
+      insert_creator_reply: {
+        Args: {
+          p_author_name?: string
+          p_reply_text: string
+          p_suggestion_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
