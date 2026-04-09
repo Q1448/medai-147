@@ -31,7 +31,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full liquid-glass-heavy border-b border-primary/8">
-        <div className="container flex h-18 items-center justify-between py-3">
+        <div className="container flex h-16 items-center justify-between py-2 gap-2">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg shadow-md">
               <Stethoscope className="h-6 w-6" />
@@ -48,13 +48,13 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 flex-shrink min-w-0">
             {navLinkKeys.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300",
+                  "px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium rounded-xl transition-all duration-300 whitespace-nowrap",
                   location.pathname === link.href
                     ? "gradient-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground hover:bg-primary/8"
@@ -67,9 +67,8 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-2">
             <Link to="/premium">
-              <Button variant="ghost" size="sm" className="rounded-xl gap-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10">
+              <Button variant="ghost" size="icon" className="rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 h-9 w-9" title="Premium">
                 <Crown className="h-4 w-4" />
-                <span className="text-xs font-semibold">Premium</span>
               </Button>
             </Link>
             {user ? (
