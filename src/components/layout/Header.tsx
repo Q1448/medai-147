@@ -48,13 +48,13 @@ export function Header() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 flex-shrink min-w-0">
             {navLinkKeys.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300",
+                  "px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium rounded-xl transition-all duration-300 whitespace-nowrap",
                   location.pathname === link.href
                     ? "gradient-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground hover:bg-primary/8"
