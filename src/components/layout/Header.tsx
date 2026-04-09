@@ -67,9 +67,8 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-2">
             <Link to="/premium">
-              <Button variant="ghost" size="sm" className="rounded-xl gap-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10">
+              <Button variant="ghost" size="icon" className="rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 h-9 w-9" title="Premium">
                 <Crown className="h-4 w-4" />
-                <span className="text-xs font-semibold">Premium</span>
               </Button>
             </Link>
             {user ? (
