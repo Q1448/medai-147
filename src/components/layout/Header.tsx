@@ -31,7 +31,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full liquid-glass-heavy border-b border-primary/8">
-        <div className="container flex h-18 items-center justify-between py-3">
+        <div className="container flex h-16 items-center justify-between py-2 gap-2">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-primary text-primary-foreground transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg shadow-md">
               <Stethoscope className="h-6 w-6" />
