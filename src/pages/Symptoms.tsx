@@ -53,6 +53,7 @@ interface AnalysisResult {
     description: string;
     possibleCause: string;
     severity: "low" | "medium" | "high";
+    sources?: string[];
   }[];
   healthScore?: number;
   riskScore?: number;
@@ -459,10 +460,38 @@ export default function Symptoms() {
                         </EvidenceModal>
                       </div>
                       <p className="text-muted-foreground mb-4 leading-relaxed">{condition.description}</p>
-                      <div className="p-4 rounded-xl bg-muted/50">
+                      <div className="p-4 rounded-xl bg-muted/50 mb-3">
                         <span className="font-semibold text-foreground text-sm">{t('possibleCause')}:</span>
                         <p className="text-muted-foreground text-sm mt-1">{condition.possibleCause}</p>
                       </div>
+                      {condition.sources && condition.sources.length > 0 && (
+                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                          <span className="font-semibold text-foreground text-sm flex items-center gap-1.5 mb-2">
+                            <BookOpen className="h-3.5 w-3.5 text-primary" />
+                            {t('medicalSources')}:
+                          </span>
+                          <ul className="space-y-1.5">
+                            {condition.sources.map((source, si) => {
+                              const urlMatch = source.match(/(https?:\/\/[^\s]+)/);
+                              return (
+                                <li key={si} className="text-xs text-muted-foreground leading-relaxed">
+                                  {urlMatch ? (
+                                    <>
+                                      {source.replace(urlMatch[0], '').replace(/\s+$/, '')}
+                                      {' '}
+                                      <a href={urlMatch[0]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-0.5">
+                                        {t('viewSource')} ↗
+                                      </a>
+                                    </>
+                                  ) : (
+                                    <span>• {source}</span>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
