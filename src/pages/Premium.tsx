@@ -3,12 +3,14 @@ import { SEOHead } from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Crown, Zap, Brain, Shield, Infinity, Star, CheckCircle2, Loader2 } from "lucide-react";
+import { Crown, Zap, Brain, Shield, Infinity, Star, CheckCircle2, Loader2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
+
+type PlanKey = "monthly" | "semiannual" | "annual";
 
 export default function Premium() {
   const { t } = useLanguage();
@@ -19,6 +21,7 @@ export default function Premium() {
   const [subscribed, setSubscribed] = useState(false);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>("monthly");
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -48,6 +51,13 @@ export default function Premium() {
     { icon: Zap, text: t('premiumFeature3') },
     { icon: Shield, text: t('premiumFeature4') },
     { icon: Star, text: t('premiumFeature5') },
+    { icon: Users, text: t('premiumFeature6') },
+  ];
+
+  const plans: { key: PlanKey; price: string; priceNum: number; period: string; originalPrice?: string; badge?: string }[] = [
+    { key: "monthly", price: "5 000", priceNum: 5000, period: t('perMonth') },
+    { key: "semiannual", price: "25 000", priceNum: 25000, period: t('per6Months'), originalPrice: "30 000", badge: t('save17') },
+    { key: "annual", price: "50 000", priceNum: 50000, period: t('perYear'), originalPrice: "60 000", badge: t('save17') },
   ];
 
   const handlePurchase = async () => {
@@ -57,7 +67,9 @@ export default function Premium() {
     }
     setProcessing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout");
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { plan: selectedPlan },
+      });
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, "_blank");
@@ -99,6 +111,33 @@ export default function Premium() {
           <p className="text-lg text-muted-foreground">{t('premiumDesc')}</p>
         </div>
 
+        {/* Plan Selector */}
+        <div className="max-w-lg mx-auto mb-8">
+          <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-muted/50">
+            {plans.map((plan) => (
+              <button
+                key={plan.key}
+                onClick={() => setSelectedPlan(plan.key)}
+                className={`relative px-3 py-3 rounded-xl text-center transition-all ${
+                  selectedPlan === plan.key
+                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                {plan.badge && (
+                  <span className={`absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    selectedPlan === plan.key ? "bg-white text-amber-600" : "bg-amber-500 text-white"
+                  }`}>
+                    {plan.badge}
+                  </span>
+                )}
+                <div className="text-xs font-medium">{t(`plan_${plan.key}`)}</div>
+                <div className="text-sm font-bold mt-0.5">{plan.price} ₸</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="max-w-lg mx-auto">
           <div className="relative overflow-hidden rounded-3xl border-2 border-amber-500/30 bg-gradient-to-br from-card to-amber-500/5 p-8 md:p-10 shadow-2xl">
             {subscribed && (
@@ -113,10 +152,17 @@ export default function Premium() {
 
             <div className={`text-center mb-8 ${subscribed ? 'mt-6' : ''}`}>
               <div className="flex items-baseline justify-center gap-1 mb-2">
-                <span className="font-display text-5xl font-bold text-foreground">5 000</span>
+                <span className="font-display text-5xl font-bold text-foreground">
+                  {plans.find(p => p.key === selectedPlan)?.price}
+                </span>
                 <span className="text-xl text-muted-foreground">₸</span>
               </div>
-              <p className="text-sm text-muted-foreground">{t('perMonth')}</p>
+              {plans.find(p => p.key === selectedPlan)?.originalPrice && (
+                <p className="text-sm text-muted-foreground line-through mb-1">
+                  {plans.find(p => p.key === selectedPlan)?.originalPrice} ₸
+                </p>
+              )}
+              <p className="text-sm text-muted-foreground">{plans.find(p => p.key === selectedPlan)?.period}</p>
             </div>
 
             <div className="space-y-4 mb-8">
@@ -184,6 +230,10 @@ export default function Premium() {
               <div className="text-foreground">{t('aiModel')}</div>
               <div className="text-center text-muted-foreground">Standard</div>
               <div className="text-center text-amber-600 dark:text-amber-400 flex items-center justify-center gap-1"><Star className="h-3 w-3" /> Pro</div>
+
+              <div className="text-foreground">{t('sharing')}</div>
+              <div className="text-center text-muted-foreground">—</div>
+              <div className="text-center text-amber-600 dark:text-amber-400 flex items-center justify-center gap-1"><Users className="h-3 w-3" /> +1</div>
             </div>
           </div>
         </div>

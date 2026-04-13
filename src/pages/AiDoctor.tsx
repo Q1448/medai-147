@@ -50,6 +50,18 @@ export default function AiDoctor() {
 Маңызды: Мен тек білім беру ақпаратын ұсынамын. Шұғыл жағдайларда 103 нөміріне қоңырау шалыңыз.
 
 Сізге қалай көмектесе аламын?`;
+    } else if (language === 'zh') {
+      return `您好！我是您的高级AI医疗助手，基于最新AI技术。我可以提供以下方面的信息：
+
+- 症状与疾病 - 医学症状的详细解释
+- 治疗方案 - 一般治疗信息和家庭疗法
+- 药物信息 - 药物的作用机制和效果
+- 专科指导 - 应该去看哪位医生
+- 预防保健 - 保持健康的建议
+
+重要提示：我仅提供教育信息。如遇医疗紧急情况，请立即拨打103。请始终咨询医疗专业人员进行诊断和治疗。
+
+我能为您做什么？`;
     }
     return `Hello! I'm your advanced AI medical assistant powered by the latest AI technology. I can provide comprehensive information about:
 

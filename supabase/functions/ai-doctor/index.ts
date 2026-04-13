@@ -22,7 +22,7 @@ function validateInput(body: unknown): { messages: Array<{role: string; content:
     return { role: msg.role, content: msg.content.replace(/<[^>]*>/g, "") };
   });
   
-  const validLangs = ["en", "ru", "kk"];
+  const validLangs = ["en", "ru", "kk", "zh"];
   const lang = validLangs.includes(language as string) ? (language as string) : "en";
   const ctx = typeof profileContext === "string" ? profileContext.slice(0, 3000).replace(/<[^>]*>/g, "") : "";
   
@@ -72,11 +72,13 @@ serve(async (req) => {
       );
     }
 
-    const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Отвечай ТОЛЬКО на русском языке.'
-      : language === 'kk'
-      ? 'МАҢЫЗДЫ: Тек қазақ тілінде жауап бер.'
-      : 'Respond in English.';
+    const langInstructions: Record<string, string> = {
+      ru: 'ВАЖНО: Отвечай ТОЛЬКО на русском языке.',
+      kk: 'МАҢЫЗДЫ: Тек қазақ тілінде жауап бер.',
+      zh: '重要：请只用中文回答。',
+      en: 'Respond in English.',
+    };
+    const langInstruction = langInstructions[language] || langInstructions.en;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

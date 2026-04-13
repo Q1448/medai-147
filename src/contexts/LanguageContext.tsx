@@ -404,8 +404,15 @@ export const translations: Translations = {
   unlimitedAccess: { en: 'Unlimited access', ru: 'Безлимитный доступ', kk: 'Шексіз қолжетімділік', zh: '无限使用' },
   getPremium: { en: 'Get Premium', ru: 'Получить Premium', kk: 'Premium алу', zh: '获取Premium' },
   usageLimitReached: { en: 'Daily limit reached. Upgrade to Premium for unlimited access.', ru: 'Дневной лимит исчерпан. Перейдите на Premium для безлимитного доступа.', kk: 'Күнделікті лимит бітті. Шексіз қолжетімділік үшін Premium алыңыз.', zh: '已达每日上限。升级Premium享受无限使用。' },
-  perMonth: { en: 'month', ru: 'мес', kk: 'ай', zh: '月' },
+  perMonth: { en: '/month', ru: '/мес', kk: '/ай', zh: '/月' },
+  per6Months: { en: '/6 months', ru: '/6 мес', kk: '/6 ай', zh: '/6个月' },
+  perYear: { en: '/year', ru: '/год', kk: '/жыл', zh: '/年' },
   dayUnit: { en: 'day', ru: 'день', kk: 'күн', zh: '天' },
+  save17: { en: 'Save ~17%', ru: 'Скидка ~17%', kk: '~17% жеңілдік', zh: '节省~17%' },
+  plan_monthly: { en: '1 Month', ru: '1 Месяц', kk: '1 Ай', zh: '1个月' },
+  plan_semiannual: { en: '6 Months', ru: '6 Месяцев', kk: '6 Ай', zh: '6个月' },
+  plan_annual: { en: '1 Year', ru: '1 Год', kk: '1 Жыл', zh: '1年' },
+  sharing: { en: 'Sharing', ru: 'Совместный доступ', kk: 'Бөлісу', zh: '共享' },
 
   // Premium page
   premiumTitle: { en: 'Unlock Full Power', ru: 'Раскройте полный потенциал', kk: 'Толық қуатты ашыңыз', zh: '解锁全部功能' },
@@ -415,6 +422,7 @@ export const translations: Translations = {
   premiumFeature3: { en: 'Immunity improvement and preventive health tips', ru: 'Советы по укреплению иммунитета и профилактике заболеваний', kk: 'Иммунитетті жақсарту және алдын алу кеңестері', zh: '免疫力提升和预防健康建议' },
   premiumFeature4: { en: 'Priority processing and faster results', ru: 'Приоритетная обработка и ускоренные результаты', kk: 'Басым өңдеу және жылдам нәтижелер', zh: '优先处理和更快的结果' },
   premiumFeature5: { en: 'Full usage history with detailed reports', ru: 'Полная история использования с детальными отчётами', kk: 'Толық пайдалану тарихы мен есептер', zh: '完整使用历史和详细报告' },
+  premiumFeature6: { en: 'Share subscription with 1 person', ru: 'Делитесь подпиской с 1 человеком', kk: 'Жазылымды 1 адаммен бөлісіңіз', zh: '与1人共享订阅' },
   purchasePremium: { en: 'Purchase Premium', ru: 'Купить Premium', kk: 'Premium сатып алу', zh: '购买Premium' },
   loginToPurchase: { en: 'Sign in to purchase', ru: 'Войдите для покупки', kk: 'Сатып алу үшін кіріңіз', zh: '登录后购买' },
   securePayment: { en: 'Secure & anonymous payment', ru: 'Безопасный и анонимный платёж', kk: 'Қауіпсіз және анонимді төлем', zh: '安全匿名支付' },
@@ -427,6 +435,10 @@ export const translations: Translations = {
   freeVsPremium: { en: 'Free vs Premium', ru: 'Бесплатно vs Premium', kk: 'Тегін vs Premium', zh: '免费版 vs Premium' },
   feature: { en: 'Feature', ru: 'Функция', kk: 'Мүмкіндік', zh: '功能' },
   aiModel: { en: 'AI Model', ru: 'Модель ИИ', kk: 'AI Моделі', zh: 'AI模型' },
+
+  // Medical sources
+  medicalSources: { en: 'Medical Sources', ru: 'Медицинские источники', kk: 'Медициналық дереккөздер', zh: '医学来源' },
+  viewSource: { en: 'View source', ru: 'Источник', kk: 'Дерек көзі', zh: '查看来源' },
 
   // Profile page
   totalActions: { en: 'Total Uses', ru: 'Всего использований', kk: 'Барлық пайдалану', zh: '总使用次数' },

@@ -14,7 +14,7 @@ function validateInput(body: unknown): { image: string; profileContext: string; 
   // Max ~10MB base64
   if (image.length > 15_000_000) throw new Error("Image too large");
   
-  const validLangs = ["en", "ru", "kk"];
+  const validLangs = ["en", "ru", "kk", "zh"];
   const lang = validLangs.includes(language as string) ? (language as string) : "en";
   const ctx = typeof profileContext === "string" ? profileContext.slice(0, 3000).replace(/<[^>]*>/g, "") : "";
   
@@ -64,11 +64,13 @@ serve(async (req) => {
       );
     }
 
-    const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.'
-      : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.'
-      : 'Respond in English.';
+    const langInstructions: Record<string, string> = {
+      ru: 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.',
+      kk: 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.',
+      zh: '重要：所有回答必须完全使用中文。',
+      en: 'Respond in English.',
+    };
+    const langInstruction = langInstructions[language] || langInstructions.en;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
