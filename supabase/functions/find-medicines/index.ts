@@ -52,7 +52,7 @@ function validateInput(body: unknown): { condition: string; age?: number; weight
   const weight = typeof b.weight === "number" && b.weight > 0 && b.weight < 500 ? b.weight : undefined;
   const allergies = Array.isArray(b.allergies) ? b.allergies.filter((a): a is string => typeof a === "string").slice(0, 20) : undefined;
   const currentMedications = Array.isArray(b.currentMedications) ? b.currentMedications.filter((m): m is string => typeof m === "string").slice(0, 20) : undefined;
-  const validLangs = ["en", "ru", "kk"];
+  const validLangs = ["en", "ru", "kk", "zh"];
   const language = validLangs.includes(b.language as string) ? (b.language as string) : "en";
   const profileContext = typeof b.profileContext === "string" ? b.profileContext.slice(0, 3000).replace(/<[^>]*>/g, "") : "";
   
@@ -105,11 +105,13 @@ serve(async (req) => {
     const allergyWarning = allergies?.length ? `\nKNOWN ALLERGIES (AVOID THESE): ${allergies.join(", ")}` : "";
     const medicationWarning = currentMedications?.length ? `\nCURRENT MEDICATIONS (CHECK INTERACTIONS): ${currentMedications.join(", ")}` : "";
     
-    const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.'
-      : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.'
-      : 'Respond in English.';
+    const langInstructions: Record<string, string> = {
+      ru: 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.',
+      kk: 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.',
+      zh: '重要：所有回答必须完全使用中文。',
+      en: 'Respond in English.',
+    };
+    const langInstruction = langInstructions[language] || langInstructions.en;
 
     const prompt = `${langInstruction}
 
