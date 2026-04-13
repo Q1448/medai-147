@@ -16,7 +16,7 @@ function validateInput(body: unknown): { symptoms: string; profileContext: strin
   
   const sanitizedSymptoms = symptoms.replace(/<[^>]*>/g, "").trim();
   const sanitizedContext = typeof profileContext === "string" ? profileContext.slice(0, 3000).replace(/<[^>]*>/g, "") : "";
-  const validLangs = ["en", "ru", "kk"];
+  const validLangs = ["en", "ru", "kk", "zh"];
   const lang = validLangs.includes(language as string) ? (language as string) : "en";
   
   return { symptoms: sanitizedSymptoms, profileContext: sanitizedContext, language: lang };
@@ -73,11 +73,13 @@ serve(async (req) => {
       );
     }
 
-    const langInstruction = language === 'ru' 
-      ? 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины, вердикт и меры - всё на русском.'
-      : language === 'kk'
-      ? 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар, себептер, үкім және шаралар - бәрі қазақша.'
-      : 'Respond in English.';
+    const langInstructions: Record<string, string> = {
+      ru: 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке. Названия болезней, описания, причины, вердикт и меры - всё на русском.',
+      kk: 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек. Ауру атаулары, сипаттамалар, себептер, үкім және шаралар - бәрі қазақша.',
+      zh: '重要：所有回答必须完全使用中文。疾病名称、描述、原因、结论和措施——全部用中文。',
+      en: 'Respond in English.',
+    };
+    const langInstruction = langInstructions[language] || langInstructions.en;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -114,14 +116,17 @@ HEALTH SCORING:
 - Base scores on symptom severity, combination patterns, and lifestyle factors
 
 EVIDENCE-BASED REQUIREMENT:
-- Include citations from medical literature for each condition
-- Reference sources like BMC journals, PubMed, WHO guidelines, NICE guidelines
+- For EACH condition, include 2-3 concrete medical source citations with URLs
+- Reference specific studies from PubMed, BMC, The Lancet, NEJM, WHO, NICE, Cochrane Reviews
+- Format sources as: "Author et al., Journal Name, Year. URL" or "Organization, Guideline Name, Year. URL"
+- Example: "Smith J et al., BMJ, 2021. https://doi.org/10.1136/bmj.n1234"
+- Sources MUST be real, verifiable references with working URLs when possible
 
 ${profileContext ? `PATIENT CONTEXT:\n${profileContext}` : ""}
 
 Return exactly 3 conditions ranked by likelihood, plus health dashboard data.` 
           },
-          { role: "user", content: `Analyze these symptoms thoroughly: ${symptoms}. Provide health score, risk assessment, and both short-term and long-term improvement measures. Include medical literature citations.` }
+          { role: "user", content: `Analyze these symptoms thoroughly: ${symptoms}. Provide health score, risk assessment, and both short-term and long-term improvement measures. For each condition, include 2-3 concrete citations from medical journals with full URLs (e.g. PubMed links, DOI links, WHO pages).` }
         ],
         tools: [{
           type: "function",
@@ -140,7 +145,7 @@ Return exactly 3 conditions ranked by likelihood, plus health dashboard data.`
                       description: { type: "string", description: "Detailed description with medical citation" },
                       possibleCause: { type: "string", description: "Cause with supporting evidence" },
                       severity: { type: "string", enum: ["low", "medium", "high"] },
-                      sources: { type: "array", items: { type: "string" } }
+                      sources: { type: "array", items: { type: "string" }, description: "2-3 concrete medical citations with URLs, e.g. 'Smith J et al., BMJ, 2021. https://doi.org/10.1136/...'" }
                     },
                     required: ["name", "description", "possibleCause", "severity", "sources"]
                   }
