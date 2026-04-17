@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SplineScene } from "@/components/ui/spline-scene";
 import { useMedicalProfile } from "@/contexts/MedicalProfileContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { EvidenceModal } from "@/components/ui/evidence-modal";
 import { UsageBanner } from "@/components/UsageBanner";
 import { useUsageLimits } from "@/hooks/useUsageLimits";
@@ -23,7 +25,9 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-doctor`;
 export default function AiDoctor() {
   const { profile, getProfileContext } = useMedicalProfile();
   const { t, language } = useLanguage();
+  const { user } = useAuth();
   const { canUse, recordUsage } = useUsageLimits();
+  const sessionIdRef = useRef<string>(crypto.randomUUID());
   
   const getWelcomeMessage = () => {
     if (language === 'ru') {
@@ -86,7 +90,33 @@ How can I help you today?`;
 
   useEffect(() => {
     setMessages([{ role: "assistant", content: getWelcomeMessage() }]);
+    sessionIdRef.current = crypto.randomUUID();
   }, [language]);
+
+  // Hydrate last session for logged-in users
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("chat_history" as any)
+        .select("role, content, session_id, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(40);
+      if (!data || !Array.isArray(data) || data.length === 0) return;
+      const lastSession = (data as any[])[0]?.session_id;
+      if (!lastSession) return;
+      const sessionMsgs = (data as any[])
+        .filter((m: any) => m.session_id === lastSession && (m.role === "user" || m.role === "assistant"))
+        .reverse()
+        .map((m: any) => ({ role: m.role as "user" | "assistant", content: m.content }));
+      if (sessionMsgs.length > 0) {
+        sessionIdRef.current = lastSession;
+        setMessages([{ role: "assistant", content: getWelcomeMessage() }, ...sessionMsgs]);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
