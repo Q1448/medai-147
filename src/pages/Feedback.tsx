@@ -37,6 +37,11 @@ interface Suggestion {
   name: string | null;
   category: string | null;
   suggestion: string;
+  suggestion_en?: string | null;
+  suggestion_ru?: string | null;
+  suggestion_kk?: string | null;
+  suggestion_zh?: string | null;
+  original_lang?: string | null;
   created_at: string;
   likes_count: number;
   liked_by_me: boolean;
@@ -53,7 +58,7 @@ function getVisitorId(): string {
 }
 
 export default function Feedback() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,7 +101,7 @@ export default function Feedback() {
     setIsLoading(true);
     try {
       const [allSuggestions, allLikes, allReplies] = await Promise.all([
-        fetchAllPages('suggestions_public' as any, 'id, name, category, suggestion, created_at'),
+        fetchAllPages('suggestions_public' as any, 'id, name, category, suggestion, suggestion_en, suggestion_ru, suggestion_kk, suggestion_zh, original_lang, created_at'),
         fetchAllPages('suggestion_likes', 'suggestion_id, visitor_id'),
         fetchAllPages('suggestion_replies', 'id, suggestion_id, reply_text, author_name, is_creator, created_at'),
       ]);
@@ -255,8 +260,27 @@ export default function Feedback() {
     }
     setIsSubmitting(true);
     try {
+      // Translate to other 3 languages via edge function (best-effort, non-blocking on failure)
+      let translations: Record<string, string> = { [language]: suggestion };
+      try {
+        const { data: tr } = await supabase.functions.invoke('translate-suggestion', {
+          body: { text: suggestion, sourceLang: language },
+        });
+        if (tr?.translations) translations = { ...translations, ...tr.translations };
+      } catch (e) {
+        console.warn('Translation skipped:', e);
+      }
+
       const { error } = await supabase.from('suggestions').insert({
-        name: name || null, email: email || null, category: formData.category, suggestion,
+        name: name || null,
+        email: email || null,
+        category: formData.category,
+        suggestion,
+        suggestion_en: translations.en || (language === 'en' ? suggestion : null),
+        suggestion_ru: translations.ru || (language === 'ru' ? suggestion : null),
+        suggestion_kk: translations.kk || (language === 'kk' ? suggestion : null),
+        suggestion_zh: translations.zh || (language === 'zh' ? suggestion : null),
+        original_lang: language,
       });
       if (error) throw error;
       setIsSubmitted(true);
@@ -466,7 +490,13 @@ export default function Feedback() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-foreground/80 mb-2">{s.suggestion}</p>
+                        <p className="text-sm text-foreground/80 mb-2">
+                          {(language === 'ru' && s.suggestion_ru) ||
+                            (language === 'en' && s.suggestion_en) ||
+                            (language === 'kk' && s.suggestion_kk) ||
+                            (language === 'zh' && s.suggestion_zh) ||
+                            s.suggestion}
+                        </p>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(s.created_at)}</span>
                           {s.replies.length > 0 && (

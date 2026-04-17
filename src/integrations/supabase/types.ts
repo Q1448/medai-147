@@ -38,6 +38,87 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_history: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          language: string | null
+          role: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          language?: string | null
+          role: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string | null
+          role?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medical_profiles: {
+        Row: {
+          age: number | null
+          allergies: string | null
+          blood_type: string | null
+          chronic_conditions: string | null
+          created_at: string
+          current_medications: string | null
+          emergency_contact: string | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          current_medications?: string | null
+          emergency_contact?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          age?: number | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          current_medications?: string | null
+          emergency_contact?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       suggestion_likes: {
         Row: {
           created_at: string
@@ -126,7 +207,12 @@ export type Database = {
           email: string | null
           id: string
           name: string | null
+          original_lang: string | null
           suggestion: string
+          suggestion_en: string | null
+          suggestion_kk: string | null
+          suggestion_ru: string | null
+          suggestion_zh: string | null
         }
         Insert: {
           category?: string | null
@@ -134,7 +220,12 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string | null
+          original_lang?: string | null
           suggestion: string
+          suggestion_en?: string | null
+          suggestion_kk?: string | null
+          suggestion_ru?: string | null
+          suggestion_zh?: string | null
         }
         Update: {
           category?: string | null
@@ -142,7 +233,42 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string | null
+          original_lang?: string | null
           suggestion?: string
+          suggestion_en?: string | null
+          suggestion_kk?: string | null
+          suggestion_ru?: string | null
+          suggestion_zh?: string | null
+        }
+        Relationships: []
+      }
+      symptom_history: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          language: string | null
+          result: Json | null
+          symptoms: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string | null
+          result?: Json | null
+          symptoms?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string | null
+          result?: Json | null
+          symptoms?: Json | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -208,21 +334,36 @@ export type Database = {
           created_at: string | null
           id: string | null
           name: string | null
+          original_lang: string | null
           suggestion: string | null
+          suggestion_en: string | null
+          suggestion_kk: string | null
+          suggestion_ru: string | null
+          suggestion_zh: string | null
         }
         Insert: {
           category?: string | null
           created_at?: string | null
           id?: string | null
           name?: string | null
+          original_lang?: string | null
           suggestion?: string | null
+          suggestion_en?: string | null
+          suggestion_kk?: string | null
+          suggestion_ru?: string | null
+          suggestion_zh?: string | null
         }
         Update: {
           category?: string | null
           created_at?: string | null
           id?: string | null
           name?: string | null
+          original_lang?: string | null
           suggestion?: string | null
+          suggestion_en?: string | null
+          suggestion_kk?: string | null
+          suggestion_ru?: string | null
+          suggestion_zh?: string | null
         }
         Relationships: []
       }
