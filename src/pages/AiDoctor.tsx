@@ -205,6 +205,16 @@ How can I help you today?`;
     } finally {
       setIsLoading(false);
       await recordUsage("aiDoctor", { query: text });
+      if (user && assistantContent) {
+        try {
+          await supabase.from("chat_history" as any).insert([
+            { user_id: user.id, role: "user", content: text, language, session_id: sessionIdRef.current },
+            { user_id: user.id, role: "assistant", content: assistantContent, language, session_id: sessionIdRef.current },
+          ]);
+        } catch (e) {
+          console.warn("chat_history insert failed:", e);
+        }
+      }
     }
   };
 
