@@ -68,6 +68,39 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_journals: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          impact_factor: number | null
+          name: string
+          publisher: string | null
+          url: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_factor?: number | null
+          name: string
+          publisher?: string | null
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          impact_factor?: number | null
+          name?: string
+          publisher?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       medical_profiles: {
         Row: {
           age: number | null
