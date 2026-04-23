@@ -17,6 +17,7 @@ import About from "./pages/About";
 import Feedback from "./pages/Feedback";
 import Profile from "./pages/Profile";
 import Premium from "./pages/Premium";
+import Journals from "./pages/Journals";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -44,6 +45,7 @@ const App = () => (
                   <Route path="/feedback" element={<Feedback />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/premium" element={<Premium />} />
+                  <Route path="/journals" element={<Journals />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
