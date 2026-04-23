@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { JOURNALS_INSTRUCTION, sanitizeText, logUserAction } from "../_shared/journals.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -65,10 +66,10 @@ serve(async (req) => {
     }
 
     const langInstructions: Record<string, string> = {
-      ru: 'ВАЖНО: Все ответы должны быть ТОЛЬКО на русском языке.',
-      kk: 'МАҢЫЗДЫ: Барлық жауаптар тек қазақ тілінде болуы керек.',
-      zh: '重要：所有回答必须完全使用中文。',
-      en: 'Respond in English.',
+      ru: 'ВАЖНО: Отвечай ТОЛЬКО на русском. Не используй длинные тире (—) и эмоджи.',
+      kk: 'МАҢЫЗДЫ: Тек қазақ тілінде. Ұзын сызық (—) және эмоджи қолданба.',
+      zh: '重要：只用简体中文回答。使用准确的中文医学术语。不要使用长破折号（—）和表情符号。',
+      en: 'Respond in English. Do not use em-dashes or emoji.',
     };
     const langInstruction = langInstructions[language] || langInstructions.en;
 
@@ -101,9 +102,11 @@ HEALING STAGES:
 - Describe how the condition typically heals over time (Week 1, Week 2, Week 3, Week 4+)
 - Include what the skin should look like at each stage
 
+${JOURNALS_INSTRUCTION}
+
 ${profileContext ? `PATIENT CONTEXT:\n${profileContext}` : ""}
 
-IMPORTANT: Be precise, consider multiple causes, always recommend professional consultation. This is educational only. Recommend re-analysis in 1-2 days to track progress.` 
+IMPORTANT: Be precise, consider multiple causes, always recommend professional consultation. This is educational only. Recommend re-analysis in 1-2 days to track progress.`
           },
           { 
             role: "user", 
@@ -183,7 +186,25 @@ IMPORTANT: Be precise, consider multiple causes, always recommend professional c
     }
     const data = await response.json();
     const args = data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    const result = args ? JSON.parse(args) : { observations: [], conditions: [], recommendation: "" };
+    const raw = args ? JSON.parse(args) : { observations: [], conditions: [], recommendation: "" };
+
+    const deepSanitize = (v: any): any => {
+      if (typeof v === "string") return sanitizeText(v);
+      if (Array.isArray(v)) return v.map(deepSanitize);
+      if (v && typeof v === "object") {
+        const out: Record<string, any> = {};
+        for (const k of Object.keys(v)) out[k] = deepSanitize(v[k]);
+        return out;
+      }
+      return v;
+    };
+    const result = deepSanitize(raw);
+
+    const supabaseLog = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    await logUserAction(supabaseLog, req, "analyze-image", {
+      language,
+      conditions: result.conditions?.map((c: any) => c.name) || [],
+    });
 
     return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {

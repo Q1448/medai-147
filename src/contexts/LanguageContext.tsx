@@ -257,7 +257,7 @@ export const translations: Translations = {
   imageAnalysis: { en: 'Image Analysis', ru: 'Анализ изображений', kk: 'Сурет талдау', zh: '图像分析' },
   aboutUs: { en: 'About Us', ru: 'О нас', kk: 'Біз туралы', zh: '关于我们' },
   forInfoOnly: { en: 'For informational purposes only.', ru: 'Только в информационных целях.', kk: 'Тек ақпараттық мақсатта.', zh: '仅供参考。' },
-  madeWithLove: { en: 'Made with ❤️ by NIS IB Team', ru: 'Сделано с ❤️ командой NIS IB', kk: 'NIS IB командасы ❤️ жасаған', zh: '由NIS IB团队用❤️制作' },
+  madeWithLove: { en: 'Made by NIS IB Team', ru: 'Создано командой NIS IB', kk: 'NIS IB командасы жасады', zh: '由NIS IB团队制作' },
   
   // Medical Profile Sheet
   basicInformation: { en: 'Basic Information', ru: 'Основная информация', kk: 'Негізгі ақпарат', zh: '基本信息' },
